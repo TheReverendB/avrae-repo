@@ -1,0 +1,32 @@
+!alias tanbag embed <drac2>
+
+    cc,ch="Tan Bag of Tricks",character()
+
+    ch.create_cc_nx(cc, 0, 3,'long','bubble')
+
+    v,r=ch.get_cc(cc)>0,vroll('1d8')
+
+    creature=['jackal','ape','baboon','axe beak','black bear','giant weasel','giant hyena','tiger'][r.total-1]
+
+    article=['a','an','a','an','a','a','a','a'][r.total-1]
+
+    </drac2>
+
+    -title "<name> reaches into their {{cc}} and {{'grabs a' if v else 'finds no more'}} small furry object{{'' if v else 's'}}!"
+
+    {{f'-desc "Creature roll: {r}"' if v else ''}}
+
+    {{f'''-f "You lob the fuzzy ball and...|it transforms into {article} **{creature.title()}!**"''' if v else ''}}
+
+    -f "{{f"{cc}|This ordinary bag, made from tan cloth, appears empty. Reaching inside the bag however, reveals the presence of a small, fuzzy object. The bag weighs 1/2 pound.\n\nYou can use an action to pull the fuzzy object from the bag and throw it up to 20 feet. When the object lands, it transforms into a creature you determine by rolling a d8 and consulting the table that corresponds to the bag's color. See the Monsters Listing for the creature's statistics. The creature vanishes at the next dawn or when it is reduced to 0 hit points.\n\nThe creature is friendly to you and your companions, and it acts on your turn. You can use a bonus action to command how the creature moves and what action it takes on its next turn, or to give it general orders, such as to attack your enemies. In the absence of such orders, the creature acts in a fashion appropriate to its nature.\n\nOnce three fuzzy objects have been pulled from the bag, the bag can't be used again until the next dawn." if v else f"The bag is empty!|You need to wait until dawn to use the {cc} again!"}}"
+
+    {{ch.mod_cc(cc, -1) if v else ''}}
+
+    {{f'-f "{cc}{" (-1)" if v else ""}| {cc_str(cc)}"'}}
+
+    -thumb "{{f'https://cdn.discordapp.com/attachments/709738212209197189/{["762021678259372042/4i79RUWRKc7a4fp6V4tzoH.jpg", "762021726615633950/istock_000007152073xsmall.jpg", "762021740779929620/98be141fff52759150148421e0dc11a2.jpg", "762026689332379648/axe-beak.jpg", "762022213788237864/10-07-2016-1.jpg", "762022246771327046/weasel-albino-death.jpg", "762022261979873341/Hyna.jpg", "762022277222367243/5081.jpg"][r.total-1]}' if v else "https://media-waterdeep.cursecdn.com/avatars/thumbnails/18/923/315/315/636381773399763570.jpeg"}}"
+
+    -footer !tanbag -color <color>
+
+    
+</drac2>
