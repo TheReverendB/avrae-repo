@@ -1,0 +1,6 @@
+!alias robeofstars {{cc,re,r="Robe of Stars",'&1&'=='recharge',vroll('1d6')}}{{create_cc_nx(cc, 0, 6, 'none', 'bubble')}}{{v=get_cc(cc)>0 and not re}}{{f'''embed -title "{name} looks at their robe as the sun sets." -desc "{r} star{'' if r.total<2 else 's'} reappeared on your robe tonight!" ''' if re else '''cast "magic missile" &*& -i -l 5 -phrase "By tearing a star from their robe!"''' if v else f'''embed -title "All the stars are gone from the {cc}!" '''}}
+{{character().mod_cc(cc, -1) if v else character().mod_cc(cc, +int(r.total)) if re else ''}}
+-f "Robe of Stars|This dark blue robe is embroidered with six stars, located on the robe's upper front portion, are particularly large. While wearing this robe, you can use an action to pull off one of the stars and use it to cast magic missile as a 5th-level spell. Daily at dusk, 1d6 removed stars reappear on the robe."
+-f "{{cc}}{{" (-1)" if v else f' (+{r.total})' if re else ''}}|{{cc_str(cc)}}"
+-footer "!robeofstars [target and -rr] or [targets] / !robeofstars recharge"
+-thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/7/380/315/315/636284763972311694.jpeg
