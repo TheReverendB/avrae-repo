@@ -1,0 +1,21 @@
+!alias wFireballs <drac2>
+uses = int('%1%') if '%1%'.isdigit() else 0
+lvl = int("%1%")+2 if '%1%'.isdigit() else 0
+cc = "Wand of Fireballs"
+character().create_cc_nx(cc, 0, 7, 'long', 'bubble', reset_by='1d6+1')
+v = get_cc(cc)>=uses and lvl!=0
+x = get_cc(cc)>0
+f = "Wand of Fireballs|This wand has 7 charges. While holding it, you can use an action to expend 1 or more of its charges to cast the fireball spell (save DC 15) from it. For 1 charge, you cast the 3rd-level version of the spell. You can increase the spell slot level by one for each additional charge you expend. \n\nThe wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll a d20. On a 1, the wand crumbles into ashes and is destroyed."
+if lvl==0:
+    return f'''embed -title "{name} quickly reads the instructions for their {cc}!" -desc "`!wFireballs [charges used] [-t target(s)]`" '''
+elif v:
+    character().mod_cc(cc, -uses)
+    return f'''cast "fireball" -i -l {lvl} -dc 15 -phrase "at level {lvl} using the {cc}" -f "{f}" '''
+elif x:
+    return f'''embed -title "You do not have enough charges to use the {cc} at level {lvl}." -f "Cast at a lower level or wait until dawn." '''
+else:
+    return f'''embed -title "All of the charges are gone from the {cc}!" -desc "If all the charges are used from the wand, roll a d20.  On a one, the wand turns to dust and is destroyed." '''
+</drac2>
+-f "{{cc}}{{f" (-{uses})" if v else ""}}|{{character().cc_str(cc)}}" 
+-thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/7/470/315/315/636284781766780802.jpeg
+-footer "!wFireballs [charges used] [-t target(s)]"
