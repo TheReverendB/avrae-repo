@@ -80,8 +80,8 @@ for arg in rargs:
 	modified_args.append(arg)
 ch.mod_cc(cc, -1) if not argparse(&ARGS&).get('i') else ''
 modified_args = [(f'"{a}"' if ' ' in a else a) for a in modified_args]
-text = f'''-f "Clockwork Amulet|{ch.cc_str(cc)} {'(-1)' if not argparse(&ARGS&).get('i') else ''}\nThis copper amulet contains tiny interlocking gears and is powered by magic from Mechanus, a plane of clockwork predictability. A creature that puts an ear to the amulet can hear faint ticking and whirring noises coming from within.\nWhen you make an attack roll while wearing the amulet, you can forgo rolling the d20 to get a 10 on the die. Once used, this property can\'t be used again until the next dawn." -phrase "using their Clockwork Amulet!\n_To hit: 10 + {code} = `{10+code}`_" -f "{ctx.prefix}{ctx.alias} [attack/cast] [-t target] [args] [-i]" '''
+text = f'''-f "Clockwork Amulet|{ch.cc_str(cc)} {'(-1)' if not argparse(&ARGS&).get('i') else ''}\nWhen you make an attack roll while wearing the amulet, you can forgo rolling the d20 to get a 10 on the die. Once used, this property can\'t be used again until the next dawn." -phrase "using their Clockwork Amulet!*\n**To Hit:** 10 + {code} = **`{10+code}`*" -f "{ctx.prefix}{ctx.alias} [attack/cast] [-t target] [args] [-i]" -thumb https://cdn.discordapp.com/attachments/709738212209197189/799105852560113674/download.jpg '''
 if modified_args[0].lower() not in ['cast', 'attack', 'a']:
 	modified_args.insert(0, 'attack')
 return f'{" ".join(modified_args)} {text}'
-</drac2> 
+</drac2>
