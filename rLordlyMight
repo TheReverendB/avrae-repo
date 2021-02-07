@@ -1,0 +1,104 @@
+embed <drac2>
+cc="Rod of Lordly Might"
+ccDL="RoLM Drain Life"
+ccP="RoLM Paralyze"
+ccT="RoLM Terrify"
+character().create_cc_nx(ccDL,0,1,'long','bubble')
+character().create_cc_nx(ccP,0,1,'long','bubble')
+character().create_cc_nx(ccT,0,1,'long','bubble')
+vDL=character().get_cc(ccDL)
+vP=character().get_cc(ccP)
+vT=character().get_cc(ccT)
+a=argparse(&ARGS&)
+i=a.get('i')
+t=a.last('t') if a.last('t') else ''
+c=combat()
+f="**Description:**\nThis rod has a flanged head, and it functions as a magic mace that grants a +3 bonus to attack and damage rolls made with it. The rod has properties associated with six different buttons that are set in a row along the haft.\n\nYou can press one of the rod's six buttons as a bonus action. A button's effect lasts until you push a different button."
+f1="__Changing the Rod's shape:__|`!RoLM [sword, axe, spear, pole, ram, mace]`|inline"
+f2="__Using a special ability:__|`!RoLM [drain, paralyze, terrify]`|inline"
+
+if '&1&'.lower() in 'flame tongue sword':
+    character().set_cvar('RoLM','Flame Tongue')
+    return f'''-title "{name} changes the {cc} into a Flame Blade!" -desc "You press button 1 and the rod becomes a flame tongue, as a fiery blade sprouts from the end opposite the rod's flanged head (you choose the type of sword)." -footer "{ctx.prefix}{ctx.alias}" '''
+elif '&1&'.lower() in 'battleaxe':
+    character().set_cvar('RoLM','Battleaxe')
+    return f'''-title "{name} changes the {cc} into a Battleaxe!" -desc "You press button 2, the rod's flanged head folds down and two crescent-shaped blades spring out, transforming the rod into a magic battleaxe that grants a +3 bonus to attack and damage rolls made with it." -footer "{ctx.prefix}{ctx.alias}" '''
+elif '&1&'.lower() in 'spear':
+    character().set_cvar('RoLM','Spear')
+    return f'''-title "{name} changes the {cc} into a Spear!" -desc "You press button 3, the rod's flanged head folds down, a spear point springs from the rod's tip, and the rod's handle lengthens into a 6-foot haft, transforming the rod into a magic spear that grants a +3 bonus to attack and damage rolls made with it." -footer "{ctx.prefix}{ctx.alias}" '''
+elif '&1&'.lower() in 'climbing pole ladder':
+    character().set_cvar('RoLM','Climbing Pole')
+    return f'''-title "{name} changes the {cc} into a Climbing Pole!" -desc "You press button 4, the rod transforms into a climbing pole up to 50 feet long, as you specify. In surfaces as hard as granite, a spike at the bottom and three hooks at the top anchor the pole. Horizontal bars 3 inches long fold out from the sides, 1 foot apart, forming a ladder. The pole can bear up to 4,000 pounds. More weight or lack of solid anchoring causes the rod to revert to its normal form." -footer "{ctx.prefix}{ctx.alias}" '''
+elif '&1&'.lower() in 'battering ram':
+    character().set_cvar('RoLM','Battering Ram')
+    return f'''-title "{name} changes the {cc} into a Battering Ram!" -desc "You press button 5, the rod transforms into a handheld battering ram and grants its user a +10 bonus to Strength checks made to break through doors, barricades, and other barriers." -footer "{ctx.prefix}{ctx.alias}" '''
+elif '&1&'.lower() in 'normal mace compass':
+    character().set_cvar('RoLM','Mace / Compass')
+    return f'''-title "{name} changes the {cc} into it's basic form!" -desc "You press button 6, the rod assumes or remains in its normal form and indicates magnetic north. (Nothing happens if this function of the rod is used in a location that has no magnetic north.) The rod also gives you knowledge of your approximate depth beneath the ground or your height above it." -footer "{ctx.prefix}{ctx.alias}" '''
+elif '&1&'.lower() in 'drain life':
+	if vDL or i:
+		if c and c.me:
+			if t:
+				targ=c.get_combatant(t)
+				save=targ.save('con') if targ else err(f"Your target '{t}' is not in combat.")
+				character().mod_cc(ccDL,-1) if not i else ''
+				if save.total<17:
+					damage=targ.damage('4d6[necrotic]')
+					healing=c.me.damage(f'-{damage.total}/2 [healing]', True, False)
+					return f'''-title "{name} strikes with a life draining blow!" -f "Drain Life|**DC 17**" -f "{targ.name}|**CON Save:** {save}; Failure!\n{damage.damage}" -f "**{name}**\n**Recovered:** {healing.roll}" -f "Drain Life|When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Constitution saving throw. On a failure, the target takes an extra 4d6 necrotic damage, and you regain a number of hit points equal to half that necrotic damage. This property cannot be used again until the next dawn." -f "{ccDL} {'' if i else '(-1)'}|{character().cc_str(ccDL)}" -footer "{targ.name}: {targ.hp_str()}\n{name}: {character().hp_str()}\n\n{ctx.prefix}{ctx.alias}" '''
+				else:
+					return f'''-title "{name} strikes with a life draining blow!" -f "Drain Life|**DC 17**" -f "{targ.name}|**CON Save:** {save}; Success!" -f "Drain Life|When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Constitution saving throw. On a failure, the target takes an extra 4d6 necrotic damage, and you regain a number of hit points equal to half that necrotic damage. This property cannot be used again until the next dawn." -f "{ccDL} {'' if i else '(-1)'}|{character().cc_str(ccDL)}" -footer "{ctx.prefix}{ctx.alias}" '''
+			else:
+				return f'''-title "{name} tries to drain life with the {cc}!" -f "Drain Life|**DC 17**\n(No Target Specified.)" -f "Drain Life|When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Constitution saving throw. On a failure, the target takes an extra 4d6 necrotic damage, and you regain a number of hit points equal to half that necrotic damage. This property cannot be used again until the next dawn." -f "{ccDL}{' (-1)' if not i else ''}|{character().cc_str(ccDL)}" -footer "{ctx.prefix}{ctx.alias}" '''
+		else:
+			return f'''-title "{name} tries to drain life with the {cc}!" -f "Drain Life|**DC 17**\n(Outside combat this cannot be automated.)" -f "Drain Life|When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Constitution saving throw. On a failure, the target takes an extra 4d6 necrotic damage, and you regain a number of hit points equal to half that necrotic damage. This property cannot be used again until the next dawn." -f "{ccDL}{' (-1)' if not i else ''}|{character().cc_str(ccDL)}" -footer "{ctx.prefix}{ctx.alias}" '''
+	else:
+		return f'''-title "{name} already used their {cc} to Drain Life!" -desc "You need to wait until dawn to use this feature again." -f "{ccDL}|{character().cc_str(ccDL)}" -footer "{ctx.prefix}{ctx.alias}" '''
+elif '&1&'.lower() in 'paralyze':
+	if vP or i:
+		character().mod_cc(ccP,-1) if not i else ''
+		if c:
+			if t:
+				targ=c.get_combatant(t)
+				save=targ.save('str') if targ else err(f"Your target '{t}' is not in combat.")
+				if save.total<17 and targ:
+					targ.add_effect('Paralyzed - Rod of Lordly Might','',10,desc='Paralyzed by the Rod of Lordly Might. The target can repeat the DC 17 Strength saving throw at the end of each of its turns, ending the effect on a success.')
+					return f'''-title "{name} tries to paralyze with the {cc}!" -f "Paralyze|**DC 17**" -f "{targ.name}|**STR Save:** {save}; Failure!\n**Effect:** {targ.get_effect('Paralyzed - Rod of Lordly Might')}" -f "Paralyze|When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Strength saving throw. On a failure, the target is paralyzed for 1 minute. The target can repeat the saving throw at the end of each of its turns, ending the effect on a success. This property cannot be used again until the next dawn." -f "{ccP}{' (-1)' if not i else ''}|{character().cc_str(ccP)}" -footer "{ctx.prefix}{ctx.alias}" '''
+				else:
+					return f'''-title "{name} tries to paralyze with the {cc}!" -f "Paralyze|**DC 17**" -f "{targ.name}|**STR Save:** {save}; Success!" -f "Paralyze|When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Strength saving throw. On a failure, the target is paralyzed for 1 minute. The target can repeat the saving throw at the end of each of its turns, ending the effect on a success. This property cannot be used again until the next dawn." -f "{ccP}{' (-1)' if not i else ''}|{character().cc_str(ccP)}" -footer "{ctx.prefix}{ctx.alias}" '''
+			else:
+				return f'''-title "{name} tries to paralyze with the {cc}!" -f "Paralyze|**DC 17**\n(No Target Specified.)" -f "Paralyze|When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Strength saving throw. On a failure, the target is paralyzed for 1 minute. The target can repeat the saving throw at the end of each of its turns, ending the effect on a success. This property cannot be used again until the next dawn." -f "{ccP}{' (-1)' if not i else ''}|{character().cc_str(ccP)}" -footer "{ctx.prefix}{ctx.alias}" '''
+		else:
+			return f'''-title "{name} tries to paralyze with the {cc}!" -f "Paralyze|**DC 17**\n(Cannot apply effects outside of combat.)" -f "Paralyze|When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Strength saving throw. On a failure, the target is paralyzed for 1 minute. The target can repeat the saving throw at the end of each of its turns, ending the effect on a success. This property cannot be used again until the next dawn." -f "{ccP}{' (-1)' if not i else ''}|{character().cc_str(ccP)}" -footer "{ctx.prefix}{ctx.alias}" '''
+	else:
+		return f'''-title "{name} already used their {cc} to Paralyze!" -desc "You need to wait until dawn to use this feature again." -f "{ccP}|{character().cc_str(ccP)}" -footer "{ctx.prefix}{ctx.alias}" '''
+
+elif '&1&'.lower() in 'terrify':
+	if vT or i:
+		if c:
+			if a.get('t'):
+				character().mod_cc('RoLM Terrify',-1) if not i else ''
+				dc, out = 17, [' -f "Rod of Lordly Might|DC 17"']
+				targets = a.get('t')
+				for target in targets:
+					targList = target.split('|')
+					targComb = combat().get_combatant(targList[0])
+					targName = targComb.name
+					targARGs = argparse(targList[1] if len(targList)>1 else [])
+					targBonus = targARGs.get('sb')
+					dice = targComb.saves.get("wis").d20(targARGs.adv(boolwise=True))
+					saveRoll = vroll(f'{dice} {"+"+"+".join(targBonus) if targBonus else ""}')
+					out.append(f''' -f "{targName}|**WIS Save:** {saveRoll}; {['Failure!', targComb.add_effect('Terrified - Rod of Lordly Might','',10,desc='A frightened target can repeat the DC 17 wisdom save at the end of each of its turns, ending the effect on itself on a success.')][0] if saveRoll.total<dc else 'Success!'} \n {f"""**Effect:** {targComb.get_effect('Terrified - Rod of Lordly Might')}""" if saveRoll.total<dc else ''}" ''')
+				return f'''-title "{name} tries to terrify with the {cc}!" {' '.join(out)} -f "Terrify|While holding the rod, you can use an action to force each creature you can see within 30 feet of you to make a DC 17 Wisdom saving throw. On a failure, a target is frightened of you for 1 minute. A frightened target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. This property cannot be used again until the next dawn." -f "{ccT}{' (-1)' if vT and not i else ''}|{character().cc_str(ccT)}" -footer "{ctx.prefix}{ctx.alias}" '''
+			else:
+				return f'''-title "{name} tries to terrify with the {cc}!" -f "Terrify|**DC 17**\n(No Target Specified.)" -f "Terrify|While holding the rod, you can use an action to force each creature you can see within 30 feet of you to make a DC 17 Wisdom saving throw. On a failure, a target is frightened of you for 1 minute. A frightened target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. This property cannot be used again until the next dawn." -f "{ccT}{' (-1)' if not i else ''}|{character().cc_str(ccT)}" -footer "{ctx.prefix}{ctx.alias}" '''
+		else:
+			return f'''-title "{name} tries to terrify with the {cc}!" -f "Terrify|**DC 17**\n(Cannot apply effects outside of combat.)" -f "Terrify|While holding the rod, you can use an action to force each creature you can see within 30 feet of you to make a DC 17 Wisdom saving throw. On a failure, a target is frightened of you for 1 minute. A frightened target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. This property cannot be used again until the next dawn." -f "{ccT}{' (-1)' if not i else ''}|{character().cc_str(ccT)}" -footer "{ctx.prefix}{ctx.alias}" '''
+	else:
+		return f'''-title "{name} already used their {cc} to Terrify!" -desc "You need to wait until dawn to use this feature again." -f "{ccT}|{character().cc_str(ccT)}" -footer "{ctx.prefix}{ctx.alias}" '''
+elif '&1&'.lower() in 'help?':
+    return f'''-title "Using the {cc}:" -desc "{f}" -f "{f1}" -f "{f2}" -f "{ctx.prefix}{ctx.alias}" '''
+else:
+    return f'''-title "{name} checks their {cc}!" -desc "Looking down you see the {cc} is still a {get('RoLM')}.  Use `{ctx.prefix}help {ctx.alias}` for a guide to using this alias." -f "{ccDL}|{character().cc_str(ccDL)}|inline" -f "{ccP}|{character().cc_str(ccP)}|inline" -f "{ccT}|{character().cc_str(ccT)}|inline" -f "{ctx.prefix}{ctx.alias}" '''
+</drac2>
+-thumb "https://cdn.discordapp.com/attachments/733167931571044460/769308376143888414/rod-of-lordly-might_0-1.jpg" -color <color>
