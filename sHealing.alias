@@ -1,4 +1,4 @@
-!alias sHealing <drac2>
+<drac2>
 cc = "Staff of Healing"
 ch = character()
 ch.create_cc_nx(cc,0,10,'long','bubble',reset_by='1d6+4')
