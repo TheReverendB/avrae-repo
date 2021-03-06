@@ -1,4 +1,4 @@
-!alias wmm <drac2>
+<drac2>
 cc="Wand of Magic Missiles"
 character().create_cc_nx(cc, 0, 7, 'long', 'bubble', reset_by='1d6+1')
 r=vroll('1d6+1')
