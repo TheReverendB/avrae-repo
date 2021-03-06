@@ -1,0 +1,27 @@
+<drac2>
+uses=int('&1&') if '&1&'.isdigit() else 0
+lvl=int("&1&")+2 if '&1&'.isdigit() else 0
+cc="Necklace of Fireballs"
+i=argparse(&ARGS&).get('i')
+ch=character()
+f=f"{cc}|This necklace has 1d6 + 3 beads hanging from it. You can use an action to detach a bead and throw it up to 60 feet away. When it reaches the end of its trajectory, the bead detonates as a 3rd-level fireball spell (save DC 15).\n\nYou can hurl multiple beads, or even the whole necklace, as one action. When you do so, increase the level of the fireball by 1 for each bead beyond the first."
+if "&1&".lower()=="roll":
+	r=vroll('1d6+3')
+	ch.create_cc_nx(cc, 0, r.total, None, 'bubble')
+	return f"""embed -title "{name} counts the beads on their {cc}!" -desc "{r}\n\n`!nFireballs [charges used] [-t target(s)]` to use your beads." -f "{f}" -f "{cc}|{ch.cc_str(cc)}" """
+if lvl==0:
+	return f'''embed -title "{name} quickly reads the instructions for their {cc}!" {""" -desc '`!nFireballs roll` to roll for beads on your necklace.'""" if not ch.cc_exists(cc) else  f""" -desc '`!nFireballs [charges used] [-t target(s)] [-i]`'  -f '{cc}|{ch.cc_str(cc)}' """} '''
+if ch.cc_exists(cc):
+	v=ch.get_cc(cc)>=uses and lvl!=0
+	x=ch.get_cc(cc)>0
+	if v or i:
+		ch.mod_cc(cc, -uses)
+		return f'''cast "fireball" -i -l {lvl} -dc 15 -phrase "at level {lvl} using the {cc}" -f "{f}" -f "{cc}{f" (-{uses})" if v and not i else ""}|{ch.cc_str(cc)}"'''
+	elif x:
+		return f'''embed -title "You do not have {uses} beads left on your {cc}." -f "{cc}|{ch.cc_str(cc)}" '''
+	else:
+		return f'''embed -title "All of the beads are gone from the {cc}!" -desc "You grasp at your empty necklace, unadorned by magical beads and useless." -f "{cc}|{ch.cc_str(cc)}" '''
+</drac2>
+
+-thumb https://www.dndbeyond.com/avatars/7/317/636284755113118340.jpeg
+-footer "{{ctx.prefix}}{{ctx.alias}} [charges used] [-t target(s)] [-i]" 
