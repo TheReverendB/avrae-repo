@@ -37,4 +37,4 @@ else:
 `-b #` - Adds a bonus to the insight check
 `adv`/`dis` - Rolls both checks at adv/dis
 You can do target specific, i.e, `-t OR1|dis` or `-c "GO1|-b 5"`' """
-</drac2>  -footer "!insightful [args]" -thumb <image>
+</drac2>  -footer "!insightful [args]" -thumb <image> 
