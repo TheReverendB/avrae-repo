@@ -26,7 +26,7 @@ if ins and t:
     if ins.get_effect('Insighted'):
       ins.remove_effect('Insighted')
     ins.add_effect(f"Insighted: {t.name}",'',10)
-  return f"""-title "{ins.name} attempts to use Insightful Fighting on {t.name}!" -f "{t.name}|**Deception:** {tRoll}" -f "{ins.name}|**Insight:** {aRoll} {'Success' if v else 'Failure'}!\n**Effect:** {ins.get_effect('Insighted')}" -f "Insightful Fighting - {['No weaknesses found.', 'Weakness Identified!'][v]}|You make an Insight check against a creature you can see that isn't incapacitated, contested by their Deception check. If you succeed, you can use your Sneak Attack on that target if you don't have adv. on the attack roll, but not if you have disadv. Lasts for 1 min or until you successfully use this feature again."
+  return f"""-title "{ins.name} attempts to use Insightful Fighting on {t.name}!" -f "{t.name}|**Deception:** {tRoll}" -f "{ins.name}|**Insight:** {aRoll} {'Success' if v else 'Failure'}!" -f "Insightful Fighting - {['No weaknesses found.', 'Weakness Identified!'][v]}|You make an Insight check against a creature you can see that isn't incapacitated, contested by their Deception check. If you succeed, you can use your Sneak Attack on that target if you don't have adv. on the attack roll, but not if you have disadv. Lasts for 1 min or until you successfully use this feature again."
  """
 else:
   return f""" -title "How best to injure a foe?"
