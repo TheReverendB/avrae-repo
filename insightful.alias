@@ -15,10 +15,9 @@ if ins and t:
   aDice=ins.skills.insight.d20(a.adv(boolwise=True))
   aDice+='+' + a.join('b', '+') if a.last('b') else ''
 
-  a.add_context(t.name, argparse(ta))
-  a.set_context(t.name)
-  tDice=t.skills.deception.d20(a.adv(boolwise=True))
-  tDice+='+' + a.join('b', '+') if a.last('b') else ''
+  argsT = argparse(ta)
+  tDice=t.skills.deception.d20(argsT.adv(boolwise=True))
+  tDice+='+' + argsT.join('b', '+') if a.last('b') else ''
   aRoll=vroll(aDice)
   tRoll=vroll(tDice)
 
@@ -36,5 +35,5 @@ else:
 `-t <target>` - The target of the insight.
 `-b #` - Adds a bonus to the insight check
 `adv`/`dis` - Rolls both checks at adv/dis
-You can do target specific, i.e, `-t OR1|dis` or `-c "GO1|-b 5"`' """
-</drac2>  -footer "!insightful [args]" -thumb <image> 
+Args default to only affect the Insighter.  Use specific args for the target: `-t OR1|dis`' """
+</drac2>  -footer "!insightful [args]" -thumb <image>
