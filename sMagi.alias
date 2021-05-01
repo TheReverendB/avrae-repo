@@ -1,0 +1,83 @@
+<drac2>
+spell_ab="Spell Absorption"
+spells={
+  "Conjure Elemental": 7,
+  "Lightning Bolt": 7,
+  "Plane Shift": 7,
+  "Fireball": 7,
+  "Telekinesis": 5,
+  "Passwall": 5,
+  "Wall of Fire": 4,
+  "Ice Storm": 4,
+  "Dispel Magic": 3,
+  "Flaming Sphere ": 2,
+  "Invisibility": 2,
+  "Knock": 2,
+  "Web": 2,
+  "Protection from Evil and Good": 0,
+  "Enlarge/Reduce": 0,
+  "Detect Magic": 0,
+  "Arcane Lock": 0,
+  "Mage Hand": 0,
+  "Light": 0,
+  spell_ab: 0
+}
+flavor='-color <color> -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/7/422/1000/1000/636284770290048212.jpeg'
+
+# create the cc
+cc='Staff of the Magi'
+ch=character()
+ch.create_cc_nx(cc, 0, 50, 'long',reset_by='4d6+2')
+
+# parse arguments
+alias=ctx.prefix+ctx.alias
+syntax=f'`{alias} "<spell>" [cast arguments][-i]` or `{alias} absorption <amount>`'
+a=&ARGS&
+if not a or a[0].lower() in ['?','help']:
+  return f'echo **Use:** {syntax}. **Charges:** {ch.cc_str(cc)}\n**Supported spells:** {", ".join(spells.keys())}.'
+cast_args="""&*&"""
+
+# match the spell name
+spell=a[0]
+match=[sn for sn in spells.keys() if spell.lower() in sn.lower()]
+if not match:
+  return f'echo **Use:** {syntax}. **Charges:** {ch.cc_str(cc)}\n**Supported spells:** {", ".join(spells.keys())}.\nCase insensitive and partial name is supported.'
+if len(match)>1 and a[0].lower()!="light":
+  return f'echo **Multiple spells match `{spell}`:** {", ".join(match)}.'
+elif a[0].lower()=="light":
+  match=['Light']
+match=match[0]
+cost=spells[match]
+
+# handle recharging
+if match==spell_ab:
+  if len(a)>1 and a[1].strip('-+').isdigit():
+    recharge = int(a[1].strip('-+'))
+    ch.mod_cc(cc,recharge)
+    ab_field = f''' -f "{cc} (+{recharge})|{ch.cc_str(cc)}|inline" '''
+  else:
+    return f'''echo A spell level is required to use the {cc} for {spell_ab}.  `{alias} "{spell_ab}" <level absorbed>`'''
+
+# set level for casting
+if match.lower()=="lightning bolt" or match.lower()=="fireball":
+  lvl_phrase = f'-l 7 -phrase "at level 7 with their {cc}!"'
+else:
+  lvl_phrase = f'-phrase "with their {cc}!"'
+
+# no charges used
+if argparse(a).last('i') or cost==0:
+  fields=f'-f  "{cc}|{ch.cc_str(cc)} _No charges used_|inline" '
+else:
+  # remove the charges
+  if cost>ch.get_cc(cc):
+    return f'echo Not enough charges [{cost}] on your {cc} to cast {match} : {ch.cc_str(cc)}'
+  remaining = ch.mod_cc(cc,-cost)
+  fields=f''' -f "{cc} (-{cost})|{ch.cc_str(cc)}|inline" '''
+
+#output alias
+if match==spell_ab:
+  desc = '''-f "Spell Absorption|While holding the staff, you have advantage on saving throws against spells. In addition, you can use your reaction when another creature casts a spell that targets only you. If you do, the staff absorbs the magic of the spell, canceling its effect and gaining a number of charges equal to the absorbed spell's level. However, if doing so brings the staff's total number of charges above 50, the staff explodes as if you activated it's retributive strike." '''
+  return f'embed -title "{name} uses {spell_ab} with their {cc}!" {desc} {ab_field} {flavor}'
+else:
+  return f'cast "{match}" {lvl_phrase} {cast_args} -i {fields} {flavor}'
+</drac2> 
