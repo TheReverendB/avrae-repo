@@ -79,16 +79,25 @@ elif '&1&'.lower() in 'terrify':
 			if a.get('t'):
 				character().mod_cc('RoLM Terrify',-1) if not i else ''
 				dc, out = 17, [' -f "Rod of Lordly Might|DC 17"']
-				targets = a.get('t')
+				targets, targetArgs = [], {}
+				for targ in a.get('t'):
+					targName, targArgs = (targ.split("|")+[""])[:2]
+					targArgs = argparse(targArgs)
+					if curTarg := c.get_combatant(targName):
+						targets.append(curTarg)
+						a.add_context(curTarg.name, argparse(targArgs))
+						targetArgs[curTarg.name] = targArgs
+					elif curTarg := c.get_group(targName):
+						for gTarg in curTarg.combatants:
+							targets.append(gTarg)
+							a.add_context(gTarg.name, argparse(targArgs))
+							targetArgs[gTarg.name] = targArgs
 				for target in targets:
-					targList = target.split('|')
-					targComb = combat().get_combatant(targList[0])
-					targName = targComb.name
-					targARGs = argparse(targList[1] if len(targList)>1 else [])
-					targBonus = targARGs.get('sb')
-					dice = targComb.saves.get("wis").d20(targARGs.adv(boolwise=True))
+					targName = target.name
+					targBonus = targetArgs[targName].get('sb')
+					dice = target.saves.get("wis").d20(targetArgs[targName].adv(boolwise=True, custom={'adv': 'sadv', 'dis': 'sdis'}))
 					saveRoll = vroll(f'{dice} {"+"+"+".join(targBonus) if targBonus else ""}')
-					out.append(f''' -f "{targName}|**WIS Save:** {saveRoll}; {['Failure!', targComb.add_effect('Terrified - Rod of Lordly Might','',10,desc='A frightened target can repeat the DC 17 wisdom save at the end of each of its turns, ending the effect on itself on a success.')][0] if saveRoll.total<dc else 'Success!'} \n {f"""**Effect:** {targComb.get_effect('Terrified - Rod of Lordly Might')}""" if saveRoll.total<dc else ''}" ''')
+					out.append(f''' -f "{targName}|**WIS Save:** {saveRoll}; {['Failure!', target.add_effect('Terrified - Rod of Lordly Might','',10,desc='A frightened target can repeat the DC 17 wisdom save at the end of each of its turns, ending the effect on itself on a success.')][0] if saveRoll.total<dc else 'Success!'} \n {f"""**Effect:** {target.get_effect('Terrified - Rod of Lordly Might')}""" if saveRoll.total<dc else ''}" ''')
 				return f'''-title "{name} tries to terrify with the {cc}!" {' '.join(out)} -f "Terrify|While holding the rod, you can use an action to force each creature you can see within 30 feet of you to make a DC 17 Wisdom saving throw. On a failure, a target is frightened of you for 1 minute. A frightened target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. This property cannot be used again until the next dawn." -f "{ccT}{' (-1)' if vT and not i else ''}|{character().cc_str(ccT)}" -footer "{ctx.prefix}{ctx.alias}" '''
 			else:
 				return f'''-title "{name} tries to terrify with the {cc}!" -f "Terrify|**DC 17**\n(No Target Specified.)" -f "Terrify|While holding the rod, you can use an action to force each creature you can see within 30 feet of you to make a DC 17 Wisdom saving throw. On a failure, a target is frightened of you for 1 minute. A frightened target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. This property cannot be used again until the next dawn." -f "{ccT}{' (-1)' if not i else ''}|{character().cc_str(ccT)}" -footer "{ctx.prefix}{ctx.alias}" '''
