@@ -1,0 +1,77 @@
+<drac2>
+ch    = character()
+cc    = "Neclace of Prayer Beads"
+n     = '\n'
+beads = load_json(get('PrayerBeads',[]))
+alias = 'embed'
+title = f"""-title "{name} checks out their {cc}:" """
+fields= ''
+desc  = ''
+#a dict to assign bead type to spell name
+spellBeads  = {'bless': 'Blessing', 'cure wounds': 'Curing', 'lesser restoration': 'Curing', 'greater restoration': 'Favor', 'branding smite': 'Smiting', 'planar ally': 'Summons', 'wind walk': 'Wind Walking'}
+
+spell_table  = f"""```\nBead of...   | Spell\n-------------|--------------------\nBlessing     | Bless\nCuring       | Cure Wounds\n             |  (2nd level) or\n             |  Lesser Restoration\nFavor        | Greater Restoration\nSmiting      | Branding Smite\nSummons      | Planar Ally\nWind Walking | Wind Walk```"""
+
+base_fields = f""" -f "`{ctx.prefix+ctx.alias} roll new`|Rolls randomly for the beads and saves them to a cvar named 'PrayerBeads' for later use." -f "`{ctx.prefix+ctx.alias} cast <spell> [casting arguments]`|This will cast the coresponding spell and consume a bead.  Specify the spell like: `{ctx.prefix+ctx.alias} cast 'cure wounds'` or `{ctx.prefix+ctx.alias} cast wind`.  Partial matching will work. Use the typical casting arguments for this." -f "`{ctx.prefix+ctx.alias} set [type] [type]...`|Enter up to six types, separated by spaces, to set the types of beads on the neclace.  Use the following options to set the beads: `Blessing`, `Curing`, `Favor`, `Smiting`, `Summons`, `'Wind Walking'`.\nPartial matching will work." """
+
+base_desc   = f"""-desc "You currently have {len(beads) if beads else 'zero'} bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {'**'+'**, **'.join(beads[:-1])+'** and **'+beads[-1]+'**' if len(beads)>1 else '' if not beads else '**'+beads[0]+'**'}.\n\nYou can use them to cast the corresponding spells:{spell_table}" """ if beads else f""" -desc "This necklace has 1d4 + 2 magic beads made from aquamarine, black pearl, or topaz. It also has many nonmagical beads made from stones such as amber, bloodstone, citrine, coral, jade, pearl, or quartz. If a magic bead is removed from the necklace, that bead loses its magic.\n\nSix types of magic beads exist. The GM decides the type of each bead on the necklace or determines it randomly. A necklace can have more than one bead of the same type. To use one, you must be wearing the necklace. Each bead contains a spell that you can cast from it as a bonus action (using your spell save DC if a save is necessary). Once a magic bead's spell is cast, that bead can't be used again until the next dawn." """
+flavor      = ' -color <color> -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/18/903/315/315/636381755691898979.jpeg'
+
+
+#rolling for beads
+if "roll new" in "&*&".lower():
+	r            = vroll('1d4+2') #a roll for bead quantity
+	table        = {"6": "Blessing", "12": "Curing", "16": "Favor", "18": "Smiting", "19": "Summons", "20": "Wind Walking"} #a dict for getting bead type from our rolls
+	beads_rolled = [vroll('1d20') for x in range(r.total)] #a list of rolls for bead type
+	results      = [] #a list to append our results
+	for bead in beads_rolled:
+		results.append([table[x] for x in table if bead.total<=int(x)][0]) #compare our rolls to the table to get bead names
+	title =f""" -title "{name} rolls for the beads on their {cc}!" """
+	desc =f""" -desc "**Roll for Amount of Beads:** {r}\n\n**Rolled Beads:**\n{n.join([f'{beads_rolled[x]} - {results[x]}' for x in range(r.total)])}" """
+	fields=f""" -f "The beads rolled above can be used to cast the corresponding spells shown this list:|{spell_table}" """
+	ch.set_cvar('PrayerBeads',dump_json(results)) #store our bead list as a cvar
+
+#casting stuff
+elif "&1&".lower()=="cast" and beads:
+	#match args to a list to grab a full spell name
+	spell = [x for x in list(spellBeads) if "&2&".lower() in x]+[None]
+	#error if no matches
+	if spell[0]==None:
+		err(f"""_ _\nNo {'matches were found for the spell `&2&`' if '&2&'!='&2'+'&' else 'spell'} entered. Choose from {', '.join([f'**{x.title()}**' for x in list(spellBeads)[:-1]])+' or **'+list(spellBeads)[-1].title()+'**'} to cast the spell from your Prayer Bead.  Partial matches will work.""")
+	#error if multiple matches
+	elif len(spell)>2:
+		err(f"""_ _\nMultiple matches were found for `&2&`: {', '.join([f'**{x.title()}**' for x in spell[:-1]])}""")
+	#cast the spell and remove the bead if one match
+	elif spellBeads[spell[0]] in beads:
+		beads.remove(spellBeads[spell[0]])
+		ch.set_cvar('PrayerBeads',dump_json(beads))
+		bead_display=f"""You currently have {len(beads) if beads else 'no more'} bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {f'**{"**, **".join(beads[:-1])}** and **{beads[-1]}**.' if len(beads)>1 else '' if not beads else f'**{beads[0]}**.'}"""
+		return f'''cast "{spell[0]}" -i {'-l 2' if spell[0]=='cure wounds' else ''} {' '.join([f'"{x}"' for x in &ARGS&[2:]])} -phrase "using their {cc}!" -f "{bead_display}\n\n{ctx.prefix+ctx.alias} [cast/set/roll new] [-t target(s)] [casting args]" {flavor} '''
+	#return error if spell doesn't match available beads
+	else:
+		title = f"""-title "{name} can't find the {spellBeads[spell[0]]} bead on their {cc}!" """
+		desc  = base_desc
+		fields= base_fields
+
+#manually setting the beads
+elif "&1&".lower()=="set":
+	beads=[] #a list to append our results
+	for x in &ARGS&[1:]: #loop over all the args except the first to find matches
+		new_bead= ([bead_type for bead_type in ['Blessing', 'Curing', 'Favor', 'Smiting', 'Summons', 'Wind Walking'] if x.lower().strip(',') in bead_type.lower()]+[None])[0]
+		if new_bead: 
+			beads.append(new_bead) #add it to the list if we get a match
+	ch.set_cvar('PrayerBeads',dump_json(beads[:6])) #save our list to our cvar but limit the result to 6 beads
+	title =f""" -title "{name} sets the beads on their {cc}!" """
+	desc  =f""" -desc "You just set {len(beads) if beads else 'zero'} bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {'**'+'**, **'.join(beads[:-1])+'** and **'+beads[-1]+'**.' if len(beads)>1 else '' if not beads else '**'+beads[0]+'**.'}\n\nIf your desired beads did not appear above, try again.  You can enter up to six types, separated by spaces, to set the types of beads on the neclace.  Use the following options to set the beads: `Blessing`, `Curing`, `Favor`, `Smiting`, `Summons`, `'Wind Walking'`.\nPartial matching will work." """
+
+elif exists("PrayerBeads"):
+	title = f""" -title "{name} has an empty {cc}!" """
+	desc  = """ -desc "**Looks like you used all your beads already, or you're having trouble setting it up.**  Follow the instructions below to get set up or manually add back some beads." """
+	fields= base_fields
+
+else:
+	desc  = base_desc+"\n\n**You didn't set up your {cc} yet.**  See below for set up instructions."
+	fields= base_fields
+
+return f"""{alias} {title} {desc} {fields} -f "{ctx.prefix+ctx.alias} [cast/set/roll new] [-t target(s)] [casting args]" {flavor} """
+</drac2>  
