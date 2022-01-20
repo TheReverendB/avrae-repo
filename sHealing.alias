@@ -3,16 +3,16 @@ cc = "Staff of Healing"
 ch = character()
 ch.create_cc_nx(cc,0,10,'long','bubble',reset_by='1d6+4')
 a = &ARGS&
-x = '&1&'=='recharge'
+x = '&1&'.lower()=='recharge'
 r = vroll('1d6+4')
 recharge=r.total
 f="Description|This staff has 10 charges. While holding it, you can use an action to expend 1 or more of its charges to cast one of the following spells from it, using your spell save DC and spellcasting ability modifier: **cure wounds** (1 charge per spell level, up to 4th), **lesser restoration** (2 charges), or **mass cure wounds** (5 charges).\n\nThe staff regains 1d6 + 4 expended charges daily at dawn. If you expend the last charge, roll a d20. On a 1, the staff vanishes in a flash of light, lost forever."
 
-if '&1&'=='recharge':
+if x:
     ch.mod_cc(cc,+recharge)
     return f'''embed -title "{name} recharges the {cc}!" -desc "{r}" -f "{cc}|Using your staff:\nCure Wounds - `!sHealing cure [charges used] [-t target]`\nLesser Restoration - `!sHealing lesser [-t target]`\nMass Cure Wounds - `!sHealing mass [-t targets]`" '''
 else:
-	return f'''embed -title "{name} checks the {cc}!" -f "{cc}|Using your staff:\nCure Wounds - `!sHealing cure [charges used] [-t target]`\nLesser Restoration - `!sHealing lesser [-t target]`\nMass Cure Wounds - `!sHealing mass [-t targets]`\nRehcarging - `!sHealing recharge`" '''
+	return f'''embed -title "{name} checks the {cc}!" -f "{cc}|Using your staff:\nCure Wounds - `!sHealing cure [charges used] [-t target]`\nLesser Restoration - `!sHealing lesser [-t target]`\nMass Cure Wounds - `!sHealing mass [-t targets]`\nRecharging - `!sHealing recharge`" '''
 </drac2>
 -f "{{cc}}{{f" (+{recharge})" if x else ""}}|{{character().cc_str(cc)}}"
--thumb 'https://media-waterdeep.cursecdn.com/avatars/thumbnails/19/258/315/315/636382374378584479.jpeg' -footer "!sHealing [cure, lesser, mass]"
+-thumb 'https://media-waterdeep.cursecdn.com/avatars/thumbnails/19/258/315/315/636382374378584479.jpeg' -footer "{{ctx.prefix}}{{ctx.alias}} [cure, lesser, mass, recharge]"
