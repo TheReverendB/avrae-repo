@@ -7,8 +7,9 @@ ch = character()
 g = load_json(get_gvar('c7fac1dc-a814-4b1e-81b0-f3ee6abec1cf'))
 y = "&1&".lower()
 i = argparse(&ARGS&).get('i')
+racialBonus = "+1d4[Artisan's Intuition]" if "Mark of Making" in ch.race else "+1d4[Tireless Precision]" if "Vedalken" in ch.race and "precision" in aargs else ''
 slevel = ([lvl for lvl in g.sp if y in g.sp[lvl]]+[None])[0] 
-rollstring=["1d20","2d20kh1","2d20kl1"][a.adv()] + ("mi"+a.last("mi") if a.last("mi") else "mi10" if character().csettings.get('talent',0) and ch.skills.arcana.prof >= 1 else "")+"+"+str(ch.skills.arcana.value)+("+"+a.join("b","+") if a.last("b") else "")+ ("+1d4" if "guidance" in aargs else "")
+rollstring=["1d20","2d20kh1","2d20kl1"][a.adv()] + ("mi"+a.last("mc") if a.last("mc") else "mi10" if character().csettings.get('talent',0) and ch.skills.arcana.prof >= 1 else "")+"+"+str(ch.skills.arcana.value)+("+"+a.join("b","+") if a.last("b") else "")+ ("+1d4" if "guidance" in aargs else "")+racialBonus
 aRoll = vroll(rollstring)
 
 if slevel in ['0','1','2','3','4','5','6','7','8','9']:
