@@ -5,12 +5,45 @@ ma ='Mizzium Apparatus'
 a = argparse(aargs)
 ch = character()
 g = load_json(get_gvar('c7fac1dc-a814-4b1e-81b0-f3ee6abec1cf'))
-y = "&1&".lower()
 i = argparse(&ARGS&).get('i')
 racialBonus = "+1d4[Artisan's Intuition]" if "Mark of Making" in ch.race else "+1d4[Tireless Precision]" if "Vedalken" in ch.race and "precision" in aargs else ''
-slevel = ([lvl for lvl in g.sp if y in g.sp[lvl]]+[None])[0] 
+
 rollstring=["1d20","2d20kh1","2d20kl1"][a.adv()] + ("mi"+a.last("mc") if a.last("mc") else "mi10" if character().csettings.get('talent',0) and ch.skills.arcana.prof >= 1 else "")+"+"+str(ch.skills.arcana.value)+("+"+a.join("b","+") if a.last("b") else "")+ ("+1d4" if "guidance" in aargs else "")+racialBonus
+
 aRoll = vroll(rollstring)
+
+
+# -- handle partial spell name entry -- #
+
+# make a list of all possible spells 
+fullSpellList = []
+for x in range(1,10):
+	fullSpellList += g.sp[str(x)]
+
+# try for an exact match
+fullSpellName = [x for x in fullSpellList if "&1&".lower()==x]
+
+# try for partial match 
+if not fullSpellName:
+	fullSpellName = [x for x in fullSpellList if "&1&".lower() in x]
+
+# if we matched multiple spells
+if len(fullSpellName)>1:
+	return f"""embed -title "Your entry `&1&` matches more than one possible spell name."  -desc "Possible matches: `{'`, `'.join(fullSpellName)}`\n\n**Command ran:**\n\n`{ctx.prefix+ctx.alias} &*&`"  """
+
+# if we still didn't match anything
+elif not fullSpellName:
+	return f"""embed -title "Your {ma} has a breakdown!" -desc "Your entry `&1&` doesn't match any known spell.  Check your spelling and try again.\n\n**Command ran:**\n\n`{ctx.prefix+ctx.alias} &*&`"  """
+
+# we ended up with only one match
+else:
+	fullSpellName = fullSpellName[0]
+
+
+
+# grab our spell level
+slevel = ([lvl for lvl in g.sp if fullSpellName in g.sp[lvl]]+[None])[0]
+
 
 if slevel in ['0','1','2','3','4','5','6','7','8','9']:
 	upcast = 0 if not argparse(cargs).get("l") else argparse(cargs).last("l")
@@ -23,20 +56,20 @@ if slevel in ['0','1','2','3','4','5','6','7','8','9']:
 	rSpell = '' if slevel == '0' else g.fspell[rslevel][randint(len(g.fspell[rslevel]))]
 	if slevel=='0':
 		if v:
-			return f'''cast "&1&" i {' '.join(f'"{carg}"' if " " in carg else carg for carg in cargs)} -title "{name} casts __&1&__ with their {ma}!" -phrase "*Arcana roll:** {aRoll}\n**DC: {dc}** *Success!" -f "{g.miz}" '''
+			return f'''cast "{fullSpellName}" i {' '.join(f'"{carg}"' if " " in carg else carg for carg in cargs)} -title "{name} casts __{fullSpellName}__ with their {ma}!" -phrase "*Arcana roll:** {aRoll}\n**DC: {dc}** *Success!" -f "{g.miz}" '''
 		else:
 			return f'''embed -title "Your ineptitude has caused your {ma} to malfunction!" -desc "_**Arcana roll:** {aRoll}_\n_**DC: {dc}** Failure!_\n\n If you try to cast a cantrip you don't know, the DC for the Intelligence (Arcana) check is 10, and on a failed check, there is no effect." -f "{g.miz}" '''
 	elif slevel!='0':
 		if x:
 			ch.spellbook.use_slot(int(slevel)) if not i else ''
 			if v:
-				return f'''cast "&1&" i {' '.join(f'"{carg}"' if " " in carg else carg for carg in cargs)} -title "{name} casts __&1&__ with their {ma}!" -phrase "*Arcana roll:** {aRoll}\n**DC: {dc}** *Success!" -f "{g.miz}" -f "Spell Slots {'(-1)' if not i else ''}|{character().spellbook.slots_str(int(slevel))}" '''
+				return f'''cast "{fullSpellName}" i {' '.join(f'"{carg}"' if " " in carg else carg for carg in cargs)} -title "{name} casts __{fullSpellName}__ with their {ma}!" -phrase "*Arcana roll:** {aRoll}\n**DC: {dc}** *Success!" -f "{g.miz}" -f "Spell Slots {'(-1)' if not i else ''}|{character().spellbook.slots_str(int(slevel))}" '''
 			else:
-				return f'''cast "{rSpell}" i {' '.join(f'"{carg}"' if " " in carg else carg for carg in cargs)} -title "{name} tries to cast __&1&__ with their {ma} but casts __{rSpell}__ instead!" -phrase "*Arcana roll:** {aRoll}\n**DC:** {dc} *Failure!*\n\n*On a successful check, you cast the spell as normal, using your spell save DC and spellcasting ability modifier. On a failed check, you cast a different spell from the one you intended. If the slot is 6th level or higher, roll on the table for 5th-level spells." -f "{g.miz}" -f "Spell Slots {'(-1)' if not i else ''}|{character().spellbook.slots_str(int(slevel))}" '''
+				return f'''cast "{rSpell}" i {' '.join(f'"{carg}"' if " " in carg else carg for carg in cargs)} -title "{name} tries to cast __{fullSpellName}__ with their {ma} but casts __{rSpell}__ instead!" -phrase "*Arcana roll:** {aRoll}\n**DC:** {dc} *Failure!*\n\n*On a successful check, you cast the spell as normal, using your spell save DC and spellcasting ability modifier. On a failed check, you cast a different spell from the one you intended. If the slot is 6th level or higher, roll on the table for 5th-level spells." -f "{g.miz}" -f "Spell Slots {'(-1)' if not i else ''}|{character().spellbook.slots_str(int(slevel))}" '''
 		elif mslot and not x:
 			return f'''embed -title "{name} does not have any slots left at level {slevel}!" -desc "You need a level {slevel} spell slot in order to use your {ma} like this!\n\nCast again at a different level or have a nap." -f "Spell Slots|{character().spellbook.slots_str(int(slevel))}" '''
 		elif not mslot:
 			return f'''embed -title "{name} has clearly never cast a spell this high a level in their life!" -desc "You'll need to level up a bit more if you want to cast a level {slevel} spell with your {ma}." '''
 else:
 	return f'''embed -title "{name} reads the manual on their {ma}!" -desc "You can use `!mizapp` just like `!cast` with arguments and targets as per usual.  If you get a bonus or advantage to your arcana check, add those after `*` like in this example:\n`!mizapp 'spell name' [spell args] [-t targets] * [arcana args]`\n\nExample casting 'fire bolt' with disadvantage to hit GO1, but with advantage and bonus 1d4 to the arcana roll:\n `!mizapp 'fire bolt' dis -t GO1 * adv -b 1d4`" '''
-</drac2> -thumb 'https://cdn.discordapp.com/attachments/709738212209197189/776857816107450368/tenor.gif' -footer '!mizapp "<spell name>" [casting args] * [arcana args]'
+</drac2> -thumb 'https://cdn.discordapp.com/attachments/709738212209197189/776857816107450368/tenor.gif' -footer '{{ctx.prefix+ctx.alias}} "<spell name>" [casting args] * [arcana args]'
