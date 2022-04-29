@@ -1,12 +1,12 @@
-!alias web <drac2>
-(ch:=character()).create_cc_nx((cc:="Wand of Web"),0,7,'long','bubble',reset_by='1d6+1')
-i = argparse(&ARGS&).get('i')
-v = ch.get_cc(cc) or i
-f = "This wand has 7 charges. While holding it, you can use an action to expend 1 of its charges to cast the web spell (save DC 15) from it.\nThe wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll a d20. On a 1, the wand crumbles into ashes and is destroyed."
-foot = f"{ctx.prefix}{ctx.alias} [casting arguments] [-i]"
-if v:
-    ch.mod_cc(cc, -1) if not i else ''
-    return f"""cast "web" -dc 15 -i &*& -phrase "using the {cc}!" -f "{f}" -f "{cc} {'' if i else '(-1)'}|{ch.cc_str(cc)}" -f "{foot}" """
-else:
-    return f"""embed -title "{name} tries to use the {cc}!" -desc "You're all out of uses!  Roll that d20!" -f "{f}" -f "{cc}|{ch.cc_str(cc)}" -footer "{foot}" """
+<drac2>  # since this is a pretty simple device, all it does is cast the spell, or tell you you're out of uses.  The -i argument is included to allow for easy recasting if you forgot to target or similar.
+(ch:=character()).create_cc_nx((cc:="Wand of Web"),0,7,'long','bubble',reset_by='1d6+1')  # create our counter and simultaneously assign ch and cc
+i = argparse(&ARGS&).get('i')  # handle ignoring a use with the -i argument
+v = ch.get_cc(cc) or i  # do we have uses remaining or did we -i ignore uses?
+desc = "This wand has 7 charges. While holding it, you can use an action to expend 1 of its charges to cast the web spell (save DC 15) from it.\nThe wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll a d20. On a 1, the wand crumbles into ashes and is destroyed."  # a description of our item
+foot = f"{ctx.prefix}{ctx.alias} [casting arguments] [-i]"  # set up our footer
+if v:  # if we can cast the spell
+    '' if i else ch.mod_cc(cc, -1)  # reduce our counter unless we are ignoring uses
+    return f"""cast web -dc 15 -i &*& -phrase "using the {cc}!" -f "{desc}" -f "{cc} {'' if i else '(-1)'}|{ch.cc_str(cc)}" -f "{foot}" """  # set our output string for the !cast command
+else:  # if we don't have any uses remaining
+    return f"""embed -title "{name} tries to use the {cc}!" -desc "You're all out of uses!  Roll that d20!" -f "{desc}" -f "{cc}|{ch.cc_str(cc)}" -footer "{foot}" """  # output string for our embed
 </drac2> -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/7/484/1000/1000/636284784324774673.jpeg
