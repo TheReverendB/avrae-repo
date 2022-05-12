@@ -1,6 +1,6 @@
 <drac2>
 uses= int('&1&') if '&1&'.isdigit() else 0  # grab the entered number of uses or default to 0 
-lvl = int("&1&")+2 if '&1&'.isdigit() else 0  # calaculate the of the spell or default to 0 
+lvl = int('&1&')+2 if '&1&'.isdigit() else 0  # calaculate the of the spell or default to 0 
 cc  = "Necklace of Fireballs"  # set the name of our counter 
 i   = argparse(&ARGS&).get('i')  # allow for ignoring uses of the counter
 ch  = character()  # make typing easier later
@@ -16,7 +16,7 @@ if lvl==0:  # this happens if you didn't enter a number as the first argument
 
 if ch.cc_exists(cc):  # this happens if you have a counter
 	v = ch.get_cc(cc)>=uses and lvl!=0  # do you have enough uses remaining?
-	x = ch.get_cc(cc)>0  # do we have any uses?
+	x = ch.get_cc(cc)>0  # do we have more than 0 uses?
 
 	if v or i:  # we have uses or have ignored uses
 		'' if i else ch.mod_cc(cc, -uses)  # reduce our counter by the amount of beads we used
