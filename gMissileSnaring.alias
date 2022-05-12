@@ -1,19 +1,18 @@
 embed <drac2>
-r = vroll(f'1d10 + {dexterityMod}')
-c = combat() and combat().me
-damage = int("&1&") if "&1&".isdigit() else 0
-healing = min(r.total, damage)
+r = vroll(f'1d10 + {dexterityMod}')  # roll for our damage reduced
+damage = int("&1&") if "&1&".isdigit() else 0  # grab our damage input
+healing = min(r.total, damage)  # make sure to only heal back the damage we took
 text = ''
 
-if damage:
-  character().modify_hp(healing,False)
+if damage:  # did we enter a damage amount?
+  character().modify_hp(healing,False)  # heal up to max hp
   text += f""" -desc "**Original Damage:** {damage}\n**Damage Reduced:** {r}\n**Healing:** {healing}"""
-  if damage<=healing:
+  if damage<=healing:  # if damage is less than healing, we caught the missile
     text += '\n **You caught the missile!**" '
-  else:
+  else:  # add our end quotation if we didn't catch it
     text += '"'
-else:
+else:  # display only of the roll without a damage input
   text += f' -desc "**Possible Damage Reduced:** {r}" -f "Used with damage taken amount entered, this alias will also heal you."'
 text += ''' -f "Gloves of Missile Snaring|When a ranged weapon attack hits you while you're wearing them, you can use your reaction to reduce the damage by 1d10 + your Dexterity modifier, provided that you have a free hand.  If you reduce the damage to 0, you catch the missile if it is small enough for you to hold it in that hand." '''
 return text
-</drac2> -title "<name> uses the Gloves of Missile Snaring!" -footer "{{f'{name}: {character().hp_str()} +({healing})\n\n{ctx.prefix+ctx.alias} [damage taken]' if c and damage else f'{ctx.prefix+ctx.alias} [damage taken]'}}" -thumb "https://cdn.discordapp.com/attachments/697795366946471997/754022634701848761/636284736601097596.jpeg" -color <color> 
+</drac2> -title "<name> uses the Gloves of Missile Snaring!" -footer "{{f'{name}: {character().hp_str()} +({healing})\n\n{ctx.prefix+ctx.alias} [damage taken]' if damage else f'{ctx.prefix+ctx.alias} [damage taken]'}}" -thumb "https://cdn.discordapp.com/attachments/697795366946471997/754022634701848761/636284736601097596.jpeg" -color <color> 
