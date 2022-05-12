@@ -1,17 +1,16 @@
 <drac2>
-cargs = &ARGS&[1:&ARGS&.index("*")] if '*' in &ARGS& else &ARGS&[1:]
-aargs = &ARGS&[&ARGS&.index("*")+1:] if '*' in &ARGS& else []
+cargs = &ARGS&[1:&ARGS&.index("*")] if '*' in &ARGS& else &ARGS&[1:]  # make a list of our casting args, splitting on * if supplied
+aargs = &ARGS&[&ARGS&.index("*")+1:] if '*' in &ARGS& else []  # make a list of our arcana roll args
 ma ='Mizzium Apparatus'
-a = argparse(aargs)
+a  = argparse(aargs)
 ch = character()
-g = load_json(get_gvar('c7fac1dc-a814-4b1e-81b0-f3ee6abec1cf'))
-i = argparse(&ARGS&).get('i')
-racialBonus = "+1d4[Artisan's Intuition]" if "Mark of Making" in ch.race else "+1d4[Tireless Precision]" if "Vedalken" in ch.race and "precision" in aargs else ''
+g  = load_json(get_gvar('c7fac1dc-a814-4b1e-81b0-f3ee6abec1cf'))
+i  = argparse(&ARGS&).get('i')
 
-rollstring=["1d20","2d20kh1","2d20kl1"][a.adv()] + ("mi"+a.last("mc") if a.last("mc") else "mi10" if character().csettings.get('talent',0) and ch.skills.arcana.prof >= 1 else "")+"+"+str(ch.skills.arcana.value)+("+"+a.join("b","+") if a.last("b") else "")+ ("+1d4" if "guidance" in aargs else "")+racialBonus
+racialBonus = "+1d4[Artisan's Intuition]" if "Mark of Making" in ch.race else "+1d4[Tireless Precision]" if "Vedalken" in ch.race and "precision" in aargs else ''  # allow for racial bonuses
+rollstring  =["1d20","2d20kh1","2d20kl1"][a.adv()] + ("mi"+a.last("mc") if a.last("mc") else "mi10" if character().csettings.get('talent',0) and ch.skills.arcana.prof >= 1 else "")+"+"+str(ch.skills.arcana.value)+("+"+a.join("b","+") if a.last("b") else "")+ ("+1d4" if "guidance" in aargs else "")+racialBonus  # old skool roll string construction
 
-aRoll = vroll(rollstring)
-
+aRoll = vroll(rollstring)  # our arcana roll
 
 # -- handle partial spell name entry -- #
 
@@ -44,32 +43,33 @@ else:
 # grab our spell level
 slevel = ([lvl for lvl in g.sp if fullSpellName in g.sp[lvl]]+[None])[0]
 
-
+# handle upcasting, verify user has a slot at the correct level
 if slevel in ['0','1','2','3','4','5','6','7','8','9']:
-	upcast = 0 if not argparse(cargs).get("l") else argparse(cargs).last("l")
-	slevel = str(max(int(slevel),int(upcast)))
-	x = ch.spellbook.get_slots(int(slevel))>0 if not i else True 
-	mslot = ch.spellbook.get_max_slots(int(slevel))>0
-	dc = 10+(int(slevel)*2)
-	rslevel = slevel if slevel in ['0','1','2','3','4','5'] else '5'
-	v = dc <= aRoll.total
+	upcast = min(argparse(cargs).last("l", 0, int), 9)  # grab our upcast or default to 0, cap the max at 9 to avoid level 10+ spell nonsense
+	slevel = str(max(int(slevel),int(upcast)))  # adjust our level we're casting at
+	x      = ch.spellbook.get_slots(int(slevel))>0 if not i else True  # do we have unused slots at this level or are we ignoring slots
+	mslot  = ch.spellbook.get_max_slots(int(slevel))>0  # did we ever have slots at this level?
+	dc     = 10+(int(slevel)*2)  # calculate our dc based off spell level
+	rslevel= slevel if slevel in ['0','1','2','3','4','5'] else '5'  # random spell has a max level 5 on fail
+	v      = dc <= aRoll.total
 	rSpell = '' if slevel == '0' else g.fspell[rslevel][randint(len(g.fspell[rslevel]))]
-	if slevel=='0':
+
+	if slevel=='0':  # cantrip casting
 		if v:
 			return f'''cast "{fullSpellName}" i {' '.join(f'"{carg}"' if " " in carg else carg for carg in cargs)} -title "{name} casts __{fullSpellName}__ with their {ma}!" -phrase "*Arcana roll:** {aRoll}\n**DC: {dc}** *Success!" -f "{g.miz}" '''
 		else:
 			return f'''embed -title "Your ineptitude has caused your {ma} to malfunction!" -desc "_**Arcana roll:** {aRoll}_\n_**DC: {dc}** Failure!_\n\n If you try to cast a cantrip you don't know, the DC for the Intelligence (Arcana) check is 10, and on a failed check, there is no effect." -f "{g.miz}" '''
-	elif slevel!='0':
+	elif slevel!='0':  # non-cantrip casting
 		if x:
 			ch.spellbook.use_slot(int(slevel)) if not i else ''
-			if v:
+			if v:  # we beat the dc and are casting the spell we wanted
 				return f'''cast "{fullSpellName}" i {' '.join(f'"{carg}"' if " " in carg else carg for carg in cargs)} -title "{name} casts __{fullSpellName}__ with their {ma}!" -phrase "*Arcana roll:** {aRoll}\n**DC: {dc}** *Success!" -f "{g.miz}" -f "Spell Slots {'(-1)' if not i else ''}|{character().spellbook.slots_str(int(slevel))}" '''
-			else:
+			else:  # we failed the dc and are casting a random spell for this level
 				return f'''cast "{rSpell}" i {' '.join(f'"{carg}"' if " " in carg else carg for carg in cargs)} -title "{name} tries to cast __{fullSpellName}__ with their {ma} but casts __{rSpell}__ instead!" -phrase "*Arcana roll:** {aRoll}\n**DC:** {dc} *Failure!*\n\n*On a successful check, you cast the spell as normal, using your spell save DC and spellcasting ability modifier. On a failed check, you cast a different spell from the one you intended. If the slot is 6th level or higher, roll on the table for 5th-level spells." -f "{g.miz}" -f "Spell Slots {'(-1)' if not i else ''}|{character().spellbook.slots_str(int(slevel))}" '''
-		elif mslot and not x:
+		elif mslot and not x:  # we're out of slots at this level
 			return f'''embed -title "{name} does not have any slots left at level {slevel}!" -desc "You need a level {slevel} spell slot in order to use your {ma} like this!\n\nCast again at a different level or have a nap." -f "Spell Slots|{character().spellbook.slots_str(int(slevel))}" '''
-		elif not mslot:
+		elif not mslot:  # we never had a slot this high
 			return f'''embed -title "{name} has clearly never cast a spell this high a level in their life!" -desc "You'll need to level up a bit more if you want to cast a level {slevel} spell with your {ma}." '''
-else:
+else:  # display the help if things went wrong or nothing was input
 	return f'''embed -title "{name} reads the manual on their {ma}!" -desc "You can use `!mizapp` just like `!cast` with arguments and targets as per usual.  If you get a bonus or advantage to your arcana check, add those after `*` like in this example:\n`!mizapp 'spell name' [spell args] [-t targets] * [arcana args]`\n\nExample casting 'fire bolt' with disadvantage to hit GO1, but with advantage and bonus 1d4 to the arcana roll:\n `!mizapp 'fire bolt' dis -t GO1 * adv -b 1d4`" '''
 </drac2> -thumb 'https://cdn.discordapp.com/attachments/709738212209197189/776857816107450368/tenor.gif' -footer '{{ctx.prefix+ctx.alias}} "<spell name>" [casting args] * [arcana args]'
