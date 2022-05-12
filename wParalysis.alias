@@ -1,14 +1,14 @@
 embed <drac2>
-a,ch,c,cc,out=argparse(&ARGS&),character(),combat(),"Wand of Paralysis",[]
+a,ch,c,cc,out=argparse(&ARGS&),character(),combat(),"Wand of Paralysis",[]  # shorthand variables to use later
 desc = f""" -f "While holding this wand, you can use an action to expend 1 of its charges to cause a thin blue ray to streak from the tip toward a creature you can see within 60 feet of you. The target must succeed on a DC 15 Constitution saving throw or be paralyzed for 1 minute. At the end of each of the target's turns, it can repeat the saving throw, ending the effect on itself on a success." """
 ch.create_cc_nx(cc,0,7,'long','bubble',reset_by='1d6+1',desc="This wand has 7 charges. While holding it, you can use an action to expend 1 of its charges to cause a thin blue ray to streak from the tip toward a creature you can see within 60 feet of you. The target must succeed on a DC 15 Constitution saving throw or be paralyzed for 1 minute. At the end of each of the target's turns, it can repeat the saving throw, ending the effect on itself on a success.\n\nThe wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll a d20. On a 1, the wand crumbles into ashes and is destroyed.")
-i = a.get('i')
-v = ch.get_cc(cc)
-t = a.last('t')
-alias = ctx.prefix+ctx.alias
-footer = f"""-footer "{alias} [cast|reset] [-t target]" """
-adv = a.adv(boolwise=True, custom={'adv':'sadv', 'dis':'sdis'})
-bonus = "+"+a.join('sb', '+', '') if a.get('sb') else ''
+i = a.get('i')  # are we ignoring uses?
+v = ch.get_cc(cc)  # grab our wand uses remaining
+t = a.last('t')  # grab our target
+alias = ctx.prefix+ctx.alias  # handle different prefixes and renamed aliases
+footer = f"""-footer "{alias} [cast|reset] [-t target]" """  # save our footer
+adv = a.adv(boolwise=True, custom={'adv':'sadv', 'dis':'sdis'})  # grab advantage args customizing for sadv and sdis
+bonus = "+"+a.join('sb', '+', '') if a.get('sb') else ''  # grab any bonuses and put them all together for our vroll()
 # some help here
 if '''&1&'''.lower() in '?help' or not &ARGS&:
   return f""" -title "{name} reads the manual on their {cc}!" -desc "`{alias} cast [-t target]` to use the wand,\n`{alias} reset` to reset the wand's charges." {desc} -f "{cc}|{ch.cc_str(cc)}" """
@@ -21,24 +21,23 @@ if '''&1&'''.lower() in 'reset':
 
 # let's attack with this mutha
 if '''&1&'''.lower() in 'cast':
-  if v or i:
-    '' if i else ch.mod_cc(cc,-1)
-    if c and c.me:
-      if targ:=c.get_combatant(t):
-        save = vroll(targ.saves.get('con').d20(adv)+bonus)
-        if save.total<15:
+  if v or i:  # do we have uses or are we ignoring our counter?
+    '' if i else ch.mod_cc(cc,-1)  # mod our counter if we aren't ignoring uses
+    if c and c.me:  # is combat going and are we in combat?
+      if targ:=c.get_combatant(t):  # grab our target's SimpleCombatant object and only proceed if we grabbed it
+        save = vroll(targ.saves.get('con').d20(adv)+bonus)  # roll their save
+        if save.total<15:  # check for failed save and apply the effect if they failed
           targ.add_effect(f'Paralyzed ({cc})','',10,desc="At the end of each of the target's turns, it can repeat the DC 15 Constitution saving throw, ending the effect on itself on a success.")
-          return f'''-title "{name} uses their {cc}!" -f "Meta|**DC 15**" -f "{targ.name}|**CON Save**: {save}; Failure!\n**Effect:** {targ.get_effect(f'Paralyzed ({cc})')}" {desc} -f "{cc}|{ch.cc_str(cc)} {'_use ignored_' if i else '(-1)'}" '''
-        else:
+          return f'''-title "{name} uses their {cc}!" -f "Meta|**DC 15**" -f "{targ.name}|**CON Save**: {save}; Failure!\n**Effect:** {targ.get_effect(f'Paralyzed ({cc})')}" {desc} -f "{cc}|{ch.cc_str(cc)} {'_use ignored_' if i else '(-1)'}" '''  # return our embed showing the successful attack
+        else:  # they passed the save
           return f'''-title "{name} uses uses their {cc}!" -f "Meta|**DC 15**" -f "{targ.name}|**CON Save**: {save}; Success!" {desc} -f "{cc}|{ch.cc_str(cc)} {'_use ignored_' if i else '(-1)'}" '''
-      else:
+      else:  # couldn't find a target or no target
         return f'''-title "{name} uses their {cc}!" -f "Meta|**DC 15**\n({f'Target `{t}` not found' if t else 'No Target Specified'})" {desc} -f "{cc}|{ch.cc_str(cc)} {'_use ignored_' if i else '(-1)'}" '''
-    else:
+    else:  # we aren't in combat
       return f'''-title "{name} uses their {cc}!" -f "Meta|**DC 15**\n(Cannot apply effects outside of combat.)" {desc} -f "{cc}|{ch.cc_str(cc)} {'_use ignored_' if i else '(-1)'}" '''
-  else:
+  else:  # we don't have uses remaining
     return f'''-title "{name} already used all the charges in their {cc}!" -desc "You need to wait until dawn to use this bad boy again.\n\n`{alias} cast -i` to ignore the counter,\n`{alias} reset` to reset the wand's charges." -f "{cc}|{ch.cc_str(cc)}" '''
-
-else:
+else:  # we didn't try to cast or reset or ask for help
   return f""" -title "{name} reads the manual on their {cc}!" -desc "`{alias} cast [-t target]` to use the wand,\n`{alias} reset` to reset the wand's charges." {desc} -f "{cc}|{ch.cc_str(cc)}" """
 
 </drac2> -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/19/270/315/315/636382375578855080.jpeg -color <color> {{footer}}
