@@ -16,7 +16,7 @@ aRoll = vroll(rollstring)  # our arcana roll
 
 # make a list of all possible spells 
 fullSpellList = []
-for x in range(1,10):
+for x in range(10):
 	fullSpellList += g.sp[str(x)]
 
 # try for an exact match
@@ -28,13 +28,13 @@ if not fullSpellName:
 
 # if we matched multiple spells
 if len(fullSpellName)>1:
-	return f"""embed -title "Your entry `&1&` matches more than one possible spell name."  -desc "Possible matches: `{'`, `'.join(fullSpellName)}`\n\n**Command ran:**\n\n`{ctx.prefix+ctx.alias} &*&`"  """
+	return f"""embed -title "Your entry `&1&` matches more than one possible spell name."  -desc 《Possible matches: `{'`, `'.join(fullSpellName)}`\n\n**Command ran:**\n\n`{ctx.prefix+ctx.alias} &*&`》  """
 
 # if we still didn't match anything
 elif not fullSpellName:
-	return f"""embed -title "Your {ma} has a breakdown!" -desc "Your entry `&1&` doesn't match any known spell.  Check your spelling and try again.\n\n**Command ran:**\n\n`{ctx.prefix+ctx.alias} &*&`"  """
+	return f"""embed -title "Your {ma} has a breakdown!" -desc 《Your entry `&1&` doesn't match any known spell.  Check your spelling and try again.\n\n**Command ran:**\n\n`{ctx.prefix+ctx.alias} &*&`》  """
 
-# we ended up with only one match
+# we ended up with only one match 《 》
 else:
 	fullSpellName = fullSpellName[0]
 
