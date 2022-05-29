@@ -55,18 +55,18 @@ if SpellName=='fear':
   newTargs = ' -t '+' -t '.join([f'"{x}|{y}"' if y else f'"{x}"' for x,y in tDict.items()])  # make a new target string with our arguments
 
   [args.remove(x) for x in a.get('t')]  # remove our targets from our args list so we don't duplicate them
-  [args.remove(x) for x in args if x=='-t']  # remove all the '-t' from the args as well
-  [args.remove(x) for x in args if x=='-t']  # remove all the '-t' from the args a second time since sometimes the first one seemed to miss one
+  while '-t' in args:  # remove all the '-t' from the args as well
+    args.remove('-t')
 
   oldArgs = ' '.join([f'"{x}"' if ' ' in x else str(x) for x in args[1:] ])  # assemble our old arguments, after removing the spell name.
 
   i or ch.mod_cc(cc,-1)
-  return f"""cast "{SpellName}" -dc 13 i {newTargs} {oldArgs} -phrase "with {get('their', 'their')} {cc}!" -f "{cc}|{ch.cc_str(cc)} {'_use ingored_' if i else '(-1)'}\n**Fear** - _Targets only beasts that have an Intelligence of 3 or lower._" """+Display
+  return f"""cast "{SpellName}" -dc 13 i {newTargs} {oldArgs} -phrase "with {get('their', 'their')} {cc}!" -f "{cc}|{ch.cc_str(cc)} {'- _use ignored_' if i else '(-1)'}\n**Fear** - _Targets only beasts that have an Intelligence of 3 or lower._" """+Display
 
 
 elif SpellName:  # matched a spell (and v is true since we already handled if not v)
   i or ch.mod_cc(cc,-1)
-  return f"""cast "{SpellName}" -dc 13 i &*& -phrase "with {get('their', 'their')} {cc}!" -f "{cc}|{ch.cc_str(cc)} {'_use ingored_' if i else '(-1)'}" """+Display  # we add &*& in here to allow args to populate this portion, like targets, since argparse(&ARGS) gobbles them up
+  return f"""cast "{SpellName}" -dc 13 i &*& -phrase "with {get('their', 'their')} {cc}!" -f "{cc}|{ch.cc_str(cc)} {'- _use ignored_' if i else '(-1)'}" """+Display  # we add &*& in here to allow args to populate this portion, like targets, since argparse(&ARGS) gobbles them up
 
 else:  # instructions if none of the other things happened
   return f"""embed -title "{name} takes a hard look at {get('their', 'their')} {cc}!" -desc "{ch.cc(cc).desc}" -f "You can use this alias to cast spells with targets as normal.\n`{alias} fear`  will use a charge of the ring and cast the **Fear** spell.\n`{alias} friend`  will cast the **Animal Friendship** spell." -f "{cc}|{ch.cc_str(cc)}" """+Display
