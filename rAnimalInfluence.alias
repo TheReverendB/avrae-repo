@@ -13,19 +13,61 @@ if len(SpellName)>2:  # do we have multiple matches (we would have two items in 
 else:  # if the list is not greater than 2, we either matched a spell or the list is only [0] which will be falsey when we return SpellName[0]
   SpellName=SpellName[0]
 
-Display = f""" -f "{cc}|{ch.cc_str(cc)} {'_use ingored_' if i else '(-1)' if v and SpellName else ''}" -thumb https://www.dndbeyond.com/avatars/thumbnails/7/341/1000/1000/636284758989654087.jpeg -color {color} -footer "{alias} [SpellName]" """  # mostly this is so we only have to type the counter display once, but also add -thumb, -color and -footer here so they don't show up in the echo return
+Display = f""" -thumb https://www.dndbeyond.com/avatars/thumbnails/7/341/1000/1000/636284758989654087.jpeg -color {color} -footer "{alias} [SpellName]" """  # add our -thumb, -color and -footer here so they don't show up in the echo return
 
 
 if &ARGS& and not SpellName:  # did someone enter args but they didn't match a spell?
   Display+=f""" -f "Your entry `&1&` did not match any spells this ring can cast." """  # add this extra field of text to be less confusing
 
 if not v:  # no uses remaining and uses not ignored
-  return f"""embed -title "{name} tries to use {get('their','their')} {cc}!" -desc "Your ring is exhausted and won't regain charges until dawn.  `{alias} 'Spell Name' -i` to ignore a use." """+Display
+  return f"""embed -title "{name} tries to use {get('their','their')} {cc}!" -desc "Your ring is exhausted and won't regain charges until dawn. `{alias} 'Spell Name' -i` to ignore a use." -f "{cc}|{ch.cc_str(cc)}" """+Display
 
-if SpellName:  # matched a spell (and v is true since we already handled if not v)
+
+# let's automatically pass monsters with an intelligence of 4 or higher
+args = &ARGS&
+tDict= {}
+tArgs= ''
+newTargs = ''
+
+if SpellName=='fear':
+  for t in a.get('t'):  # for everyone we targeted
+    if '|' in t:  # if they have target specific args, let's grab those and save them
+      tName, tArgs = t.split('|')
+      tDict[tName] = tArgs
+    else:  # if not, we still save them in our tDict
+      tName, tArgs = t, ''
+      tDict[tName] = tArgs
+
+    # if we target a group, split the group into individual targets to check for intelligence
+    if combat() and (target:=combat().get_group(tName)):
+      for gt in target.combatants:  # for each combatant in the group
+        if gt.stats.intelligence>3:  # if their intelligence is above 3
+          tDict[gt.name]='pass '+tDict[tName]  # we add the 'pass ' argument
+        else:  # otherwise, we just keep the original args for the group
+          tDict[gt.name]=tDict[tName]
+      tDict.pop(tName)  # remove the group as a target from our tDict once we're done with every individual
+
+      # individual combatants
+    if combat() and (target:=combat().get_combatant(tName)):
+      if target.stats.intelligence>3:
+        tDict[tName]='pass '+tArgs  # add 'pass ' for single combatants with intelligence above 3
+
+  newTargs = ' -t '+' -t '.join([f'"{x}|{y}"' if y else f'"{x}"' for x,y in tDict.items()])  # make a new target string with our arguments
+
+  [args.remove(x) for x in a.get('t')]  # remove our targets from our args list so we don't duplicate them
+  [args.remove(x) for x in args if x=='-t']  # remove all the '-t' from the args as well
+  [args.remove(x) for x in args if x=='-t']  # remove all the '-t' from the args a second time since sometimes the first one seemed to miss one
+
+  oldArgs = ' '.join([f'"{x}"' if ' ' in x else str(x) for x in args[1:] ])  # assemble our old arguments, after removing the spell name.
+
   i or ch.mod_cc(cc,-1)
-  return f"""cast "{SpellName}" -dc 13 i &*& -phrase "with {get('their', 'their')} {cc}!"   """+Display  # we add &*& in here to allow args to populate this portion, like targets, since argparse(&ARGS) gobbles them up
+  return f"""cast "{SpellName}" -dc 13 i {newTargs} {oldArgs} -phrase "with {get('their', 'their')} {cc}!" -f "{cc}|{ch.cc_str(cc)} {'_use ingored_' if i else '(-1)'}\n**Fear** - _Targets only beasts that have an Intelligence of 3 or lower._" """+Display
+
+
+elif SpellName:  # matched a spell (and v is true since we already handled if not v)
+  i or ch.mod_cc(cc,-1)
+  return f"""cast "{SpellName}" -dc 13 i &*& -phrase "with {get('their', 'their')} {cc}!" -f "{cc}|{ch.cc_str(cc)} {'_use ingored_' if i else '(-1)'}" """+Display  # we add &*& in here to allow args to populate this portion, like targets, since argparse(&ARGS) gobbles them up
 
 else:  # instructions if none of the other things happened
-  return f"""embed -title "{name} takes a hard look at {get('their', 'their')} {cc}!" -desc "{ch.cc(cc).desc}" -f "You can use this alias to cast spells with targets as normal.\n`{alias} fear`  will use a charge of the ring and cast the **Fear** spell.\n`{alias} friend`  will cast the **Animal Friendship** spell." """+Display
+  return f"""embed -title "{name} takes a hard look at {get('their', 'their')} {cc}!" -desc "{ch.cc(cc).desc}" -f "You can use this alias to cast spells with targets as normal.\n`{alias} fear`  will use a charge of the ring and cast the **Fear** spell.\n`{alias} friend`  will cast the **Animal Friendship** spell." -f "{cc}|{ch.cc_str(cc)}" """+Display
 </drac2>
