@@ -1,0 +1,64 @@
+<drac2>
+xRay   = "x-ray vision"
+n      = '\n'
+spells ={
+  "clairvoyance": 2,
+  "crown of madness": 1,
+  "disintegrate": 4,
+  "dominate monster": 5,
+  "eyebite": 4,
+  xRay: 0
+}
+desc   = "- You have truesight.\n- You can use an action to see as if you were wearing a ring of X-ray vision. You can end this effect as a bonus action.\n- The eye has 8 charges. You can use an action and expend 1 or more charges to cast one of the following spells (save DC 18) from it: clairvoyance (2 charges), crown of madness (1 charge), disintegrate (4 charges), dominate monster (5 charges), or eyebite (4 charges). The eye regains 1d4 + 4 expended charges daily at dawn. Each time you cast a spell from the eye, there is a 5 percent chance that Vecna tears your soul from your body, devours it, and then takes control of the body like a puppet. If that happens, you become an NPC under the DM's control."
+
+flavor = f'-color {color} -thumb https://www.dndbeyond.com/avatars/25122/351/637855687992553066.jpeg'
+
+# parse arguments
+syntax=f'`{ctx.prefix}{ctx.alias} "<spell>" [<cast arguments>][-i]`'
+
+a=&ARGS&
+
+if not a or a[0].lower() in ['?','help']:
+  return f'echo _ _\nUse: {syntax}.\nSupported options: {", ".join(spells.keys())}.'
+
+# create the cc
+cc='Eye of Vecna'
+ch=character()
+ch.create_cc_nx(cc, 0, 8, 'long', 'bubble', reset_by='1d4+4')
+
+# match the spell name
+spell     = a[0].lower()
+cast_args = """&*&""".strip(spell)
+
+match =[sn for sn in spells if spell.lower() in sn.lower()]
+if not match:
+  return f'echo _ _\nUse: {syntax}.\nSupported spells: {", ".join(spells.keys())}.\nCase insensitive and partial name is supported.'
+if len(match)>1:
+  return f'echo _ _\nMultiple spells match `{spell}`: {", ".join(match)}.  Be more specific to cast.'
+
+match = match[0]
+cost  = spells[match]
+
+if argparse(a).last('i') or cost==0:
+  fields=f'-f  "{cc} _use ignored_|{ch.cc_str(cc)}|inline" '
+else:
+  # remove the charges
+  current=ch.get_cc(cc)
+  if cost>current:
+    return f'echo Not enough charges [{cost}] on your {cc} to cast {match} : {ch.cc_str(cc)}'
+  remaining = ch.mod_cc(cc,-cost)
+  fields=f' -f "{cc} (-{cost})|{ch.cc_str(cc)}|inline" '
+
+
+#output alias
+if match==xRay:
+  return f'''embed -title "{name} activates their X-Ray Vision using their {cc}!" -desc "**{cc}**\n{f'{n}- '.join(desc.split('- ')[:3])}" {flavor} -f "{cc}|{ch.cc_str(cc)}" '''
+else:
+  # does vecna consume their soul?
+  r = vroll('1d20')
+  if r.total==1:
+    vecna=f''' -title "{name} casts {match} and their soul is consumed by Vecna!" -f "Does Vecna consume your soul?|{r}\nYes.  Yes he does." '''
+  else:
+    vecna=f""" -f "Does Vecna consuem your soul?|{r}\nNot yet." """
+  return f'''cast "{match}" -dc 18 {cast_args} -phrase "with their {cc}" -i -f "{desc}" {vecna} {fields} {flavor} '''
+</drac2>
