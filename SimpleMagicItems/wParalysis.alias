@@ -27,7 +27,7 @@ if '''&1&'''.lower() in 'cast':
       if targ:=c.get_combatant(t):  # grab our target's SimpleCombatant object and only proceed if we grabbed it
         save = vroll(targ.saves.get('con').d20(adv)+bonus)  # roll their save
         if save.total<15:  # check for failed save and apply the effect if they failed
-          targ.add_effect(f'Paralyzed ({cc})','',10,desc="At the end of each of the target's turns, it can repeat the DC 15 Constitution saving throw, ending the effect on itself on a success.")
+          targ.add_effect(f'Paralyzed ({cc})',duration=10,desc="At the end of each of the target's turns, it can repeat the DC 15 Constitution saving throw, ending the effect on itself on a success.",buttons=[{"label":"Break Free","automation":[{"type":"target","target":"self","effects":[{"type":"save","stat":"con","fail":[{"type":"text","text":"{caster.name} is still paralyzed!"}],"success":[{"type":"remove_ieffect"},{"type":"text","text":"{caster.name} breaks free from the paralysis!"}],"dc":"15"}]}],"verb":"tries to break free","style":"3"}])
           return f'''-title "{name} uses their {cc}!" -f "Meta|**DC 15**" -f "{targ.name}|**CON Save**: {save}; Failure!\n**Effect:** {targ.get_effect(f'Paralyzed ({cc})')}" {desc} -f "{cc}|{ch.cc_str(cc)} {'_use ignored_' if i else '(-1)'}" '''  # return our embed showing the successful attack
         else:  # they passed the save
           return f'''-title "{name} uses uses their {cc}!" -f "Meta|**DC 15**" -f "{targ.name}|**CON Save**: {save}; Success!" {desc} -f "{cc}|{ch.cc_str(cc)} {'_use ignored_' if i else '(-1)'}" '''
@@ -41,3 +41,7 @@ else:  # we didn't try to cast or reset or ask for help
   return f""" -title "{name} reads the manual on their {cc}!" -desc "`{alias} cast [-t target]` to use the wand,\n`{alias} reset` to reset the wand's charges." {desc} -f "{cc}|{ch.cc_str(cc)}" """
 
 </drac2> -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/19/270/315/315/636382375578855080.jpeg -color <color> {{footer}}
+
+[{"label":"Break Free","automation":[{"type":"target","target":"self","effects":[{"type":"save","stat":"dex","fail":[{"type":"text","text":"{caster.name} is still paralyzed!"}],"success":[{"type":"remove_ieffect"},{"type":"text","text":"{caster.name} breaks free from the paralysis!"}],"dc":"15"}]}],"verb":"tries to break free","style":"3"}]
+
+
