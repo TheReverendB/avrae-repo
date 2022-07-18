@@ -1,8 +1,8 @@
-!alias pearlofpower embed <drac2>
+embed <drac2>
 cc = "Pearl of Power"
 character().create_cc_nx(cc,0, 1, None, "bubble")
-v,re,desc = get_cc(cc),'&1&'=='recharge',"While this pearl is on your person, you can use an action to speak its command word and regain one expended spell slot. If the expended slot was of 4th level or higher, the new slot is 3rd level. Once you use the pearl, it can't be used again until the next dawn."
-slotsUsed = [(get_slots(x) < get_slots_max(x)) for x in range(1,4)]
+v,re,desc = character().get_cc(cc),'&1&'=='recharge',"While this pearl is on your person, you can use an action to speak its command word and regain one expended spell slot. If the expended slot was of 4th level or higher, the new slot is 3rd level. Once you use the pearl, it can't be used again until the next dawn."
+slotsUsed = [(character().spellbook.get_slots(x) < character().spellbook.get_max_slots(x)) for x in range(1,4)]
 slotRestored = 0
 out = []
 if v and (slotsUsed[0] or slotsUsed[1] or slotsUsed[2]):
@@ -13,25 +13,25 @@ if v and (slotsUsed[0] or slotsUsed[1] or slotsUsed[2]):
             slotRestored = x
             break
     if slotRestored:
-        set_slots(slotRestored, get_slots(slotRestored) + 1)
+        character().spellbook.set_slots(slotRestored, character().spellbook.get_slots(slotRestored) + 1)
         character().mod_cc(cc,-1)
-        out.append(f"-f 'Spell Slots (+1)|{slots_str(slotRestored)}'")
-        out.append(f"-f '{cc} (-1)|{cc_str(cc)}'")
+        out.append(f"-f 'Spell Slots (+1)|{character().spellbook.slots_str(slotRestored)}'")
+        out.append(f"-f '{cc} (-1)|{character().cc_str(cc)}'")
 elif v:
     out.append(f"-title '{name} attempts to use the magic of their {cc}!'")
     out.append(f'''-desc """You haven't used any spell slots that can be restored!\n\nYou need to have an empty slot of 3rd level or less to use the {cc}.""" ''')
-    out.append(f"-f 'Spell Slots|{slots_str(1)}\n{slots_str(2)}\n{slots_str(3)}'")
-    out.append(f"-f '{cc}|{cc_str(cc)}'")
+    out.append(f"-f 'Spell Slots|{character().spellbook.slots_str(1)}\n{character().spellbook.slots_str(2)}\n{character().spellbook.slots_str(3)}'")
+    out.append(f"-f '{cc}|{character().cc_str(cc)}'")
 elif re:
     character().mod_cc(cc,+1)
     out.append(f"-title '{name} can feel power returning to the {cc}!'")
     out.append(f'-desc "{desc}"')
-    out.append(f"-f '{cc} (+1)|{cc_str(cc)}'")
+    out.append(f"-f '{cc} (+1)|{character().cc_str(cc)}'")
 else:
     out.append(f'''-title "{name}'s {cc} is out of power!" ''')
     out.append(f"-desc 'Your {cc} is exhausted.  `!pearlofpower recharge` to charge it at dawn.'")
-    out.append(f"-f '{cc}|{cc_str(cc)}'")
+    out.append(f"-f '{cc}|{character().cc_str(cc)}'")
 return "\n".join(out)
 </drac2>
--footer "!pearlofpower  /  !pearlofpower recharge"
+-footer "{{ctx.prefix}}{{ctx.alias}}  /  {{ctx.prefix}}{{ctx.alias}} recharge"
 -thumb 'https://cdn.discordapp.com/attachments/758809345361707078/767406441685319700/images.jpg'
