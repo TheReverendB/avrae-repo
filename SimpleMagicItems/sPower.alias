@@ -1,0 +1,107 @@
+<drac2>
+retro="Retributive Strike"
+power="Power Strike"
+spells={
+  "Cone of Cold": 5,
+  "Fireball": 5,
+  "Globe of Invulnerability": 6,
+  "Hold Monster": 5,
+  "Levitate": 2,
+  "Lightning Bolt": 5,
+  "Magic Missile": 1,
+  "Ray of Enfeeblement": 1,
+  "Wall of Force": 5,
+  retro: 0,
+  power: 1
+}
+# create the cc
+cc='Staff of Power'
+ch=character()
+ch.create_cc_nx(cc, 0, 20, 'long',reset_by='2d8+4',desc="""The staff has 20 charges for the following properties. The staff regains 2d8 + 4 expended charges daily at dawn. If you expend the last charge, roll a d20. On a 1, the staff retains its +2 bonus to attack and damage rolls but loses all other properties. On a 20, the staff regains 1d8 + 2 charges.
+
+__**Power Strike**__
+When you hit with a melee attack using the staff, you can expend 1 charge to deal an extra 1d6 force damage to the target.
+ 
+__**Spells**__
+While holding this staff, you can use an action to expend 1 or more of its charges to cast one of the following spells from it, using your spell save DC and spell attack bonus: **cone of cold** (5 charges), **fireball** (5th-level version, 5 charges), **globe of invulnerability** (6 charges), **hold monster** (5 charges), **levitate** (2 charges), **lightning bolt** (5th-level version, 5 charges), **magic missile** (1 charge), **ray of enfeeblement** (1 charge), or **wall of force** (5 charges).""")
+
+# parse arguments
+alias=ctx.prefix+ctx.alias
+syntax=f'`{alias} "<spell>" [cast arguments][-i]` or `{alias} "power strike"` or `{alias} "retributive strike"`'
+a=&ARGS&
+if not a or a[0].lower() in '?help':
+  return f'echo   **Use:** {syntax}. \n**Charges:** {ch.cc_str(cc)}\n**Supported spells/actions:** {", ".join(spells.keys())}.'
+
+cast_args="""&*&""".strip(a[0])
+ignore=argparse(a).last('i')
+
+#add flavor
+flavor=f'''-color <color> -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/19/188/315/315/636382353417817884.jpeg -footer "{alias}"'''
+
+# match the spell name
+spell=a[0]
+match=[sn for sn in spells.keys() if spell.lower() in sn.lower()]
+if not match:
+  return f'echo   **Use:** {syntax}.\n**Charges:** {ch.cc_str(cc)}\n**Supported spells:** {", ".join(spells.keys())}.'
+if len(match)>1:
+  return f'echo **Multiple spells match `{spell}`:** {", ".join(match)}.'
+match=match[0]
+cost=spells[match]
+
+
+#handle exploding staff
+if match==retro:
+  exp_amt=ch.get_cc(cc)
+  abr_field=f""" -f "Retributive Strike|You can use an action to break the staff over your knee or against a solid surface, performing a retributive strike. The staff is destroyed and releases its remaining magic in an explosion that expands to fill a 30-foot-radius sphere centered on it.{'`'*3}
+Distance from Origin | Damage
+---------------------|----------------
+You                  | 16 x {exp_amt} = {16*exp_amt}[force]
+10 ft. away or less  | 8  x {exp_amt} = {8*exp_amt}[force]
+11 to 20 ft. away    | 6  x {exp_amt} = {6*exp_amt}[force]
+21 to 30 ft. away    | 4  x {exp_amt} = {4*exp_amt}[force]{'`'*3}\n\nDue to the difficult nature of targeting for this, damage will need to be applied manually. " -f "You have a 50 percent chance to instantly travel to a random plane of existence, avoiding the explosion. If you fail to avoid the effect, you take force damage equal to 16 × the number of charges in the staff. Every other creature in the area must make a DC 17 Dexterity saving throw. On a failed save, a creature takes an amount of damage based on how far away it is from the point of origin, as shown in the table. On a successful save, a creature takes half as much damage." """
+
+# set level for casting
+if match.lower()=="lightning bolt" or match.lower()=="fireball":
+  lvl_phrase = f'-l 5 -phrase "at level 5 with their {cc}!"'
+else:
+  lvl_phrase = f'-phrase "with their {cc}!"'
+
+# no charges used
+if ignore:
+  fields=f' -f  "{cc}|{ch.cc_str(cc)} _charges ignored_|inline" '
+else:
+  # remove the charges
+  if cost>ch.get_cc(cc):
+    return f'echo Not enough charges ({cost=}) on your {cc} to use {match}: {ch.cc_str(cc)}'
+  remaining = ch.mod_cc(cc,-cost)
+  fields=f''' -f "{cc}|{ch.cc_str(cc)} (-{cost})|inline" '''
+
+# no charges recharge
+if not ch.get_cc(cc) and not ignore:
+  rroll = vroll('1d20')
+  fields+=f''' -f "Out of Charges!|If you expend the last charge, roll a d20. On a 1, the staff retains its +2 bonus to attack and damage rolls but loses all other properties. On a 20, the staff regains 1d8 + 2 charges.\n{rroll}'''
+  if rroll.total==20:
+    recharge = vroll('1d8+2')
+    ch.mod_cc(cc, recharge.total)
+    fields+=f'\nThe staff regains charges!\n{recharge} _charges gained!_\n**{cc}**\n{ch.cc_str(cc)} (+{recharge.total})" '
+  elif rroll.total==1:
+    fields+=f'''\nThe staff retains it's +2 bonus but loses all other properties!" '''
+  else:
+    fields+=f'''\nThe staff is empty but otherwise unchanged." '''
+
+# output alias
+if match==power:
+  r = vroll('1d6[force]')
+  t = argparse(a).last('t')
+  out = f'''-f "Meta|**Damage**: {r}"  '''
+  if c:=combat():
+    if targ:=c.get_combatant(t):
+      damage=targ.damage('1d6[force]')
+      out = f'''-f "{targ.name}|{damage.damage}\n\n{targ}" '''
+  return f'''embed -title "{name}" uses {match} after {get('they', 'they')} land{'' if get('they')=='they' else 's'} an attack with the {cc}! {out} -f "Effect|When you hit with a melee attack using the staff, you can expend 1 charge to deal an extra 1d6 force damage to the target." {fields} {flavor} '''
+if match==retro:
+  ch.set_cc(cc, 0)
+  return f'''embed -title "{name} uses {match} with {get('their', 'their')} {cc}{' and it explodes violently' if exp_amt else ''}!" {abr_field} -f "{cc}|{ch.cc_str(cc)}" {flavor}'''
+else:
+  return f'''cast "{match}" {lvl_phrase} {cast_args} -i {fields} {flavor} '''
+</drac2>
