@@ -17,21 +17,16 @@ typ         = a.last('type','').lower()
 align       = a.last('align','').upper()
 xp          = a.last('xp', 0, int)
 cr          = a.last('cr','').lower()
+book        = a.last('book','')
 env         = a.get('env') or []
 envLower    = [x.lower() for x in env if x!='True']
 
 # import our gvars from our monsterList uvar and monsterServerList and pull relevant info from (small) critterDB jsons.
-SvarList    = load_json(get_svar('monsterServerList', '[]'))
-UvarList    = load_json(get('monsterList', '[]'))
+SvarSet    = set(load_json(get_svar('monsterServerList', '[]')))
+UvarSet    = set(load_json(get('monsterList', '[]')))
 
 # combine our gvar lists into one if there are multiple sources
-if SvarList and UvarList:
-  GvarList = UvarList
-  for SvarGvar in SvarList:
-    if SvarGvar not in GvarList:
-      GvarList.append(SvarGvar)
-else:
-  GvarList = UvarList or SvarList
+GvarList = list(SvarSet | UvarSet)
 
 # load our monsters from the gvars, sifting through the chaff of a critterDB json
 if GvarList:
@@ -41,7 +36,7 @@ if GvarList:
       DBname = ''.join([x[0] for x in gDB.name.split()]).strip('(')
       for M in gDB.creatures:
         DBalign = ''.join([x[0].upper() for x in M.stats.alignment.split()]) if len(M.stats.alignment.split())>1 else M.stats.alignment.capitalize()
-        critterDB[M.name.lower()] = {"size": M.stats.size.lower() , "type": M.stats.race.lower() , "align": DBalign , "cr": M.stats.challengeRatingStr, "xp": M.stats.experiencePoints, "source": DBname}
+        critterDB[M.name.lower()] = {"size": M.stats.size.lower() , "type": M.stats.race.lower() , "align": DBalign , "cr": M.stats.challengeRatingStr, "xp": M.stats.experiencePoints, "source": DBname.upper()}
         if M.flavor.environment:
           critterDB[M.name].update({"env": M.flavor.environment})
       g.update(critterDB)
@@ -52,28 +47,31 @@ else:
 
 
 # compile a list of xp and environments in order to support homebrew
-xpList  = []
-envList = []
-for mon in g:  # look through each monster
-  if g[mon].xp not in xpList:  # check if mon xp is not in our list
-    xpList.append(g[mon].xp)  # add unique xp amounts to our list
-  if 'env' in g[mon]:  # some monsters do not have an env listed so we check first to avoid an error
-    for ev in g[mon].env:  # look at each environment in their list
-      if ev not in envList:  # check if their env is not in our list
-        envList.append(ev)  # add unique environments to our list
+xpSet  = set()
+envSet = set()
+bookSet= set()
+
+for _, mon in g.items():  # look through each monster
+  xpSet.add(mon.xp)  # add unique xp amounts to our list
+  bookSet.add(mon.source)
+  if 'env' in mon:  # some monsters do not have an env listed so we check first to avoid an error
+    envSet.update(mon.env)  # add unique environments to our list
+
+xpList  = list(xpSet)  # convert to a list to sort
 xpList.sort()  # numerical order
+bookList= list(bookSet)  # convert to a list to sort
+bookList.sort()  # alphabetical order
+envList = list(envSet)  # convert to a list to sort
 envList.sort()  # alphabetical order
 
-
-
 # instructions for later use
-instructions = f""" -f "Use this to lookup some quick, general monster stats useful for building an encounter.  Defaults to trying to look up by monster name.  Enter only a monster's name, or a monster's name in quotes along with other arguments to filter by other stats like, Type (`-type`), Alignment (`-align`), CR (`-cr`), XP (`-xp`) or Environment (`-env`).\n\nYou can enter multiple environments, but they have to be from the list: {'`'+'`, `'.join(envList)+'`' if envList else '*`No Environments listed for current monsters`*'}, and with multiple `-env`, like `-env hill -env mountain`." -f "Some monsters do not have an Alignment or Environment and will be excluded from those search results." -f "Exact matches are given preference over partial matches.|Examples:\n`{ctx.prefix+ctx.alias} goblin` will return only a goblin but...\n`{ctx.prefix+ctx.alias} gobli` will retun a few monsters with `gobli` in their name like Goblin Boss, or Hobgoblin.\n`{ctx.prefix+ctx.alias} 'red dragon' -env hill` will grab an Adult Red Dragon, an Ancient Red Dragon, and a Young Red Dragon." """
+instructions = f""" -f "Use this to lookup some quick, general monster stats useful for building an encounter.  Defaults to trying to look up by monster name.  Enter only a monster's name, or a monster's name in quotes along with other arguments to filter by other stats like, Type (`-type`), Alignment (`-align`), CR (`-cr`), XP (`-xp`), Book (`-book`) or Environment (`-env`).\n\nYou can enter multiple environments, but they have to be from the list: {'`'+'`, `'.join(envList)+'`' if envList else '*`No Environments listed for current monsters`*'}, and with multiple `-env`, like `-env hill -env mountain`." -f "To choose a book use one of the abbreviations from your list of sources, as CritterDB sources will have unique abbreviated names: `{'`, `'.join(bookList)}`" -f "Some monsters do not have an Alignment or Environment and will be excluded from those search results." -f "Exact matches are given preference over partial matches.|Examples:\n`{ctx.prefix+ctx.alias} goblin` will return only a goblin but...\n`{ctx.prefix+ctx.alias} gobli` will retun a few monsters with `gobli` in their name like Goblin Boss, or Hobgoblin.\n`{ctx.prefix+ctx.alias} 'red dragon' -env hill` will grab an Adult Red Dragon, an Ancient Red Dragon, and a Young Red Dragon." """
 
 
 
 # name matching while allowing users to input either an unquoted name, a quoted name with other args or using the -name argument
-arg1      = a.last('name','').lower() if a.get('name') else '''&*&'''.lower() if '"' not in '''&*&''' and &ARGS& and len(&ARGS&)>1 and not (typ or align or xp or cr or env) else '''&1&'''.lower() if &ARGS& else ''
-name_list = [x for x in g if arg1 == x] or [x for x in g if arg1 in x]
+arg1      = a.last('name','').lower() if a.get('name') else '''&*&'''.lower() if '"' not in '''&*&''' and &ARGS& and len(&ARGS&)>1 and not (typ or align or xp or cr or env or book) else '''&1&'''.lower() if &ARGS& else ''
+name_list = [arg1] if arg1 in g else [x for x in g if arg1 in x]
 
 # help handling
 if not arg1 or arg1 in "?help":
@@ -85,74 +83,60 @@ if name_list:
   terms.append(f"**Name:** `{arg1}`")
   search_list = name_list
 else:
-  search_list = [x for x in g]
-
+  search_list = list(g)
 
 
 # size
 if size:
   terms.append(f"**Size:** {size.capitalize()}")
 
-for mon in search_list:
-  if not size or size in g[mon].size:
-    size_list.append(mon)
-
-
-
 # type
 if typ:
   terms.append(f"**Type:** {typ.capitalize()}")
-
-for mon in size_list:
-  if not typ or typ in g[mon].type:
-    type_list.append(mon)
-
-
 
 # alignment
 if align:
   terms.append(f"**Alignment:** {align}")
 
-for mon in type_list:
-  if not align or align in g[mon].align:
-    align_list.append(mon)
-
-
-
 # xp
 if xp:
-  low, high = [x for x in xpList if x<=xp][-1], [x for x in xpList if x>=xp][0]
+  low, high = [x for x in xpList if x<=xp][-1], [x for x in xpList if x>=xp][0]  # set our high and low thresholds
   terms.append(f"**XP:** {f'between {low} and {high}' if low!=high else f'{low}'}")
-
-for mon in align_list:  # filter out results for xp
-  if not xp or low<=g[mon].xp<=high:
-    xp_list.append(mon)
-
-
 
 # cr
 if cr:
   terms.append(f"**CR:** {cr}")
   cr = roll(f'{cr}*100')
 
-for mon in xp_list:  # filter out results for cr
-  if not cr or cr == roll(f'{g[mon].cr}*100'):
-    cr_list.append(mon)
-
-
+# book
+if book:
+  terms.append(f"**Book:** {book}")
 
 # environments
 if env:
   terms.append(f"**Environment{'s' if len(envLower)>1 else ''}:** {', '.join([x.title() for x in envLower])}")
 
-for mon in cr_list:  # filter out results for environment
-  if not env or 'env' in g[mon] and all([x in g[mon].env for x in envLower]):
-    final_list.append(mon)
 
+for mon in search_list:  # loop through our monster list and only append those that match our criteria
+  mon_stat = g[mon]
+  if size and not size in mon_stat.size:
+    continue
+  if typ and not typ in mon_stat.type:
+    continue
+  if align and not align in mon_stat.align:
+    continue
+  if xp and not low<=mon_stat.xp<=high:
+    continue
+  if cr and not cr == roll(f'{mon_stat.cr}*100'):
+    continue
+  if book and not book.lower() in mon_stat.source.lower():
+    continue
+  env_list = mon_stat.get("env",[])
+  if env and not all(x in env_list for x in envLower):
+    continue
+  final_list.append(mon)
 
-# TROUBLESHOOTING 
-# return f"""echo _ _\nname_list: {name_list[:10]}\nsize: {size_list[:10]}\ntype: {type_list[:10]}\nalign: {align_list[:10]}\nxp: {xp_list[:10]}\ncr: {cr_list[:10]}\nfinal: {final_list[:10]} """
-
+final_list.sort()
 
 # a return for no results matching the criteria
 if not terms and len(final_list)==len(search_list) or not final_list:
@@ -187,4 +171,4 @@ else:
 # spit it all out
 return "embed "+' '.join(out)
 
-</drac2> -title "You did the Monster Match!" -footer "{{ctx.prefix+ctx.alias}} [\"monster name\"|-type|-align|-xp|-cr|-env]" -thumb https://cdn.discordapp.com/attachments/709738212209197189/930280128976658502/images.png
+</drac2> -title "You did the Monster Match!" -footer "{{ctx.prefix+ctx.alias}} [\"monster name\"|-type|-align|-xp|-cr|-book|-env]" -thumb https://cdn.discordapp.com/attachments/709738212209197189/930280128976658502/images.png
