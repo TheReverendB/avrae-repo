@@ -4,7 +4,7 @@ ch = character()
 ch.create_cc_nx(cc,0,1,'long','bubble',desc="This copper amulet contains tiny interlocking gears and is powered by magic from Mechanus, a plane of clockwork predictability. A creature that puts an ear to the amulet can hear faint ticking and whirring noises coming from within.\n\nWhen you make an attack roll while wearing the amulet, you can forgo rolling the d20 to get a 10 on the die. Once used, this property can't be used again until the next dawn.\nItem | XGtE 137")
 if ch.get_cc(cc):
   ch.mod_cc(cc, -1)
-  return f'''-phrase "using {get('their', 'their')} {cc}! " -attackroll 10 -f "{cc}|{ch.cc_str(cc)} (-1)\nWhen you make an attack roll while wearing the amulet, you can forgo rolling the d20 to get a 10 on the die. Once used, this property can't be used again until the next dawn." '''
+  return f'''-phrase "using {get('their', 'their')} {cc}! " -attackroll1 10 -f "{cc}|{ch.cc_str(cc)} (-1)\nWhen you make an attack roll while wearing the amulet, you can forgo rolling the d20 to get a 10 on the die. Once used, this property can't be used again until the next dawn." '''
 else:
   return f""" -phrase "trying to use {get('their', 'their')} {cc}!" -f "{cc}|{ch.cc_str(cc)}\n\nYou already used your amulet and need to wait until dawn to use it again.  `{ctx.prefix}cc \\\"Clockwork Amulet\\\" +1` to recharge your amulet." """
 </drac2>
