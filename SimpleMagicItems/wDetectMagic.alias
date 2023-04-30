@@ -1,0 +1,31 @@
+<drac2>  # since this is a pretty simple device, all it does is cast the spell, or tell you you're out of uses.  The -i argument is included to allow for easy recasting if you forgot to target or similar.
+
+# variables 
+ch   = character()
+desc = "This wand has 3 charges. While holding it, you can expend 1 charge as an action to cast the detect magic spell from it. The wand regains 1d3 expended charges daily at dawn."
+cc   = "Wand of Magic Detection"
+
+# create our counter if it doesn't exist
+ch.create_cc_nx(cc,0,3,'long','bubble',reset_by='1d3', desc=desc)
+
+# more variables
+i    = argparse(&ARGS&).get('i')  # handle ignoring a use with the -i argument
+v    = ch.get_cc(cc) or i  # do we have uses remaining or did we -i ignore uses?
+foot = f"{ctx.prefix}{ctx.alias} [-i]"  # set up our footer
+
+
+if v:  # if we can cast the spell
+
+    # reduce our counter unless we are ignoring uses
+    i or ch.mod_cc(cc, -1)
+
+    # set our output string for the !cast command
+    return f"""cast "Detect Magic" -i &*& -phrase "using the {cc}!" -f "{desc}" -f "{cc} {'' if i else '(-1)'}|{ch.cc_str(cc)}" -f "{foot}" """
+
+
+else:  # if we don't have any uses remaining
+
+    # output string for our embed
+    return f"""embed -title "{name} tries to use the {cc}!" -desc "You're all out of uses!\n`{ctx.prefix}cc reset '{cc}'` to reset the wand at dawn - otherwise it resets on a long rest." -f "{desc}" -f "{cc}|{ch.cc_str(cc)}" -footer "{foot}" """
+
+</drac2> -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/19/199/315/315/636382355178736703.jpeg -color <color>
