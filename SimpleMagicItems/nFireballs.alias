@@ -1,6 +1,6 @@
 <drac2>
 uses= min(7, int('&1&') if '&1&'.isdigit() else 0)  # grab the entered number of uses or default to 0 
-lvl = uses+2 if uses else 0  # calaculate the of the spell or default to 0 
+lvl = uses+2 if uses else 0  # calaculate the level of the spell or default to 0 
 cc  = "Necklace of Fireballs"  # set the name of our counter 
 i   = argparse(&ARGS&).get('i')  # allow for ignoring uses of the counter
 ch  = character()  # make typing easier later
