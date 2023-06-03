@@ -1,0 +1,147 @@
+embed <drac2>
+args    = &ARGS&
+a       = argparse(args)
+ch      = character()
+r       = vroll('1d100')
+rTotal  = a.last('roll',0, int) or r.total
+i       = a.get('i')
+target  = a.last('t')
+targets = a.get('t')
+cc      = "Wand of Wonders"
+cc_desc = """This wand has 7 charges. While holding it, you can use an action to expend 1 of its charges and choose a target within 120 feet of you. The target can be a creature, an object, or a point in space. Roll d100 and consult the following table to discover what happens.
+
+If the effect causes you to cast a spell from the wand, the spell's save DC is 15. If the spell normally has a range expressed in feet, its range becomes 120 feet if it isn't already. If an effect covers an area, you must center the spell on and include the target. If an effect has multiple possible subjects, the GM randomly determines which ones are affected.
+The wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll a d20. On a 1, the wand crumbles into dust and is destroyed."""
+
+# create our counter
+ch.create_cc_nx(cc, 0, 7, 'long', 'star', desc=cc_desc, reset_by='1d6+1')
+
+v = ch.get_cc(cc)
+
+
+# display our counter
+cc_disp = f""" -f "{cc}|{ch.cc_str(cc)}" """
+
+# default title
+title = f"{name} looks at this funky wand!"
+
+
+# use the wand Willow!
+if '&1&'.lower()=='use' and v or i:
+  i or ch.mod_cc(cc, -1)
+  cc_disp = f""" -f "{cc}|{ch.cc_str(cc)} {'' if i else '(-1)'}" """
+  title = f"""{name} uses the {cc}!"""
+  if rTotal!=r.total:
+    r = f'_Forced Roll:_ `{rTotal}`'
+
+  if rTotal<=5:
+    return f""" -desc "**Effect Roll**:\n{r}\nYou cast Slow!" """
+  
+  
+  elif rTotal<=10:
+    return f""" -desc "**Effect Roll**:\n{r}\nYou cast Faerie Fire." """
+  
+  
+  elif rTotal<=15:
+    return f""" -desc "**Effect Roll**:\n{r}\nYou are stunned until the start of your next turn, believing something awesome just happened." """
+  
+  
+  elif rTotal<=20:
+    return f""" -desc "**Effect Roll**:\n{r}\nYou cast Gust of Wind." """
+  
+  
+  elif rTotal<=25:
+    return f""" -desc "**Effect Roll**:\n{r}\nYou cast detect thoughts on the target you chose. If you didn't target a creature ({f'you targeted {", ".join(targets)}' if targets else "no targets found"}), you instead take 1d6 psychic damage." """
+  
+  
+  elif rTotal<=30:
+    return f""" -desc "**Effect Roll**:\n{r}\nYou cast Stinking Cloud." """
+  
+  
+  elif rTotal<=33:
+    return f""" -desc "**Effect Roll**:\n{r}\nHeavy rain falls in a 60-foot radius centered on the target. The area becomes lightly obscured. The rain falls until the start of your next turn." """
+  
+
+  elif rTotal<=36:
+    eff_roll = vroll('1d100')
+    phrase = f""" -desc "**Effect Roll**:\n{r}\nAn animal appears in the unoccupied space nearest the target. The animal isn't under your control and acts as it normally would. Roll a d100 to determine which animal appears. On a 01–25, a rhinoceros appears; on a 26–50, an elephant appears; and on a 51–100, a rat appears." """
+
+    # rhinoceros
+    if eff_roll.total <= 25:
+      text = f"""{phrase} -f "Animal Roll:|{eff_roll} Rhinoceros!" """
+
+    # elephant
+    elif eff_roll.total <= 50:
+      text = f"""{phrase} -f "Animal Roll:|{eff_roll} Elephant!" """
+
+    # rat
+    else:
+      text = f"""{phrase} -f "Animal Roll:|{eff_roll} Rat!" """
+
+    return text
+  
+
+  elif rTotal<=46:
+    return f""" -desc "**Effect Roll**:\n{r}\nYou cast lightning bolt." """
+  
+
+  elif rTotal<=49:
+    return f""" -desc "**Effect Roll**:\n{r}\nA cloud of 600 oversized butterflies fills a 30‐foot radius centered on the target. The area becomes heavily obscured. The butterflies remain for 10 minutes." """
+
+
+  elif rTotal<=53:
+    return f''' -desc "**Effect Roll**:\n{r}\nYou enlarge the target as if you had cast enlarge/reduce. If the target can't be affected by that spell, or if you didn't target a creature, you become the target." '''
+
+
+  elif rTotal<=58:
+    return f""" -desc "**Effect Roll**:\n{r}\nYou cast darkness." """
+
+  
+  elif rTotal<=62:
+    return f""" -desc "**Effect Roll**:\n{r}\nGrass grows on the ground in a 60‐foot radius centered on the target. If grass is already there, it grows to ten times its normal size and remains overgrown for 1 minute." """
+
+
+  elif rTotal<=65:
+    return f""" -desc "**Effect Roll**:\n{r}\nAn object of the GM's choice disappears into the Ethereal Plane. The object must be neither worn nor carried, within 120 feet of the target, and no larger than 10 feet in any dimension." """
+  
+
+  elif rTotal<=69:
+    return f""" -desc "**Effect Roll**:\n{r}\n"You shrink yourself as if you had cast enlarge/reduce on yourself." """
+  
+
+  elif rTotal<=79:
+    return f""" -desc "**Effect Roll**:\n{r}\nYou cast fireball." """
+  
+
+  elif rTotal<=84:
+    return f""" -desc "**Effect Roll**:\n{r}\nYou cast invisibility on yourself." """
+  
+
+  elif rTotal<=87:
+    return f""" -desc "**Effect Roll**:\n{r}\nLeaves grow from the target. If you chose a point in space as the target, leaves sprout from the creature nearest to that point. Unless they are picked off, the leaves turn brown and fall off after 24 hours." """
+  
+
+  elif rTotal<=90:
+    return f""" -desc "**Effect Roll**:\n{r}\nA stream of 1d4 × 10 gems, each worth 1 gp, shoots from the wand's tip in a line 30 feet long and 5 feet wide. Each gem deals 1 bludgeoning damage, and the total damage of the gems is divided equally among all creatures in the line." """
+  
+
+  elif rTotal<=95:
+    return f""" -desc "**Effect Roll**:\n{r}\nA burst of colorful shimmering light extends from you in a 30‐foot radius. You and each creature in the area that can see must succeed on a DC 15 Constitution saving throw or become blinded for 1 minute. A creature can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success." """
+
+
+  elif rTotal<=97:
+    return f""" -desc "**Effect Roll**:\n{r}\nThe target's skin turns bright blue for 1d10 days. If you chose a point in space, the creature nearest to that point is affected." -f "Days of blue skin:|{vroll('1d10')}" """
+
+    
+  else:
+    return f""" -desc "**Effect Roll**:\n{r}\nIf you targeted a creature ({f'you targeted {", ".join(targets)}' if targets else "no targets found"}), it must make a DC 15 Constitution saving throw. If you didn't target a creature, you become the target and must make the saving throw. If the saving throw fails by 5 or more, the target is instantly petrified. On any other failed save, the target is restrained and begins to turn to stone. While restrained in this way, the target must repeat the saving throw at the end of its next turn, becoming petrified on a failure or ending the effect on a success. The petrification lasts until the target is freed by the greater restoration spell or similar magic." """
+
+
+else:
+  if not v or i:
+    title = f"{name} tries to use the {cc}!"
+  return f""" -desc "{cc_desc}" {'' if v or i else ''' -f "You'll need to wait until dawn to use the wand again." '''} """
+
+
+
+</drac2> {{cc_disp}} -title "{{title}}" -thumb https://www.dndbeyond.com/avatars/thumbnails/7/486/1000/1000/636284784520399817.jpeg -footer "{{ctx.prefix+ctx.alias}} [use] [-i]"
