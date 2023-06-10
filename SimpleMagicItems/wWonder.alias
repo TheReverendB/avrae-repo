@@ -7,7 +7,7 @@ rTotal  = a.last('roll',0, int) or r.total
 i       = a.get('i')
 target  = a.last('t')
 targets = a.get('t')
-cc      = "Wand of Wonders"
+cc      = "Wand of Wonder"
 cc_desc = """This wand has 7 charges. While holding it, you can use an action to expend 1 of its charges and choose a target within 120 feet of you. The target can be a creature, an object, or a point in space. Roll d100 and consult the following table to discover what happens.
 
 If the effect causes you to cast a spell from the wand, the spell's save DC is 15. If the spell normally has a range expressed in feet, its range becomes 120 feet if it isn't already. If an effect covers an area, you must center the spell on and include the target. If an effect has multiple possible subjects, the GM randomly determines which ones are affected.
