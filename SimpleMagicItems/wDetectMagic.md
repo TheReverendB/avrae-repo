@@ -1,4 +1,3 @@
-
 A simple alias for the Wand of Detect Magic.
 
 `!wDetectMagic` will create a counter, cast the spell and spend a use from the counter.
