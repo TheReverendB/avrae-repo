@@ -1,19 +1,19 @@
 <drac2>
-cc, ch, alias = "Ring of Animal Influence", character(), ctx.prefix+ctx.alias
-ch.create_cc_nx(cc,0,3,'long','bubble',reset_by='1d3',desc="This ring has 3 charges, and it regains 1d3 expended charges daily at dawn. While wearing the ring, you can use an action to expend 1 of its charges to cast one of the following spells:\n**- Animal Friendship** (save DC 13)\n**- Fear** (save DC 13), targeting only beasts that have an Intelligence of 3 or lower\n**- Speak with Animals**")
-a = argparse(&ARGS&)
-i = a.get('i')
-v = ch.get_cc(cc) or i
+cc, ch, alias = "Ring of Animal Influence", character(), ctx.prefix+ctx.alias  # I don't like typing
+ch.create_cc_nx(cc,0,3,'long','bubble',reset_by='1d3',desc="This ring has 3 charges, and it regains 1d3 expended charges daily at dawn. While wearing the ring, you can use an action to expend 1 of its charges to cast one of the following spells:\n**- Animal Friendship** (save DC 13)\n**- Fear** (save DC 13), targeting only beasts that have an Intelligence of 3 or lower\n**- Speak with Animals**")  # create our counter
+a = argparse(&ARGS&)  # save me some more typing
+i = a.get('i')  # allow users to ignore uses
+v = ch.get_cc(cc) or i  # can we cast?
 
 SpellList = ["fear", "speak with animals", "animal friendship"]  # a list for spell name matching
 SpellName = [x for x in SpellList if """&1&""".lower() in x]+[0]  # match our first input to a spell name.  I like to add 0 to the list to make this a little easier later.
 
-if len(SpellName)>2:  # do we have multiple matches (we would have two items in our list if we matched one spell name only)?
+if len(SpellName)>2:  # do we have multiple matches? (we would have two items in our list if we matched one spell name only)
   return f"""techo 40 Your entry, `&1&`, matched more than one spell: `{'`, `'.join(SpellName[:-1])}`\nBe more specific to cast the desired spell or use quotes: `{alias} "animal friendship"` when casting."""
 else:  # if the list is not greater than 2, we either matched a spell or the list is only [0] which will be falsey when we return SpellName[0]
   SpellName=SpellName[0]
 
-Display = f""" -thumb https://www.dndbeyond.com/avatars/thumbnails/7/341/1000/1000/636284758989654087.jpeg -color {color} -footer "{alias} [SpellName]" """  # add our -thumb, -color and -footer here so they don't show up in the echo return
+Display = f""" -thumb https://www.dndbeyond.com/avatars/thumbnails/7/341/1000/1000/636284758989654087.jpeg -color {color} -footer "{alias} [SpellName] [args]" """  # add our -thumb, -color and -footer here so they don't show up in the echo return
 
 
 if &ARGS& and not SpellName:  # did someone enter args but they didn't match a spell?
@@ -23,7 +23,7 @@ if not v:  # no uses remaining and uses not ignored
   return f"""embed -title "{name} tries to use {get('their','their')} {cc}!" -desc "Your ring is exhausted and won't regain charges until dawn. `{alias} 'Spell Name' -i` to ignore a use." -f "{cc}|{ch.cc_str(cc)}" """+Display
 
 
-# let's automatically pass monsters with an intelligence of 4 or higher
+# let's automatically pass monsters with an intelligence of 4 or higher while preserving target specific args
 args = &ARGS&
 tDict= {}
 tArgs= ''
@@ -69,5 +69,5 @@ elif SpellName:  # matched a spell (and v is true since we already handled if no
   return f"""cast "{SpellName}" -dc 13 i &*& -phrase "with {get('their', 'their')} {cc}!" -f "{cc}|{ch.cc_str(cc)} {'- _use ignored_' if i else '(-1)'}" """+Display  # we add &*& in here to allow args to populate this portion, like targets, since argparse(&ARGS) gobbles them up
 
 else:  # instructions if none of the other things happened
-  return f"""embed -title "{name} takes a hard look at {get('their', 'their')} {cc}!" -desc "{ch.cc(cc).desc}" -f "You can use this alias to cast spells with targets as normal.\n`{alias} fear`  will use a charge of the ring and cast the **Fear** spell.\n`{alias} friend`  will cast the **Animal Friendship** spell." -f "{cc}|{ch.cc_str(cc)}" """+Display
+  return f"""embed -title "{name} takes a hard look at {get('their', 'their')} {cc}!" -desc "{ch.cc(cc).desc}" -f "You can use this alias to cast spells with targets as normal.\n`{alias} fear`  will use a charge of the ring and cast the **Fear** spell.\n`{alias} friend`  will cast **Animal Friendship**.\n`{alias} speak`  will cast **Speak with Animals**." -f "{cc}|{ch.cc_str(cc)}" """+Display
 </drac2>

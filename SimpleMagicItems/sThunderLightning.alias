@@ -1,0 +1,149 @@
+embed <drac2>
+
+cc   = "Staff of Thunder and Lightning"
+ccL  = "sT&L Lightning"
+ccT  = "sT&L Thunder"
+ccLS = "sT&L Lightning Strike"
+ccTC = "sT&L Thunderclap"
+ccTL = "sT&L Thunder and Lightning"
+alias= ctx.prefix+ctx.alias
+character().create_cc_nx(ccL, 0,1,'long','bubble', desc="When you hit with a melee attack using the staff, you can cause the target to take an extra 2d6 lightning damage.")
+character().create_cc_nx(ccT, 0,1,'long','bubble', desc='When you hit with a melee attack using the staff, you can cause the staff to emit a crack of thunder, audible out to 300 feet. The target you hit must succeed on a DC 17 Constitution saving throw or become stunned until the end of your next turn. This property cannot be used again until the next dawn.')
+character().create_cc_nx(ccLS,0,1,'long','bubble', desc="You can use an action to cause a bolt of lightning to leap from the staff's tip in a line that is 5 feet wide and 120 feet long. Each creature in that line must make a DC 17 Dexterity saving throw, taking 9d6 lightning damage on a failed save, or half as much damage on a successful one. This property cannot be used again until the next dawn.")
+character().create_cc_nx(ccTC,0,1,'long','bubble', desc="You can use an action to cause the staff to issue a deafening thunderclap, audible out to 600 feet. Each creature within 60 feet of you (not including you) must make a DC 17 Constitution saving throw. On a failed save, a creature takes 2d6 thunder damage and becomes deafened for 1 minute. On a successful save, a creature takes half damage and isn't deafened. This property cannot be used again until the next dawn.")
+character().create_cc_nx(ccTL,0,1,'long','bubble', desc="You can use an action to use the Lightning Strike and Thunderclap properties at the same time. Doing so doesn't expend the daily use of those properties, only the use of this one.")
+vL =character().get_cc(ccL)
+vT =character().get_cc(ccT)
+vLS=character().get_cc(ccLS)
+vTC=character().get_cc(ccTC)
+vTL=character().get_cc(ccTL)
+a  =argparse(&ARGS&)
+i  =a.get('i')
+t  =a.last('t') if a.last('t') else ''
+c  =combat()
+n  ='\n'
+f  ="**Description:**\nThis staff can be wielded as a magic quarterstaff that grants a +2 bonus to attack and damage rolls made with it. It also has the following additional properties. When one of these properties is used, it can't be used again until the next dawn."
+footer = f' -footer "{alias} [lightning | thunder | strike | clap | dual] [-t target(s)] [-i]"'
+
+
+
+if '&1&'.lower() in 'lightning':
+  desc = ' -f "Lightning|When you hit with a melee attack using the staff, you can cause the target to take an extra 2d6 lightning damage."'
+  if vL or i:
+    '' if i else character().mod_cc(ccL, -1)
+    if c and c.me:
+      if t:
+        targ = c.get_combatant(t)
+        damage = targ.damage('2d6[lightning]')
+        return f"""-title "{name} adds a touch of Lightning with the {cc}!" -desc "**{targ.name}**\n{damage.damage}" {desc} -f "{ccL}|{character().cc_str(ccL)} {'_use ignored_' if i else '(-1)'}" -f "{str(targ)}" {footer}  """
+      else:
+        return f"""-title "{name} adds a touch of Lightning with the {cc}!" -desc "**Damage**: {vroll('2d6[lightning]')}" {desc} -f "{ccL}|{character().cc_str(ccL)} {'_use ignored_' if i else '(-1)'}" {footer}  """
+    else:
+      return f"""-title "{name} adds a touch of Lightning with the {cc}!" -desc "{'**'+t.upper()+'**'+n if t else ''}**Damage**: {vroll('2d6[lightning]')}" {desc} -f "{ccL}|{character().cc_str(ccL)} {'_use ignored_' if i else '(-1)'}" {footer}  """
+  else:
+    return f"""-title "{name} already used the {cc} in this manner!" -desc "You need to wait until dawn to use this feature again.\n\n`{alias} lightning -i` to ignore the counter." -f "{ccL}|{character().cc_str(ccL)}" {footer}  """
+
+
+
+
+if '&1&'.lower() in 'thunder':
+  desc = ' -f "Thunder|When you hit with a melee attack using the staff, you can cause the staff to emit a crack of thunder, audible out to 300 feet. The target you hit must succeed on a DC 17 Constitution saving throw or become stunned until the end of your next turn. This property cannot be used again until the next dawn."'
+  if vT or i:
+    character().mod_cc(ccT,-1) if not i else ''
+    if c and c.me:
+      if t:
+        targ  = c.get_combatant(t)
+        adv   = a.adv(boolwise=True, custom={'adv':'sadv', 'dis':'sdis'})
+        bonus = "+"+a.join('sb', '+', '') if a.get('sb') else ''
+        save  = vroll(targ.saves.get('con').d20(adv)+bonus) if targ else err(f"Your target '{t}' is not in combat.")
+        if save.total<17 and targ:
+          combat().me.add_effect('Thunder Stun','',2,end=True)
+          targ.add_effect('Thunder Struck - Staff of Thunder and Lightning','',parent=combat().me.get_effect('Thunder Stun'),desc=f'The target is stunned until the end of {name}\'s next turn.')
+          return f'''-title "{name} uses Thunder with the {cc}!" -f "Stun|**DC 17**" -f "{targ.name}|**CON Save**: {save}; Failure!\n**Effect:** {targ.get_effect('Thunder Struck')}" {desc} -f "{ccT}|{character().cc_str(ccT)} {'_use ignored_' if i else '(-1)'}" {footer} '''
+        else:
+          return f'''-title "{name} uses Thunder with the {cc}!" -f "Stun|**DC 17**" -f "{targ.name}|**CON Save**: {save}; Success!" {desc} -f "{ccT}|{character().cc_str(ccT)} {'_use ignored_' if i else '(-1)'}" {footer} '''
+      else:
+        return f'''-title "{name} uses Thunder with the {cc}!" -f "Stun|**DC 17**\n(No Target Specified.)" {desc} -f "{ccT}|{character().cc_str(ccT)} {'_use ignored_' if i else '(-1)'}" {footer} '''
+    else:
+      return f'''-title "{name} uses Thunder with the {cc}!" -f "Stun|**DC 17**\n(Cannot apply effects outside of combat.)" {desc} -f "{ccT}|{character().cc_str(ccT)} {'_use ignored_' if i else '(-1)'}" {footer} '''
+  else:
+    return f'''-title "{name} already used their {cc} to Stun!" -desc "You need to wait until dawn to use this feature again.\n\n`{alias} thunder -i` to ignore the counter." -f "{ccT}|{character().cc_str(ccT)}" {footer} '''
+
+
+
+
+elif '&1&'.lower() in 'strike':
+  desc = ''' -f "Lightning Strike|You can use an action to cause a bolt of lightning to leap from the staff's tip in a line that is 5 feet wide and 120 feet long. Each creature in that line must make a DC 17 Dexterity saving throw, taking 9d6 lightning damage on a failed save, or half as much damage on a successful one. This property cannot be used again until the next dawn."'''
+  if vLS or i:
+    character().mod_cc(ccLS,-1) if not i else ''
+    ls=vroll('9d6[lightning]')
+    if c:
+      if (targets:=a.get('t')):
+        dc, out, targHP = 17, [f' -f "Meta|**Damage**: {ls}\n**DC**: 17"'], []
+        for target in targets:
+          targList = target.split('|')
+          targComb = combat().get_combatant(targList[0])
+          if targComb:
+            targName  = targComb.name
+            targARGs  = argparse(targList[1] if len(targList)>1 else [])
+            targBonus = targARGs.get('sb')
+            dice      = targComb.saves.get("dex").d20(targARGs.adv(boolwise=True))
+            saveRoll  = vroll(f'{dice} {"+"+"+".join(targBonus) if targBonus else ""}')
+            damage    = targComb.damage(f'{ls.total} [lightning]') if saveRoll.total<dc else targComb.damage(f'{ls.total}/2 [lightning]')
+            out.append(f''' -f "{targName}|**DEX Save**: {saveRoll}; {f'Failure!' if saveRoll.total<dc else f'Success!'}\n{damage.damage}" ''')
+            targHP.append(str(targComb))
+        return f'''-title "{name} makes Lightning Strike with {cc}!" {n.join(out)} {desc} -f "{ccLS}|{character().cc_str(ccLS)} {'_use ignored_' if i else '(-1)'}" -f "{n.join([x for x in targHP])}" {footer} '''
+      else:
+        return f'''-title "{name} makes Lightning Strike with {cc}!" -f "Meta|**Damage**: {ls}\n**DC 17**\n(No Target Specified)" {desc} -f "{ccLS}|{character().cc_str(ccLS)} {'_use ignored_' if i else '(-1)'}" {footer} '''
+    else:
+      return f'''-title "{name} makes Lightning Strike with {cc}!" -f "Meta|**Damage**: {ls}\n**DC 17**\n" {desc} -f "{ccLS}|{character().cc_str(ccLS)} {'_use ignored_' if i else '(-1)'}" {footer} '''
+  else:
+    return f'''-title "{name} already used their {cc} to Lightning Strike!" -desc "You need to wait until dawn to use this feature again.\n\n`{alias} strike -i` to ignore the counter." -f "{ccLS}|{character().cc_str(ccLS)}" {footer} '''
+
+
+
+
+elif '&1&'.lower() in 'thunderclap':
+  desc = f""" -f "Thunderclap|You can use an action to cause the staff to issue a deafening thunderclap, audible out to 600 feet. Each creature within 60 feet of you (not including you) must make a DC 17 Constitution saving throw. On a failed save, a creature takes 2d6 thunder damage and becomes deafened for 1 minute. On a successful save, a creature takes half damage and isn't deafened. This property cannot be used again until the next dawn." """
+  if vTC or i:
+    character().mod_cc(ccTC,-1) if not i else ''
+    tc=vroll('2d6[thunder]')
+    if c:
+      if (targets:=a.get('t')):
+        dc, out, targHP = 17, [f' -f "Meta|**Damage**: {tc}\n**DC**: 17"'], []
+        for target in targets:
+          targList  = target.split('|')
+          targComb  = combat().get_combatant(targList[0])
+          if targComb:
+            targName  = targComb.name
+            targARGs  = argparse(targList[1] if len(targList)>1 else [])
+            targBonus = targARGs.get('sb')
+            dice      = targComb.saves.get("con").d20(targARGs.adv(boolwise=True))
+            saveRoll  = vroll(f'{dice} {"+"+"+".join(targBonus) if targBonus else ""}')
+            damage    = targComb.damage(f'{tc.total} [thunder]') if saveRoll.total<dc else targComb.damage(f'{tc.total}/2 [thunder]')
+            if saveRoll.total<17:
+              targComb.add_effect('Deafened - Staff of Thunder and Lightning','',10)
+            effect    = f'**Effect:** {targComb.get_effect("Deafened")}' if saveRoll.total<dc else ''
+            out.append(f""" -f "{targName}|**CON Save**: {saveRoll}; {f'Failure!' if saveRoll.total<dc else f'Success!'}\n{damage.damage}\n{effect}" """)
+            targHP.append(str(targComb))
+        return f'''-title "{name} uses Thunderclap!" -phrase "with the {cc}" {n.join(out)} {desc} -f "{ccTC}|{character().cc_str(ccTC)} {'_use ignored_' if i else '(-1)'}" -f "{n.join([x for x in targHP])}" {footer} '''
+      else:
+        return f'''-title "{name} uses Thunderclap!" -phrase "with the {cc}" -f "Meta|**Damage**: {tc}\n**DC 17**\n(No Target Specified)" {desc} -f "{ccTC}|{character().cc_str(ccTC)} {'_use ignored_' if i else '(-1)'}" {footer} '''
+    else:
+      return f'''-title "{name} uses Thunderclap!" -phrase "with the {cc}" -f "Meta|**Damage**: {tc}\n**DC 17**\n" {desc} -f "{ccTC}|{character().cc_str(ccTC)} {'_use ignored_' if i else '(-1)'}" {footer} '''
+  else:
+    return f'''-title "{name} already used their {cc} to Thunderclap!" -desc "You need to wait until dawn to use this feature again.\n\n`{alias} thunderclap -i` to ignore the counter." -f "{ccTC}|{character().cc_str(ccTC)}" {footer} '''
+
+
+
+
+elif '&1&'.lower() in 'dual':
+  if vTL or i:
+    character().mod_cc(ccTL,-1) if not i else ''
+    return f'''-title "{name} uses Thunder and Lightning at the same time!" -phrase "with the {cc}" -f "You can use an action to use the Lightning Strike and Thunderclap properties at the same time. Doing so doesn't expend the daily use of those properties, only the use of this one. (use `{alias} clap -i [-t target(s)]` and `{alias} strike -i [-t target(s)]` to not expend a use, and target the two effects separately.)" -f "{ccTL}|{character().cc_str(ccTL)} {'_use ignored_' if i else '(-1)'}|inline" {footer}'''
+  else:
+    return f"""-title "{name} tries to use Thunder and Lightning at the same time!" -f "You need to wait until dawn to use this feature again.\n\n`{alias} dual -i` to ignore the counter." -f "{ccTL}|{character().cc_str(ccTL)}|inline" {footer} """
+else:
+    return f'''-title "{name} checks their {cc}:" -desc "{f}" -f "{ccL}|{character().cc_str(ccL)}|inline" -f "{ccT}|{character().cc_str(ccT)}|inline" -f "{ccLS}|{character().cc_str(ccLS)}|inline" -f "{ccTC}|{character().cc_str(ccTC)}|inline" -f "{ccTL}|{character().cc_str(ccTL)}|inline" {footer} '''
+</drac2>
+-thumb "https://media.discordapp.net/attachments/759274660587634708/856997646447542292/636284771044710531.jpeg" -color <color>

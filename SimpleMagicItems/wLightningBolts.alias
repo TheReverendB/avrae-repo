@@ -7,7 +7,7 @@ v = character().get_cc(cc)>=uses and lvl!=0  # make sure we have charges to cast
 x = character().get_cc(cc)>0  # make sure we have more than 0 charges
 f = "Wand of Lightning Bolts|This wand has 7 charges. While holding it, you can use an action to expend 1 or more of its charges to cast the lightning bolt spell (save DC 15) from it. For 1 charge, you cast the 3rd-level version of the spell. You can increase the spell slot level by one for each additional charge you expend. \n\nThe wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll a d20. On a 1, the wand crumbles into ashes and is destroyed."
 if lvl==0:  # did we enter a number of charges to use?
-    return f'''embed -title "{name} quickly reads the instructions for their {cc}!" -desc "`!wLightningBolts [charges used] [-t target(s)]`" '''
+    return f'''embed -title "{name} quickly reads the instructions for their {cc}!" -desc "`{ctx.prefix+ctx.alias} <charges used> [-t target(s)]`" '''
 elif v:  # cast the spell
     character().mod_cc(cc, -uses)
     return f'''cast "lightning bolt" -i -l {lvl} -dc 15 -phrase "at level {lvl} using the {cc}" -f "{f}" '''
@@ -18,4 +18,4 @@ else:  # empty wand
 </drac2>
 -f "{{cc}}{{f" (-{uses})" if v else ""}}|{{character().cc_str(cc)}}"
 -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/7/472/315/315/636284782524739861.jpeg 
--footer "{{ctx.prefix}}{{ctx.alias}} [charges used] [-t target(s)]"
+-footer "{{ctx.prefix+ctx.alias}} <charges used> [-t target(s)]"

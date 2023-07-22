@@ -1,0 +1,17 @@
+<drac2>
+cc="Staff of Healing"
+ch=character()
+ch.create_cc_nx(cc,0,10,'long','bubble',reset_by='1d6+4')
+uses='&1&' if '&1&'.isdigit() and int('&1&')<=4 else 4
+v=ch.get_cc(cc)>=int(uses)
+x='&1&'!='&1'+"&" and '&1&'.isdigit()
+f="Description|This staff has 10 charges. While holding it, you can use an action to expend 1 or more of its charges to cast one of the following spells from it, using your spell save DC and spellcasting ability modifier: **cure wounds** (1 charge per spell level, up to 4th), **lesser restoration** (2 charges), or **mass cure wounds** (5 charges).\n\nThe staff regains 1d6 + 4 expended charges daily at dawn. If you expend the last charge, roll a d20. On a 1, the staff vanishes in a flash of light, lost forever."
+
+if v and x:
+  ch.mod_cc(cc,-int(uses))
+  return f'''cast "Cure Wounds" i -l {uses} -phrase "using the {cc}" -f "{f}" '''
+if not x:
+    return f'''embed -title "{name} forgot how to use the {cc} to Cure Wounds!" -f "Cure Wounds|`!sHealing cure <number of charges used> [-t target]`" '''
+else:
+  return f'''embed -title "You do not have enough charges to use the {cc} like this!" -f "{f}" '''
+</drac2> -f "{{cc}}{{f" (-{uses})" if v else ""}}|{{character().cc_str(cc)}}" -thumb 'https://media-waterdeep.cursecdn.com/avatars/thumbnails/19/258/315/315/636382374378584479.jpeg' -footer "!sHealing [cure, lesser, mass]"

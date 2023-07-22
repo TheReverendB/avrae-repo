@@ -1,0 +1,12 @@
+<drac2>
+(ch:=character()).create_cc_nx((cc:="Circlet of Blasting"),0,1,'long','bubble')
+i = argparse(&ARGS&).get('i')
+v = ch.get_cc(cc) or i
+f = "While wearing this circlet, you can use an action to cast the scorching ray spell with it. When you make the spell's attacks, you do so with an attack bonus of +5. The circlet can't be used this way again until the next dawn."
+foot = f"{ctx.prefix+ctx.alias} [casting arguments] [-i]"
+if v:
+    ch.mod_cc(cc, -1) if not i else ''
+    return f"""cast "scorching ray" -mod {5-proficiencyBonus} i &*& -phrase "using the {cc}!" -f "{f}" -f "{cc}|{ch.cc_str(cc)} {'*use ignored*' if i else '(-1)'}" -f "{foot}" """
+else:
+    return f"""embed -title "{name} tries to use the {cc}!" -desc "You're all out of uses!  Wait until dawn to use this again." -f "{f}" -f "{cc}|{ch.cc_str(cc)}" -footer "{foot}" """
+</drac2> -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/18/937/315/315/636381776011965319.jpeg

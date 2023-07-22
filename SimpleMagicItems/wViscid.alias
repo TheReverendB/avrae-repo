@@ -9,22 +9,22 @@ effectDesc = """A restrained creature's speed becomes 0, and it can't benefit fr
  - The creature has disadvantage on Dexterity saving throws."""
 
 if ch.get_cc(cc):
-	'' if a.get('i') else ch.mod_cc(cc, -1)
-	out.append(f'''-title "{name} uses the {cc}!" -f "{f}" -f "{cc} {'' if a.get('i') else '(-1)'}|{ch.cc_str(cc)}" ''')
-	r=vroll(rollstring+reroll+'+'+str(proficiencyBonus+(spell or intelligenceMod))+("+"+a.join("b","+") if a.last("b") else ""))
-	if c:
-		targ=c.get_combatant(a.last('t')) if a.last('t') else ''
-		if targ:
-			if r.total>=targ.ac:
-				targ.add_effect('Viscid Glob: Restrained',passive_effects={'attack_advantage':-1,'save_dis':['dex']}, duration=600, desc=effectDesc)
-				out.append(f'''-desc "**{targ.name}**\n**To Hit:** {r}\n**Effect:** {targ.name} - {targ.get_effect('glob')}" ''')
-			else:
-				out.append(f'''-desc "**{targ.name}**\n**To Hit:** {r}\n**Miss!**" ''')
-		else:
-			out.append(f'''-desc "**Meta**\n**To Hit:** {r}\nSpecify a target in combat to apply the effects." ''')
-	else:
-		out.append(f'''-desc "**Meta**\n**To Hit:** {r}\nIn combat this will apply the restrained effect on a hit." ''')
+  '' if a.get('i') else ch.mod_cc(cc, -1)
+  out.append(f'''-title "{name} uses the {cc}!" -f "{f}" -f "{cc} {'' if a.get('i') else '(-1)'}|{ch.cc_str(cc)}" ''')
+  r=vroll(rollstring+reroll+'+'+str(proficiencyBonus+(spell or intelligenceMod))+("+"+a.join("b","+") if a.last("b") else ""))
+  if c:
+    targ=c.get_combatant(a.last('t')) if a.last('t') else ''
+    if targ:
+      if r.total>=targ.ac:
+        targ.add_effect('Viscid Glob: Restrained',passive_effects={'attack_advantage':-1,'save_dis':['dex']}, duration=600, desc=effectDesc)
+        out.append(f'''-desc "**{targ.name}**\n**To Hit:** {r}\n**Effect:** {targ.name} - {targ.get_effect('glob')}" ''')
+      else:
+        out.append(f'''-desc "**{targ.name}**\n**To Hit:** {r}\n**Miss!**" ''')
+    else:
+      out.append(f'''-desc "**Meta**\n**To Hit:** {r}\nSpecify a target in combat to apply the effects." ''')
+  else:
+    out.append(f'''-desc "**Meta**\n**To Hit:** {r}\nIn combat this will apply the restrained effect on a hit." ''')
 else:
-	out.append(f'''-title "{name} tries to use the {cc}!" -desc "Looks like you're all out of charges and need to wait until midnight for the {cc} to recharge!  Roll that d20 if you haven't already!" -f "{cc}|{ch.cc_str(cc)}"  ''')
+  out.append(f'''-title "{name} tries to use the {cc}!" -desc "Looks like you're all out of charges and need to wait until midnight for the {cc} to recharge!  Roll that d20 if you haven't already!" -f "{cc}|{ch.cc_str(cc)}"  ''')
 
 return ' '.join(out) </drac2> -footer "{{ctx.prefix+ctx.alias}} [-t target] [-i]" -color <color> -thumb https://cdn.discordapp.com/attachments/709738212209197189/792733773179518986/wViscid.png

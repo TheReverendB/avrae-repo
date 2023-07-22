@@ -12,7 +12,7 @@ if x:
     ch.mod_cc(cc,+recharge)
     return f'''embed -title "{name} recharges the {cc}!" -desc "{r}" -f "{cc}|Using your staff:\nCure Wounds - `!sHealing cure [charges used] [-t target]`\nLesser Restoration - `!sHealing lesser [-t target]`\nMass Cure Wounds - `!sHealing mass [-t targets]`" '''
 else:
-	return f'''embed -title "{name} checks the {cc}!" -f "{cc}|Using your staff:\nCure Wounds - `!sHealing cure [charges used] [-t target]`\nLesser Restoration - `!sHealing lesser [-t target]`\nMass Cure Wounds - `!sHealing mass [-t targets]`\nRecharging - `!sHealing recharge`" '''
+  return f'''embed -title "{name} checks the {cc}!" -f "{cc}|Using your staff:\nCure Wounds - `!sHealing cure [charges used] [-t target]`\nLesser Restoration - `!sHealing lesser [-t target]`\nMass Cure Wounds - `!sHealing mass [-t targets]`\nRecharging - `!sHealing recharge`" '''
 </drac2>
 -f "{{cc}}{{f" (+{recharge})" if x else ""}}|{{character().cc_str(cc)}}"
 -thumb 'https://media-waterdeep.cursecdn.com/avatars/thumbnails/19/258/315/315/636382374378584479.jpeg' -footer "{{ctx.prefix}}{{ctx.alias}} [cure, lesser, mass, recharge]"

@@ -67,7 +67,7 @@ elif "&1&".lower()=="cast" and beads:
       spell = [x for x in list(spellBeads) if "&2&".lower() in x]+[None]
       # error if no matches
       if spell[0]==None:
-            err(f"""_ _\nNo {'matches were found for the spell `&2&`' if '&2&'!='&2'+'&' else 'spell'} entered. Choose from {', '.join([f'**{x.title()}**' for x in list(spellBeads)[:-1]])+' or **'+list(spellBeads)[-1].title()+'**'} to cast the spell from your Prayer Bead.  Partial matches will work.""")
+            err(f"""_ _\nNo {'matches were found for the spell `&2&`' if '&2&'!='&2'+'&' else 'spell'} entered. You can cast the following:\n`{'`, `'.join([f'{x.title()}' for x,y in spellBeads.items() if y in beads])}`{n}From your available Prayer Beads:{n}`{'`, `'.join(beads)}`""")
       # error if multiple matches
       elif len(spell)>2:
             err(f"""_ _\nMultiple matches were found for `&2&`: {', '.join([f'**{x.title()}**' for x in spell[:-1]])}""")
@@ -77,7 +77,7 @@ elif "&1&".lower()=="cast" and beads:
             beads.remove(spellBeads[spell[0]])  # remove the bead we are casting from our list
             PBDict['available'] = beads         # update our dict
             ch.set_cvar('PrayerBeads',dump_json(PBDict))  # store our dict again as a cvar
-            bead_display=f"""You currently have {len(beads) if beads else 'no more magical'} bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {f'**{"**, **".join(beads[:-1])}** and **{beads[-1]}**.' if len(beads)>1 else '' if not beads else f'**{beads[0]}**.'}"""
+            bead_display=f"""You currently have {len(beads) if beads else 'no more magical'} bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {f'`{"`, `".join(beads[:-1])}` and `{beads[-1]}`.' if len(beads)>1 else '' if not beads else f'`{beads[0]}`.'}"""
             return f'''cast "{spell[0]}" -i {'-l 2' if spell[0]=='cure wounds' else ''} {' '.join([f'"{x}"' for x in &ARGS&[2:]])} -phrase "using their {cc}!" -f "{bead_display}\n\n{ctx.prefix+ctx.alias} [cast/set/roll new] [-t target(s)] [casting args]" {flavor} '''
       # return error if spell doesn't match available beads
       else:
@@ -104,19 +104,19 @@ elif "&1&".lower()=="set":
       ch.set_cvar('PrayerBeads',dump_json(PBDict))
       beads = PBDict.reset
       title =f""" -title "{name} sets the beads on their {cc}!" """
-      desc  =f""" -desc "You just set {len(beads) if beads else 'zero'} bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {'**'+'**, **'.join(beads[:-1])+'** and **'+beads[-1]+'**.' if len(beads)>1 else '' if not beads else '**'+beads[0]+'**.'}\n\nIf your desired beads did not appear above, try again.  You can enter up to six types, separated by spaces, to set the types of beads on the necklace.  Use the following options to set the beads: `Blessing`, `Curing`, `Favor`, `Smiting`, `Summons`, `'Wind Walking'`.\nPartial matching will work." """
+      desc  =f""" -desc "You just set {len(beads) if beads else 'zero'} bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {'`'+'`, `'.join(beads[:-1])+'` and `'+beads[-1]+'`.' if len(beads)>1 else '' if not beads else '`'+beads[0]+'`.'}\n\nIf your desired beads did not appear above, try again.  You can enter up to six types, separated by spaces, to set the types of beads on the necklace.  Use the following options to set the beads: `Blessing`, `Curing`, `Favor`, `Smiting`, `Summons`, `'Wind Walking'`.\nPartial matching will work." """
 
 # ----- #
 # reset #
 # ----- #
 elif "&1&".lower()=="reset" and PBDict.reset:
       title = f""" -title "{name} feels the power of their necklace grow!" """
-      desc  = f""" -desc "You have recharged {len(beads) if beads else 'no'} magical bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {f'**{"**, **".join(beads[:-1])}** and **{beads[-1]}**.' if len(beads)>1 else '' if not beads else f'**{beads[0]}**.'}  " """
+      desc  = f""" -desc "You have recharged {len(beads) if beads else 'no'} magical bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {f'''You can cast the following:{n}`{'`, `'.join([f'{x.title()}' for x,y in spellBeads.items() if y in beads])}` {n}From your available Prayer Beads:{n}`{'`, `'.join(beads)}`''' if beads else ''}" """
 
 # message for existing user who didn't enter a command
 elif exists("PrayerBeads"):
       title = f""" -title "{name} checks the manual for their {cc}!" """
-      desc  = f""" -desc "You currently have {len(beads) if beads else 'no'} magical bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {f'**{"**, **".join(beads[:-1])}** and **{beads[-1]}**.' if len(beads)>1 else '' if not beads else f'**{beads[0]}**.'}  Once you long rest, or use **`{ctx.prefix+ctx.alias} reset`** your necklace will regain the use of {(f'**{"**, **".join(PBDict.reset[:-1])}** and **{PBDict.reset[-1]}**.' if len(PBDict.reset)>1 else '' if not PBDict.reset else f'**{PBDict.reset[0]}**.') if PBDict.reset else 'whatever magic beads you have rolled or assigned to the necklace.'}" """
+      desc  = f""" -desc "You currently have {len(beads) if beads else 'no'} magical bead{'s' if (len(beads)>1 or not beads) else ''} on your necklace. {f'''You can cast the following:{n}`{'`, `'.join([f'{x.title()}' for x,y in spellBeads.items() if y in beads])}` {n}From your available Prayer Beads:{n}`{'`, `'.join(beads)}`''' if beads else ''}{n}Once you long rest, or use `{ctx.prefix+ctx.alias} reset` your necklace will regain the use of {(f'`{"`, `".join(PBDict.reset[:-1])}` and `{PBDict.reset[-1]}`.' if len(PBDict.reset)>1 else '' if not PBDict.reset else f'`{PBDict.reset[0]}`.') if PBDict.reset else 'whatever magic beads you have rolled or assigned to the necklace.'}" """
       fields= base_fields
 
 
@@ -128,7 +128,7 @@ else:
 
 # only display the cc used field if we did a reset and have beads to reset
 if mod and PBDict.reset and not "roll new" in "&*&".lower() and not '&1&'.lower()=='set':
-      fields += f""" -f "{cc}|{'' if '&1&'=='reset' else ch.cc_str(cc)+' (-1)'}  _-recharged-_" """
+      fields += f""" -f "{cc}|{'' if '&1&'=='reset' else ch.cc_str(cc)+' (-1)'}  _-counter used to reset your beads-_" """
 
 # return our embed
 return f"""{alias} {title} {desc} {fields} -f "{ctx.prefix+ctx.alias} [cast/set/roll new] [-t target(s)] [casting args]" {flavor} """

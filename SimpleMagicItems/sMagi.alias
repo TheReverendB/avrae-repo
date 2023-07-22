@@ -1,5 +1,6 @@
 <drac2>
 spell_ab="Spell Absorption"
+retro="Retributive Strike"
 spells={
   "Conjure Elemental": 7,
   "Lightning Bolt": 7,
@@ -20,10 +21,9 @@ spells={
   "Arcane Lock": 0,
   "Mage Hand": 0,
   "Light": 0,
-  spell_ab: 0
+  spell_ab: 0,
+  retro: 0
 }
-flavor='-color <color> -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/7/422/1000/1000/636284770290048212.jpeg'
-
 # create the cc
 cc='Staff of the Magi'
 ch=character()
@@ -31,17 +31,20 @@ ch.create_cc_nx(cc, 0, 50, 'long',reset_by='4d6+2')
 
 # parse arguments
 alias=ctx.prefix+ctx.alias
-syntax=f'`{alias} "<spell>" [cast arguments][-i]` or `{alias} absorption <amount>`'
+syntax=f'`{alias} "<spell>" [cast arguments][-i]` or `{alias} absorption <amount>` or `{alias} strike`'
 a=&ARGS&
-if not a or a[0].lower() in ['?','help']:
-  return f'echo **Use:** {syntax}. **Charges:** {ch.cc_str(cc)}\n**Supported spells:** {", ".join(spells.keys())}.'
+if not a or a[0].lower() in '?help':
+  return f'echo   **Use:** {syntax}. \n**Charges:** {ch.cc_str(cc)}\n**Supported spells:** {", ".join(spells.keys())}.'
 cast_args="""&*&"""
+
+#add flavor
+flavor=f'''-color <color> -thumb https://media-waterdeep.cursecdn.com/avatars/thumbnails/7/422/1000/1000/636284770290048212.jpeg -footer "{alias}" '''
 
 # match the spell name
 spell=a[0]
 match=[sn for sn in spells.keys() if spell.lower() in sn.lower()]
 if not match:
-  return f'echo **Use:** {syntax}. **Charges:** {ch.cc_str(cc)}\n**Supported spells:** {", ".join(spells.keys())}.\nCase insensitive and partial name is supported.'
+  return f'echo   **Use:** {syntax}.\n**Charges:** {ch.cc_str(cc)}\n**Supported spells:** {", ".join(spells.keys())}.'
 if len(match)>1 and a[0].lower()!="light":
   return f'echo **Multiple spells match `{spell}`:** {", ".join(match)}.'
 elif a[0].lower()=="light":
@@ -50,13 +53,30 @@ match=match[0]
 cost=spells[match]
 
 # handle recharging
+exp_amt = 0
+recharge= 0
 if match==spell_ab:
   if len(a)>1 and a[1].strip('-+').isdigit():
     recharge = int(a[1].strip('-+'))
-    ch.mod_cc(cc,recharge)
-    ab_field = f''' -f "{cc} (+{recharge})|{ch.cc_str(cc)}|inline" '''
+    if ch.get_cc(cc) + recharge < 51:
+      ch.mod_cc(cc,recharge)
+      abr_field = f''' -f "{cc} (+{recharge})|{ch.cc_str(cc)}|inline" '''
+    else:
+      exp_amt=ch.get_cc(cc)+recharge
   else:
     return f'''echo A spell level is required to use the {cc} for {spell_ab}.  `{alias} "{spell_ab}" <level absorbed>`'''
+
+#handle exploding staff
+if match==retro:
+  exp_amt=ch.get_cc(cc)
+if exp_amt:
+  abr_field=f""" -f "Retributive Strike|You can use an action to break the staff over your knee or against a solid surface, performing a retributive strike. The staff is destroyed and releases its remaining magic in an explosion that expands to fill a 30-foot-radius sphere centered on it.{'`'*3}
+Distance from Origin | Damage
+---------------------|----------------
+You                  | 16 x {exp_amt} = {16*exp_amt}[force]
+10 ft. away or less  | 8  x {exp_amt} = {8*exp_amt}[force]
+11 to 20 ft. away    | 6  x {exp_amt} = {6*exp_amt}[force]
+21 to 30 ft. away    | 4  x {exp_amt} = {4*exp_amt}[force]{'`'*3}\n\nDue to the difficult nature of targeting for this, damage will need to be applied manually. " -f "You have a 50 percent chance to instantly travel to a random plane of existence, avoiding the explosion. If you fail to avoid the effect, you take force damage equal to 16 × the number of charges in the staff. Every other creature in the area must make a DC 17 Dexterity saving throw. On a failed save, a creature takes an amount of damage based on how far away it is from the point of origin, as shown in the following table. On a successful save, a creature takes half as much damage." """
 
 # set level for casting
 if match.lower()=="lightning bolt" or match.lower()=="fireball":
@@ -66,7 +86,7 @@ else:
 
 # no charges used
 if argparse(a).last('i') or cost==0:
-  fields=f'-f  "{cc}|{ch.cc_str(cc)} _No charges used_|inline" '
+  fields=f' -f  "{cc}|{ch.cc_str(cc)} _No charges used_|inline" '
 else:
   # remove the charges
   if cost>ch.get_cc(cc):
@@ -75,9 +95,9 @@ else:
   fields=f''' -f "{cc} (-{cost})|{ch.cc_str(cc)}|inline" '''
 
 #output alias
-if match==spell_ab:
-  desc = '''-f "Spell Absorption|While holding the staff, you have advantage on saving throws against spells. In addition, you can use your reaction when another creature casts a spell that targets only you. If you do, the staff absorbs the magic of the spell, canceling its effect and gaining a number of charges equal to the absorbed spell's level. However, if doing so brings the staff's total number of charges above 50, the staff explodes as if you activated it's retributive strike." '''
-  return f'embed -title "{name} uses {spell_ab} with their {cc}!" {desc} {ab_field} {flavor}'
+if match==spell_ab or match==retro:
+  desc = '''-f "Spell Absorption|While holding the staff, you have advantage on saving throws against spells. In addition, you can use your reaction when another creature casts a spell that targets only you. If you do, the staff absorbs the magic of the spell, canceling its effect and gaining a number of charges equal to the absorbed spell's level. However, if doing so brings the staff's total number of charges above 50, the staff explodes as if you activated its retributive strike." '''
+  return f'''embed -title "{name} uses {match} with their {cc}{' and it explodes violently' if exp_amt else ''}!" {desc} {abr_field} {flavor}'''
 else:
   return f'cast "{match}" {lvl_phrase} {cast_args} -i {fields} {flavor}'
-</drac2> 
+</drac2>

@@ -32,7 +32,7 @@ a=&ARGS&
 if not a or a[0].lower() in '?help':
   return f'echo   **Use:** {syntax}. \n**Charges:** {ch.cc_str(cc)}\n**Supported spells/actions:** {", ".join(spells.keys())}.'
 
-cast_args="""&*&""".strip(a[0])
+cast_args="""&*&""".replace(a[0], '')
 ignore=argparse(a).last('i')
 
 #add flavor

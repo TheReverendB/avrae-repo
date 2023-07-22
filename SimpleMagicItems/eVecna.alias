@@ -28,7 +28,7 @@ ch.create_cc_nx(cc, 0, 8, 'long', 'bubble', reset_by='1d4+4')
 
 # match the spell name
 spell     = a[0].lower()
-cast_args = """&*&""".strip(spell)
+cast_args = """&*&""".replace(a[0],' ')
 
 match =[sn for sn in spells if spell.lower() in sn.lower()]
 if not match:
@@ -59,6 +59,6 @@ else:
   if r.total==1:
     vecna=f''' -title "{name} casts {match} and their soul is consumed by Vecna!" -f "Does Vecna consume your soul?|{r}\nYes.  Yes he does." '''
   else:
-    vecna=f""" -f "Does Vecna consuem your soul?|{r}\nNot yet." """
+    vecna=f""" -f "Does Vecna consume your soul?|{r}\nNot yet." """
   return f'''cast "{match}" -dc 18 {cast_args} -phrase "with their {cc}" -i -f "{desc}" {vecna} {fields} {flavor} '''
 </drac2>

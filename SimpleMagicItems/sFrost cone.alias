@@ -1,0 +1,14 @@
+<drac2>
+cc = "Staff of Frost"
+character().create_cc_nx(cc,0,10,'long','bubble', reset_by='1d6+4')
+v = character().get_cc(cc)>=5
+if v:
+    character().mod_cc(cc,-5)
+    return f'''cast "Cone of Cold" -i &*& -phrase "With the {cc}!" -f "Staff of Frost|You have resistance to cold damage while you hold this staff.\n\nThe staff has 10 charges. While you hold this staff you can use an action to cast one of the following spells from it: **Cone of Cold** (5 charges), **Fog Cloud** (1 charge), **Ice Storm** (4 charges), or **Wall of Ice** (4 charges).\n\nThe staff regains 1d6 + 4 expended charges daily at dawn. If you expend the last charge, roll a d20. On a 1, the staff turns to water and is destroyed." '''
+else:
+    return f'''embed -title "{name} doesn't have enough charges to use the {cc} to cast Cone of Cold!" -f "You need to wait until dawn to use the staff this way again." '''
+</drac2>
+{{f' -f "{cc}{" (-5)" if v else ""}| {character().cc_str(cc)}"'}}
+{{combat().me.add_effect('Staff of Frost',' -resist cold', -1) if combat() and combat().me else ''}}
+-thumb "https://cdn.discordapp.com/attachments/697795366946471997/750156151051780106/636284768650698292.jpeg"
+-footer "!sFrost [spell] [-t target]"

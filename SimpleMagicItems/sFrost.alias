@@ -1,0 +1,16 @@
+embed -title "<name> wields the Staff of Frost!" -desc "**Description**
+You have resistance to cold damage while you hold this staff." 
+-f "Using the staff:|Cone of Cold: 
+`!sFrost cone  [-t target(s)]`
+Wall of Ice:  
+`!sFrost wall  [-t target(s)]`
+Ice Storm:    
+`!sFrost storm [-t target(s)]`
+Fog Cloud:    
+`!sFrost fog`" 
+-thumb "https://cdn.discordapp.com/attachments/697795366946471997/750156151051780106/636284768650698292.jpeg" 
+{{character().create_cc_nx('Staff of Frost', 0, 10, 'long', 'bubble', reset_by='1d6+4')}}
+{{combat().me.add_effect('Staff of Frost',' -resist cold', -1) if combat() and combat().me else ''}}
+-f "Staff of Frost|{{character().cc_str('Staff of Frost')}}"
+{{f'''-f "{name}: {combat().me.get_effect("Staff of Frost")}"''' if combat() and combat().me else ''}}
+-footer "!sFrost [spell] [-t target(s)]"

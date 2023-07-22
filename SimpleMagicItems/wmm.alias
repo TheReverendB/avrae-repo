@@ -1,23 +1,23 @@
 <drac2>
-cc="Wand of Magic Missiles"  # save our counter name so I don't have to type it a bunch
-character().create_cc_nx(cc, 0, 7, 'long', 'bubble', reset_by='1d6+1')  # create our counter if it doesn't exist
-r   = vroll('1d6+1')  # our roll in case we recharge
-re  = '&1&'=='recharge'  # re will be True if user enters '!wmm recharge'
-lvl = int('&1&') if '&1&'.isdigit() else 0  # set our first arg to the level being cast if it is a number or default to 0 since it's falsey
-v   = character().get_cc(cc)>=lvl and lvl!=0  # make sure they have enough charges but make sure it isn't at 0 uses remaining
-x   = character().get_cc(cc)>0  # confirm they have at least one charge remaining 
-desc= "Wand of Magic Missiles|This wand has 7 charges. You can use one charge for each spell level of Magic Missile you cast.  The wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll a d20. On a 1, the wand crumbles into ashes and is destroyed."  # save our description for use later
-if re:  # do this if we are recharging
-	character().mod_cc(cc,r.total)
-	return f'''embed -title "{name} recharges their {cc}!" -desc "{r}" -f "{desc}"''' 
-elif lvl==0:  # do this if we aren't recharging and no casting level was entered
-	return f'''embed -title "{name} reads the instructions for their {cc}!" -desc "`!wmm 3 -rr 5 -t OW1` or \n`!wmm 1 -t GO1 -t GO2 -t GO3` or \n`!wmm recharge`"'''
-elif v:  # cast the spell!!
-	character().mod_cc(cc, -lvl)
-	return f'''cast "magic missile" -i -l {lvl} -phrase "at level {lvl} using the Wand of Magic Missiles" -f "{desc}"'''
-elif x:  # we tried to cast but don't have enough uses but more than 0
-	return f'''embed -title "You do not have enough charges to use the {cc} at this level." -f "Cast at a lower level or wait until dawn."'''
-else:  # we don't have any uses remaining at all :(
-	return f'''embed -title "All of the charges are gone from the {cc}!" -desc "If all the charges are used from the Wand of Magic Missiles, roll a d20.  On a one, the wand turns to dust and is destroyed."'''
+cc="Wand of Magic Missiles"
+character().create_cc_nx(cc, 0, 7, 'long', 'bubble', reset_by='1d6+1')
+r  = vroll('1d6+1')
+re = '&1&'=='recharge'
+lvl= int('&1&') if '&1&'.isdigit() else 0
+v  = character().get_cc(cc)>=lvl and lvl!=0
+x  = character().get_cc(cc)>0
+f  = "Wand of Magic Missiles|This wand has 7 charges. You can use one charge for each spell level of Magic Missile you cast.  The wand regains 1d6 + 1 expended charges daily at dawn. If you expend the wand's last charge, roll a d20. On a 1, the wand crumbles into ashes and is destroyed."
+if re:
+  character().mod_cc(cc,r.total)
+  return f'''embed -title "{name} recharges their {cc}!" -desc "{r}" -f "{f}"''' 
+elif lvl==0:
+  return f'''embed -title "{name} reads the instructions for their {cc}!" -desc "`!wmm 3 -rr 5 -t OW1` or \n`!wmm 1 -t GO1 -t GO2 -t GO3` or \n`!wmm recharge`"'''
+elif v:
+  character().mod_cc(cc, -int(lvl))
+  return f'''cast "magic missile" -i -l {lvl} -phrase "at level {lvl} using the Wand of Magic Missiles" -f "{f}"'''
+elif x:
+  return f'''embed -title "You do not have enough charges to use the {cc} at this level." -f "Cast at a lower level or wait until dawn."'''
+else:
+  return f'''embed -title "All of the charges are gone from the {cc}!" -desc "If all the charges are used from the Wand of Magic Missiles, roll a d20.  On a one, the wand turns to dust and is destroyed."'''
 
 </drac2> -f "{{cc}} {{f'(-{lvl})' if v else f'(+{r.total})' if re else ''}}| {{character().cc_str(cc)}}" -thumb "https://www.dndbeyond.com/avatars/7/476/636284783144510537.jpeg" -f "{{ctx.prefix+ctx.alias}} <level cast> [-t target & -rr] or [-t targets] / {{ctx.prefix+ctx.alias}} recharge"
