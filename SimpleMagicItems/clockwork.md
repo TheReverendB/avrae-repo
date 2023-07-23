@@ -11,4 +11,4 @@ You need to have access to Xanathar's Guide to Everything on DnDBeyond.com in or
  
 Support the work I do with [Ko-Fi](https://ko-fi.com/thereverendb)
  
-The code behind this is posted on my  [Github](https://github.com/TheReverendB/avrae-aliases)
+The code behind this is posted on my [Github](https://github.com/TheReverendB/avrae-aliases)

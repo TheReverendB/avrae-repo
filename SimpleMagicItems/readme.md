@@ -5,6 +5,7 @@ Rebinding (renaming) any of these aliases is possible personally or for your ser
  
 Thanks to the great people over at [Avrae Discord Server](https://support.avrae.io/) who helped me learn to code these, or donated their aliases to the cause!  If you want to learn, head there.
  
+ 
 Support the work I do with [Ko-Fi](https://ko-fi.com/thereverendb)
  
-The code behind these aliases will be posted as available on my  [Github](https://github.com/TheReverendB/avrae-aliases)
+The code behind these aliases will be posted as available on my [Github](https://github.com/TheReverendB/avrae-aliases)
