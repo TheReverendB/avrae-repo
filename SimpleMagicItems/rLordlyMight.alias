@@ -111,4 +111,3 @@ else:
     return f'''-title "{name} checks their {cc}!" -desc "Looking down you see the {cc} is still a {get('RoLM')}.  Use `{ctx.prefix}help {ctx.alias}` for a guide to using this alias." -f "{ccDL}|{character().cc_str(ccDL)}|inline" -f "{ccP}|{character().cc_str(ccP)}|inline" -f "{ccT}|{character().cc_str(ccT)}|inline" -f "{ctx.prefix}{ctx.alias}" '''
 </drac2>
 -thumb "https://cdn.discordapp.com/attachments/733167931571044460/769308376143888414/rod-of-lordly-might_0-1.jpg" -color <color>
--thumb "https://cdn.discordapp.com/attachments/733167931571044460/769308376143888414/rod-of-lordly-might_0-1.jpg" -color <color>
