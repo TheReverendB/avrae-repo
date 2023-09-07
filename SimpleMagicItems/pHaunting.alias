@@ -1,0 +1,53 @@
+embed <drac2>
+# some variables
+a    = argparse(&ARGS&)
+ch   = character()
+c    = combat()
+cc   = 'Pipes of Haunting'
+out  = []
+desc = "You must be proficient with wind instruments to use these pipes. They have 3 charges. You can use an action to play them and expend 1 charge to create an eerie, spellbinding tune. Each creature within 30 feet of you that hears you play must succeed on a DC 15 Wisdom saving throw or become frightened of you for 1 minute. If you wish, all creatures in the area that aren't hostile toward you automatically succeed on the saving throw. A creature that fails the saving throw can repeat it at the end of each of its turns, ending the effect on itself on a success. A creature that succeeds on its saving throw is immune to the effect of these pipes for 24 hours. The pipes regain 1d3 expended charges daily at dawn."
+
+# create our counter
+ch.create_cc_nx(cc,0,3,'long','bubble',reset_by='1d3', desc=desc)
+
+# more variables
+i      = a.get('i')
+v      = ch.get_cc(cc)
+alias  = ctx.prefix+ctx.alias
+footer = f""" -footer "{alias} [play] [-t target]" """
+desc   = f""" -f "{desc}" """
+
+# roll modifiers
+adv    = a.adv(boolwise=True, custom={'adv':'sadv', 'dis':'sdis'})
+bonus  = (''.join(a.get('b', type_=lambda x: "+"+x if x[0] not in "+-" else x))) if a.get('b') else ''
+
+
+# do the things!
+if '''&1&'''.lower() in 'play':
+  if v or i:
+    out.append(f''' -title "{name} uses their {cc}!" ''')
+    i or ch.mod_cc(cc,-1)
+    if c and c.me:
+      out.append(f''' -f "Meta|DC: 15" ''')
+      for t in a.get("t"):
+        if targ:=c.get_combatant(t):
+          save = vroll(targ.saves.get('wis').d20(adv)+bonus)
+          if save.total<15:
+            effect = targ.add_effect(f'Frightened ({cc})',duration=10,desc="At the end of each of the target's turns, it can repeat the DC 15 Wisdom saving throw, ending the effect on itself on a success.",buttons=[{"label":"Resist Fear","automation":[{"type":"target","target":"self","effects":[{"type":"save","stat":"wis","fail":[{"type":"text","text":"{caster.name} is still frightened!"}],"success":[{"type":"remove_ieffect"},{"type":"text","text":"{caster.name} is no longer afraid!"}],"dc":"15"}]}],"verb":"tries to be brave","style":"3"}])
+            out.append(f''' -f "{targ.name}|WIS Save: {save}; Failure!\nEffect: {str(effect).splitlines()[0]}" ''')
+          else:
+            out.append(f''' -f "{targ.name}|WIS Save: {save}; Success!" ''')
+        else:
+          out.append(f''' -f "{f'{t.upper()}|Not found' if t else 'No Targets Specified|No effects applied'}" ''')
+    else:
+      out = [f''' -f "Meta|DC: 15\n(Cannot apply effects outside of combat.)" ''']
+  else:
+    out = [f''' -title "{name} already used all the charges in their {cc}!" -desc "You need to wait until dawn to use this bad boy again.\n\n`{alias} cast -i` to ignore the counter." ''']
+
+  out.append(f''' {desc} -f "{cc}|{ch.cc_str(cc)} {'use ignored' if i else '(-1)' if v else ''}" ''')
+
+  return ' '.join(out)
+
+else:
+  return f""" -title "{name} reads the manual on their {cc}!" -desc "`{alias} play [-t target]` to use the pipes." {desc} -f "{cc}|{ch.cc_str(cc)}" """
+</drac2> -thumb https://www.dndbeyond.com/avatars/thumbnails/7/331/1000/1000/636284757213119674.jpeg -color <color> {{footer}}
