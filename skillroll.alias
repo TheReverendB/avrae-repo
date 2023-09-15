@@ -24,6 +24,6 @@ bonus = (''.join(a.get('b', type_=lambda x: "+"+x if x[0] not in "+-" else x))) 
 # put all those arguments in the proper places in our d20() function, inside a vroll().
 r = vroll(ch.skills[skill].d20(adv, reroll_number, minimum_check)+bonus)
 
-# return our roll, replacing the oddly formatted skills with properly spaced plain text.
+# return our roll, replacing the camelCase skill names with plain text.
 return f"Your {skill.replace('H', ' h').replace('O', ' o')} roll:\n{r}"
 </drac2>
