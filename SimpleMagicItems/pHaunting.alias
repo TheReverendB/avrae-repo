@@ -17,34 +17,47 @@ alias  = ctx.prefix+ctx.alias
 footer = f""" -footer "{alias} [play] [-t target]" """
 desc   = f""" -f "{desc}" """
 
-# roll modifiers
-adv    = a.adv(boolwise=True, custom={'adv':'sadv', 'dis':'sdis'})
-bonus  = (''.join(a.get('b', type_=lambda x: "+"+x if x[0] not in "+-" else x))) if a.get('b') else ''
 
-
-# do the things!
+#  do the things!
 if '''&1&'''.lower() in 'play':
   if v or i:
     out.append(f''' -title "{name} uses their {cc}!" ''')
     i or ch.mod_cc(cc,-1)
     if c and c.me:
       out.append(f''' -f "Meta|DC: 15" ''')
+      target_list, target_dict = [], {}
+
+      #  parse target specific args and combine with all args
       for t in a.get("t"):
-        if targ:=c.get_combatant(t):
-          save = vroll(targ.saves.get('wis').d20(adv)+bonus)
-          if save.total<15:
-            effect = targ.add_effect(f'Frightened ({cc})',duration=10,desc="At the end of each of the target's turns, it can repeat the DC 15 Wisdom saving throw, ending the effect on itself on a success.",buttons=[{"label":"Resist Fear","automation":[{"type":"target","target":"self","effects":[{"type":"save","stat":"wis","fail":[{"type":"text","text":"{caster.name} is still frightened!"}],"success":[{"type":"remove_ieffect"},{"type":"text","text":"{caster.name} is no longer afraid!"}],"dc":"15"}]}],"verb":"tries to be brave","style":"3"}])
-            out.append(f''' -f "{targ.name}|WIS Save: {save}; Failure!\nEffect: {str(effect).splitlines()[0]}" ''')
-          else:
-            out.append(f''' -f "{targ.name}|WIS Save: {save}; Success!" ''')
+        targetName, targetArgs = (t.split('|')+[''])[:2]
+        if targ := c.get_combatant(targetName):
+          target_list.append(targ)
+          target_dict[targ.name] = argparse(targetArgs.split()+&ARGS&)
+        elif group := c.get_group(targetName):
+          for targ in group.combatants:
+            target_list.append(targ)
+            target_dict[targ.name] = argparse(targetArgs.split()+&ARGS&)
+
+      #  do the saves
+      for targ in target_list:
+        #  get modifiers from our total and target specific args
+        bonus = (''.join(target_dict[targ.name].get('b', type_=lambda x: "+"+x if x[0] not in "+-" else x))) if target_dict[targ.name].get('b') else ''
+        adv   = target_dict[targ.name].adv(boolwise=True, custom={'adv':'sadv', 'dis':'sdis'})
+        #  roll our save
+        save  = vroll(targ.saves.get('wis').d20(adv)+bonus)
+        #  apply save effects
+        if save.total<15:
+          effect = targ.add_effect(f'Frightened ({cc})',duration=10,desc="At the end of each of the target's turns, it can repeat the DC 15 Wisdom saving throw, ending the effect on itself on a success.",buttons=[{"label":"Resist Fear","automation":[{"type":"target","target":"self","effects":[{"type":"save","stat":"wis","fail":[{"type":"text","text":"{caster.name} is still frightened!"}],"success":[{"type":"remove_ieffect"},{"type":"text","text":"{caster.name} is no longer afraid!"}],"dc":"15"}]}],"verb":"tries to be brave","style":"3"}])
+          out.append(f''' -f "{targ.name}|WIS Save: {save}; Failure!\nEffect: {str(effect).splitlines()[0]}" ''')
         else:
-          out.append(f''' -f "{f'{t.upper()}|Not found' if t else 'No Targets Specified|No effects applied'}" ''')
+          effect = targ.add_effect(f'Immune to the {cc}',duration=14400,desc=f"A creature that succeeds on its saving throw is immune to the effect of these pipes for 24 hours.")
+          out.append(f''' -f "{targ.name}|WIS Save: {save}; Success!\nEffect: {str(effect).splitlines()[0]}" ''')
     else:
       out = [f''' -f "Meta|DC: 15\n(Cannot apply effects outside of combat.)" ''']
   else:
     out = [f''' -title "{name} already used all the charges in their {cc}!" -desc "You need to wait until dawn to use this bad boy again.\n\n`{alias} cast -i` to ignore the counter." ''']
 
-  out.append(f''' {desc} -f "{cc}|{ch.cc_str(cc)} {'use ignored' if i else '(-1)' if v else ''}" ''')
+  out.append(f''' {desc} -f "{cc}|{ch.cc_str(cc)} {'_use ignored_' if i else '(-1)' if v else ''}" ''')
 
   return ' '.join(out)
 
