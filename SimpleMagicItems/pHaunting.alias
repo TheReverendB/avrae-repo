@@ -32,17 +32,23 @@ if '''&1&'''.lower() in 'play':
         targetName, targetArgs = (t.split('|')+[''])[:2]
         if targ := c.get_combatant(targetName):
           target_list.append(targ)
-          target_dict[targ.name] = argparse(targetArgs.split()+&ARGS&)
+          target_dict[targ.name] = argparse(targetArgs)
         elif group := c.get_group(targetName):
           for targ in group.combatants:
             target_list.append(targ)
-            target_dict[targ.name] = argparse(targetArgs.split()+&ARGS&)
+            target_dict[targ.name] = argparse(targetArgs)
 
       #  do the saves
       for targ in target_list:
+        #  add target specific args to our context
+        a.add_context(targ.name, target_dict[targ.name])
+        #  set the context to use specific args and general args
+        a.set_context(targ.name)
         #  get modifiers from our total and target specific args
-        bonus = (''.join(target_dict[targ.name].get('b', type_=lambda x: "+"+x if x[0] not in "+-" else x))) if target_dict[targ.name].get('b') else ''
-        adv   = target_dict[targ.name].adv(boolwise=True, custom={'adv':'sadv', 'dis':'sdis'})
+        bonus = (''.join(a.get('sb', type_=lambda x: "+"+x if x[0] not in "+-" else x))) if a.get('sb') else ''
+        adv   = a.adv(boolwise=True, custom={'adv':'sadv', 'dis':'sdis'})
+        #  reset context to general
+        a.set_context(None)
         #  roll our save
         save  = vroll(targ.saves.get('wis').d20(adv)+bonus)
         #  apply save effects
