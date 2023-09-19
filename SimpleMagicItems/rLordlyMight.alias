@@ -85,19 +85,24 @@ elif '&1&'.lower() in 'terrify':
           targArgs = argparse(targArgs)
           if curTarg := c.get_combatant(targName):
             targets.append(curTarg)
-            a.add_context(curTarg.name, argparse(targArgs))
+            a.add_context(curTarg.name, targArgs)
             targetArgs[curTarg.name] = targArgs
           elif curTarg := c.get_group(targName):
             for gTarg in curTarg.combatants:
               targets.append(gTarg)
-              a.add_context(gTarg.name, argparse(targArgs))
+              a.add_context(gTarg.name,  targArgs)
               targetArgs[gTarg.name] = targArgs
+
         for target in targets:
-          targName = target.name
-          targBonus = targetArgs[targName].get('sb')
-          dice = target.saves.get("wis").d20(targetArgs[targName].adv(boolwise=True, custom={'adv': 'sadv', 'dis': 'sdis'}))
-          saveRoll = vroll(f'{dice} {"+"+"+".join(targBonus) if targBonus else ""}')
-          out.append(f''' -f "{targName}|**WIS Save:** {saveRoll}; {['Failure!', target.add_effect('Terrified - Rod of Lordly Might',duration=10,desc='A frightened target can repeat the DC 17 wisdom save at the end of each of its turns, ending the effect on itself on a success.')][0] if saveRoll.total<dc else 'Success!'} \n {f"""**Effect:** {target.get_effect('Terrified - Rod of Lordly Might')}""" if saveRoll.total<dc else ''}" ''')
+          targName  = target.name
+          a.set_context(targName)
+          targBonus = a.get('sb')
+          adv       = a.adv(boolwise=True, custom={'adv': 'sadv', 'dis': 'sdis'})
+          dice      = target.saves.get("wis").d20(adv)
+          bonus     = "+"+"+".join(targBonus) if targBonus else ""
+          saveRoll  = vroll(f'{dice} {bonus}')
+          out.append(f''' -f "{targName}|**WIS Save:** {saveRoll}; {['Failure!', target.add_effect('Terrified - Rod of Lordly Might',duration=10,desc='A frightened target can repeat the DC 17 wisdom save at the end of each of its turns, ending the effect on itself on a success.',buttons=[{"label":"Resist Fright","automation":[{"type":"target","target":"self","effects":[{"type":"save","stat":"wis","fail":[{"type":"text","text":"{caster.name} is still frightened!"}],"success":[{"type":"remove_ieffect"},{"type":"text","text":"{caster.name} is no longer afraid!"}],"dc":"17"}]}],"verb":"tries to be brave","style":"3"}])][0] if saveRoll.total<dc else 'Success!'} \n {f"""**Effect:** {target.get_effect('Terrified - Rod of Lordly Might')}""" if saveRoll.total<dc else ''}" ''')
+          a.set_context(None)
         return f'''-title "{name} tries to terrify with the {cc}!" {' '.join(out)} -f "Terrify|While holding the rod, you can use an action to force each creature you can see within 30 feet of you to make a DC 17 Wisdom saving throw. On a failure, a target is frightened of you for 1 minute. A frightened target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. This property cannot be used again until the next dawn." -f "{ccT}{' (-1)' if vT and not i else ''}|{character().cc_str(ccT)}" -footer "{ctx.prefix}{ctx.alias}" '''
       else:
         return f'''-title "{name} tries to terrify with the {cc}!" -f "Terrify|**DC 17**\n(No Target Specified.)" -f "Terrify|While holding the rod, you can use an action to force each creature you can see within 30 feet of you to make a DC 17 Wisdom saving throw. On a failure, a target is frightened of you for 1 minute. A frightened target can repeat the saving throw at the end of each of its turns, ending the effect on itself on a success. This property cannot be used again until the next dawn." -f "{ccT}{' (-1)' if not i else ''}|{character().cc_str(ccT)}" -footer "{ctx.prefix}{ctx.alias}" '''
