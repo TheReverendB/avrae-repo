@@ -1,23 +1,24 @@
 embed <drac2>
-cc="Rod of Lordly Might"
+cc  ="Rod of Lordly Might"
 ccDL="RoLM Drain Life"
-ccP="RoLM Paralyze"
-ccT="RoLM Terrify"
+ccP ="RoLM Paralyze"
+ccT ="RoLM Terrify"
 character().create_cc_nx(ccDL,0,1,'long','bubble')
 character().create_cc_nx(ccP,0,1,'long','bubble')
 character().create_cc_nx(ccT,0,1,'long','bubble')
 vDL=character().get_cc(ccDL)
-vP=character().get_cc(ccP)
-vT=character().get_cc(ccT)
-a=argparse(&ARGS&)
-i=a.get('i')
-t=a.last('t') if a.last('t') else ''
-c=combat()
-f="**Description:**\nThis rod has a flanged head, and it functions as a magic mace that grants a +3 bonus to attack and damage rolls made with it. The rod has properties associated with six different buttons that are set in a row along the haft.\n\nYou can press one of the rod's six buttons as a bonus action. A button's effect lasts until you push a different button."
-f1="__Changing the Rod's shape:__|`!RoLM [sword, axe, spear, pole, ram, mace]`|inline"
-f2="__Using a special ability:__|`!RoLM [drain, paralyze, terrify]`|inline"
+vP =character().get_cc(ccP)
+vT =character().get_cc(ccT)
+a  =argparse(&ARGS&)
+i  =a.get('i')
+t  =a.last('t') if a.last('t') else ''
+c  =combat()
+f  ="**Description:**\nThis rod has a flanged head, and it functions as a magic mace that grants a +3 bonus to attack and damage rolls made with it.  The rod has properties associated with six different buttons that are set in a row along the haft.\n\nYou can press one of the rod's six buttons as a bonus action. A button's effect lasts until you push a different button."
 
-if '&1&'.lower() in 'flame tongue sword':
+f1 ="__Changing the Rod's shape:__|`!RoLM [sword, axe, spear, pole, ram, mace]`|inline"
+f2 ="__Using a special ability:__|`!RoLM [drain, paralyze, terrify]`|inline"
+
+if '&1&'.lower() in 'flametonguesword':
     character().set_cvar('RoLM','Flame Tongue')
     return f'''-title "{name} changes the {cc} into a Flame Blade!" -desc "You press button 1 and the rod becomes a flame tongue, as a fiery blade sprouts from the end opposite the rod's flanged head (you choose the type of sword)." -footer "{ctx.prefix}{ctx.alias}" '''
 elif '&1&'.lower() in 'battleaxe':
@@ -26,13 +27,13 @@ elif '&1&'.lower() in 'battleaxe':
 elif '&1&'.lower() in 'spear':
     character().set_cvar('RoLM','Spear')
     return f'''-title "{name} changes the {cc} into a Spear!" -desc "You press button 3, the rod's flanged head folds down, a spear point springs from the rod's tip, and the rod's handle lengthens into a 6-foot haft, transforming the rod into a magic spear that grants a +3 bonus to attack and damage rolls made with it." -footer "{ctx.prefix}{ctx.alias}" '''
-elif '&1&'.lower() in 'climbing pole ladder':
+elif '&1&'.lower() in 'climbingpoleladder':
     character().set_cvar('RoLM','Climbing Pole')
     return f'''-title "{name} changes the {cc} into a Climbing Pole!" -desc "You press button 4, the rod transforms into a climbing pole up to 50 feet long, as you specify. In surfaces as hard as granite, a spike at the bottom and three hooks at the top anchor the pole. Horizontal bars 3 inches long fold out from the sides, 1 foot apart, forming a ladder. The pole can bear up to 4,000 pounds. More weight or lack of solid anchoring causes the rod to revert to its normal form." -footer "{ctx.prefix}{ctx.alias}" '''
-elif '&1&'.lower() in 'battering ram':
+elif '&1&'.lower() in 'batteringram':
     character().set_cvar('RoLM','Battering Ram')
     return f'''-title "{name} changes the {cc} into a Battering Ram!" -desc "You press button 5, the rod transforms into a handheld battering ram and grants its user a +10 bonus to Strength checks made to break through doors, barricades, and other barriers." -footer "{ctx.prefix}{ctx.alias}" '''
-elif '&1&'.lower() in 'normal mace compass':
+elif '&1&'.lower() in 'normalmacecompass':
     character().set_cvar('RoLM','Mace / Compass')
     return f'''-title "{name} changes the {cc} into it's basic form!" -desc "You press button 6, the rod assumes or remains in its normal form and indicates magnetic north. (Nothing happens if this function of the rod is used in a location that has no magnetic north.) The rod also gives you knowledge of your approximate depth beneath the ground or your height above it." -footer "{ctx.prefix}{ctx.alias}" '''
 elif '&1&'.lower() in 'drain life':
@@ -43,7 +44,7 @@ elif '&1&'.lower() in 'drain life':
         save=targ.save('con') if targ else err(f"Your target '{t}' is not in combat.")
         character().mod_cc(ccDL,-1) if not i else ''
         if save.total<17:
-          damage=targ.damage('4d6[necrotic]')
+          damage =targ.damage('4d6[necrotic]')
           healing=c.me.damage(f'-{damage.total}/2 [healing]', True, False)
           return f'''-title "{name} strikes with a life draining blow!" -f "Drain Life|**DC 17**" -f "{targ.name}|**CON Save:** {save}; Failure!\n{damage.damage}" -f "**{name}**\n**Recovered:** {healing.roll}" -f "Drain Life|When you hit a creature with a melee attack using the rod, you can force the target to make a DC 17 Constitution saving throw. On a failure, the target takes an extra 4d6 necrotic damage, and you regain a number of hit points equal to half that necrotic damage. This property cannot be used again until the next dawn." -f "{ccDL} {'' if i else '(-1)'}|{character().cc_str(ccDL)}" -footer "{targ.name}: {targ.hp_str()}\n{name}: {character().hp_str()}\n\n{ctx.prefix}{ctx.alias}" '''
         else:
@@ -113,6 +114,6 @@ elif '&1&'.lower() in 'terrify':
 elif '&1&'.lower() in 'help?':
     return f'''-title "Using the {cc}:" -desc "{f}" -f "{f1}" -f "{f2}" -f "{ctx.prefix}{ctx.alias}" '''
 else:
-    return f'''-title "{name} checks their {cc}!" -desc "Looking down you see the {cc} is still a {get('RoLM')}.  Use `{ctx.prefix}help {ctx.alias}` for a guide to using this alias." -f "{ccDL}|{character().cc_str(ccDL)}|inline" -f "{ccP}|{character().cc_str(ccP)}|inline" -f "{ccT}|{character().cc_str(ccT)}|inline" -f "{ctx.prefix}{ctx.alias}" '''
+    return f'''-title "{name} checks their {cc}!" -desc "Looking down you see the {cc} is still a {get('RoLM', 'Mace')}.  Use `{ctx.prefix}help {ctx.alias}` for a guide to using this alias." -f "{ccDL}|{character().cc_str(ccDL)}|inline" -f "{ccP}|{character().cc_str(ccP)}|inline" -f "{ccT}|{character().cc_str(ccT)}|inline" -f "{ctx.prefix}{ctx.alias}" '''
 </drac2>
 -thumb "https://cdn.discordapp.com/attachments/733167931571044460/769308376143888414/rod-of-lordly-might_0-1.jpg" -color <color>
