@@ -34,7 +34,7 @@ if hbSpells := get_svar('MAHomebrew', get_uvar('MAHomebrew', '{}')):
 		  	g.sp[str(x)].extend(more_spells)
 
 	except:
-		return f'''embed -title "Your {ma} begins to smoke and a flag pops out the end reading ERROR!" -desc «There is an issue with your Homebrew spells for this alias!  Check your `!svar MAHomebrew` and your `!uvar MAHomebrew` to insure it is a [properly formatted JSON](<https://jsonlint.com>) with spells in lists according to their level _exactly_ as shown below, but with your homebrew spell names:```json\n!svar MAHomebrew {exampleDict}```\n\nYou can use an empty list or remove spell levels for which you have no homebrew spells.\n\nIf you still can't figure it out, head to the [Avrae Development Server](<https://support.avrae.io/>) for help.»   '''
+		return f'''embed -title "Your {ma} begins to smoke and a flag pops out the end reading ERROR!" -desc «There is an issue with your Homebrew spells for this alias!  Check your `!svar MAHomebrew` and your `!uvar MAHomebrew` to insure it is a [properly formatted JSON](<https://jsonlint.com>) with spells in lists according to their level _exactly_ as shown below, but with your homebrew spell names:```json\n!svar MAHomebrew {exampleDict}```\n\nYou can use an empty list or remove spell levels for which you have no homebrew spells.\n\nIf you can't figure it out, head to the [Avrae Development Server](<https://support.avrae.io/>) for help.»   '''
 
 
 # -- PARTIAL SPELL NAME MATCHING -- #
