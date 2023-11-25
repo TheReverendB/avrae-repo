@@ -12,7 +12,32 @@ rollstring  =["1d20","2d20kh1","2d20kl1"][a.adv()] + ("mi"+a.last("mc") if a.las
 
 aRoll = vroll(rollstring)  # our arcana roll
 
-# -- handle partial spell name entry -- #
+# -- HOMEBREW SPELLS -- #
+
+exampleDict = '''!svar MAHomebrew {
+        "0": ["vicious mockeries"],
+        "1": ["which bolt?"],
+        "2": [],
+        "3": ["wind break"],
+        "4": ["aura of stank"],
+        "8": ["dom ate monster"]
+  }'''
+
+
+hbDict = {}
+
+if hbSpells := get_svar('MAHomebrew', get_uvar('MAHomebrew', '{}')):
+	try:
+		hbDict = load_json(hbSpells)
+		for x in range(10):
+		  if (more_spells := hbDict.get(str(x), [])) and typeof(more_spells)=='SafeList':
+		  	g.sp[str(x)].extend(more_spells)
+
+	except:
+		return f'''embed -title "Your {ma} begins to smoke and a flag pops out the end reading ERROR!" -desc «There is an issue with your Homebrew spells for this alias!  Check your `!svar MAHomebrew` and your `!uvar MAHomebrew` to insure it is a [properly formatted JSON](<https://jsonlint.com>) with spells in lists according to their level _exactly_ as shown below, but with your homebrew spell names:```json\n!svar MAHomebrew {exampleDict}```\n\nYou can use an empty list or remove spell levels for which you have no homebrew spells.\n\nIf you still can't figure it out, head to the [Avrae Development Server](<https://support.avrae.io/>) for help.»   '''
+
+
+# -- PARTIAL SPELL NAME MATCHING -- #
 
 # make a list of all possible spells 
 fullSpellList = []
@@ -32,7 +57,7 @@ if len(fullSpellName)>1:
 
 # if we still didn't match anything
 elif not fullSpellName:
-	return f"""embed -title "Your {ma} has a breakdown!" -desc 《Your entry `&1&` doesn't match any known spell.  Check your spelling and try again.\n\n**Command ran:**\n\n`{ctx.prefix+ctx.alias} &*&`》  """
+	return f"""embed -title "Your {ma} has a breakdown!" -desc 《Your entry `&1&` doesn't match any known spell.  Check your spelling and try again.\n\n**Command ran:**\n\n`{ctx.prefix+ctx.alias} &*&`》  """ if &ARGS& else f'''embed -title "{name} reads the manual on their {ma}!" -desc "You can use `!mizapp` just like `!cast` with arguments and targets as per usual.  If you get a bonus or advantage to your arcana check, add those after `*` like in this example:\n`!mizapp 'spell name' [spell args] [-t targets] * [arcana args]`\n\nExample casting 'fire bolt' with disadvantage to hit GO1, but with advantage and bonus 1d4 to the arcana roll:\n `!mizapp 'fire bolt' dis -t GO1 * adv -b 1d4`" '''
 
 # we ended up with only one match 《 》
 else:
