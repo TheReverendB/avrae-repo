@@ -1,3 +1,5 @@
+Cast "Mass Cure Wounds" using the Staff
+
 __Using the Staff:__
  
 Mass Cure Wounds - `!sHealing mass [-t target]`

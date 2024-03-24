@@ -45,11 +45,11 @@ for x in range(10):
 	fullSpellList += g.sp[str(x)]
 
 # try for an exact match
-fullSpellName = [x for x in fullSpellList if "&1&".lower()==x]
+fullSpellName = [x for x in fullSpellList if "&1&".lower()==x.lower()]
 
 # try for partial match 
 if not fullSpellName:
-	fullSpellName = [x for x in fullSpellList if "&1&".lower() in x]
+	fullSpellName = [x for x in fullSpellList if "&1&".lower() in x.lower()]
 
 # if we matched multiple spells
 if len(fullSpellName)>1:

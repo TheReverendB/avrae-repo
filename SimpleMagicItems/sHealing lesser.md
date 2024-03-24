@@ -1,3 +1,5 @@
+Cast "Lesser Restoration" using the Staff
+ 
 __Using the Staff:__
  
 Lesser Restoration - `!sHealing lesser [-t target]`

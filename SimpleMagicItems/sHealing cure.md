@@ -1,3 +1,5 @@
+Cast "Cure Wounds" using the Staff
+
 __Using the Staff:__
  
 Cure Wounds - `!sHealing cure [charges used] [-t target]`
