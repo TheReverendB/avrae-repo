@@ -1,6 +1,6 @@
 # avrae-aliases
-Aliases by TheReverendB#1377 for use with the Avrae Discord bot.
+Aliases and Automations by thereverendb (and others) for use with the Avrae Discord bot.
 
-These are aliases I either designed with much help from the community at the Avrae Development Discord Server or was offered to host on their behalf since the alias fit with the collection.  Most of them are in my Simple Magic Items collection on the workshop, others are not but I thought they were worth sharing.  
+These aliases and automations are shared here to help others learn as easily as I did how to use Avrae to her maximum potential.  I've learned a lot on the [Avrae Development Server](https://support.avrae.io) and an happy to share this knowledge with you.
 
-The [Simple Magic Items](https://avrae.io/dashboard/workshop/5f8ae71ebbee1bca82ad38d2) Collection.
+The [Simple Magic Items](https://avrae.io/dashboard/workshop/5f8ae71ebbee1bca82ad38d2) Collection is (I think) my most useful collection, but feel free to check out some of the other code I store here as well.
