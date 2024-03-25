@@ -1,0 +1,22 @@
+name: Brewski
+automation:
+- type: counter
+  counter: Amulet of the Drunkard
+  amount: '1'
+  allowOverflow: false
+  errorBehaviour: raise
+- type: target
+  target: self
+  effects:
+  - type: damage
+    damage: -(4d4+4) [heal]
+    overheal: false
+  - type: text
+    text: This amulet smells of old, ale-stained wood. While wearing it, you can regain
+      4d4 + 4 hit points when you drink a pint of beer, ale, mead, or wine. Once the
+      amulet has restored hit points, it can't do so again until the next dawn.
+    title: Amulet of the Drunkard
+_v: 2
+verb: downs
+phrase: healing himself thanks to the Amulet of the Drunkard
+activation_type: 9

@@ -1,0 +1,62 @@
+name: Longbow
+automation:
+- type: variable
+  name: wallop
+  value: choice and choice in 'wallop'
+  onError: '0'
+- type: target
+  target: each
+  effects:
+  - type: condition
+    condition: wallop
+    onTrue:
+    - type: counter
+      counter: Walloping Arrows
+      amount: '1'
+      allowOverflow: false
+      errorBehaviour: raise
+    onFalse: []
+    errorBehaviour: 'false'
+  - type: attack
+    hit:
+    - type: damage
+      damage: 1d8+{dexterityMod}[piercing]
+      overheal: false
+    - type: condition
+      condition: wallop
+      onTrue:
+      - type: save
+        stat: str
+        fail:
+        - type: ieffect2
+          name: Prone (Walloped)
+          duration: null
+          effects: null
+          attacks: []
+          buttons:
+          - label: Stand Up
+            automation:
+            - type: remove_ieffect
+            verb: stands up
+            style: '3'
+            defaultDC: null
+            defaultAttackBonus: null
+            defaultCastingMod: null
+          end: false
+          conc: false
+          desc: null
+          stacking: false
+          save_as: null
+          parent: null
+          target_self: false
+          tick_on_caster: false
+        success: []
+        dc: '10'
+      onFalse: []
+      errorBehaviour: 'false'
+    miss: []
+    attackBonus: dexterityMod+proficiencyBonus
+- type: text
+  text: Weapon: Martial, Ammunition, Heavy, Range, Two-Handed, Range (150/600).
+  title: Effect
+_v: 2

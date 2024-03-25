@@ -1,0 +1,58 @@
+name: Coat of the Crest
+automation:
+  - type: counter
+    counter: Coat of the Crest
+    amount: "1"
+    allowOverflow: false
+    errorBehaviour: raise
+    fixedValue: true
+  - type: counter
+    counter: ThisCounterDoesNotExist
+    amount: "0"
+    allowOverflow: false
+    errorBehaviour: ignore
+  - type: target
+    target: self
+    effects:
+      - type: damage
+        damage: -({lastCounterRequestedAmount}+1)/2 [absorbed damage]
+        overheal: false
+      - type: ieffect2
+        name: Coat of the Crest Resistance ({choice if choice else '_No damage type
+          specified_'})
+        duration: "1"
+        effects:
+          resistances:
+            - "{{choice or 'none'}}"
+        attacks: []
+        buttons: []
+        end: false
+        conc: false
+        desc: null
+        stacking: false
+        save_as: null
+        parent: null
+        target_self: false
+        tick_on_caster: false
+  - type: text
+    text: When you are the target of an attack while wearing this coat, you can
+      spend 1 charge as a reaction to gain resistance to one type of damage from
+      the triggering attack. This resistance is effective against the triggering
+      attack and lasts until the start of your next turn.
+    title: Effect
+  - type: condition
+    condition: choice and lastCounterRequestedAmount
+    onTrue: []
+    onFalse:
+      - type: text
+        text: >-
+          Use `-choice fire` with this action to grant fire resistance for one
+          round.
+
+          Use `-amt 34` if you took 34 damage and this action will heal you for half (rounded up)
+        title: Use this Action Fully!
+    errorBehaviour: "false"
+_v: 2
+proper: true
+verb: absorbs damage with their
+activation_type: 4

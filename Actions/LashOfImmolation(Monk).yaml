@@ -1,0 +1,50 @@
+name: Lash of Immolation
+automation:
+  - type: target
+    target: all
+    effects:
+      - type: attack
+        hit:
+          - type: damage
+            damage: 1d{2+2*((caster.levels.get('Monk')+7)//6)} + {dexterityMod} [magical
+              slashing] + 1d6 [fire]
+            overheal: false
+          - type: condition
+            condition: lastAttackDidCrit
+            onTrue:
+              - type: ieffect2
+                name: Restrained (Lash of Immolation)
+                duration: "1"
+                effects:
+                  attack_advantage: "-1"
+                  save_dis:
+                    - dex
+                attacks: []
+                buttons: []
+                end: false
+                conc: false
+                desc: Attacks against this target have advantage.
+                stacking: false
+                save_as: null
+                parent: null
+                target_self: false
+                tick_on_caster: true
+              - type: text
+                text: When you score a critical hit with an attack using this whip, the target
+                  also has the restrained condition until the start of your next
+                  turn, as fiery bands lash around the target.
+                title: Crit!
+            onFalse:
+              - type: text
+                text: >-
+                  The handle of this dark leather whip bears the fire rune, and embers dance
+                  around the whip's tail.
+
+
+                  You gain a +1 bonus to attack and damage rolls made with this weapon, and on a hit, the whip deals an extra 1d6 fire damage.
+                title: Item Description
+            errorBehaviour: "false"
+        miss: []
+        attackBonus: dexterityMod + proficiencyBonus + 1
+_v: 2
+verb: attacks with the

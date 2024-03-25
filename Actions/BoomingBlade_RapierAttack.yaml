@@ -1,0 +1,64 @@
+name: Booming Rapier Attack
+automation:
+- type: variable
+  name: dice
+  value: (level+1)//6
+  onError: '0'
+- type: variable
+  name: boomed
+  value: '0'
+  onError: '0'
+- type: target
+  target: each
+  effects:
+  - type: attack
+    hit:
+    - type: damage
+      damage: 1d8+{dexterityMod}[piercing] {{f"+{dice}d8[magical thunder]" if dice
+        and not boomed else ""}}
+      overheal: false
+    - type: condition
+      condition: not boomed
+      onTrue:
+      - type: variable
+        name: boomed
+        value: '1'
+      - type: ieffect2
+        name: Booming with Energy
+        duration: '1'
+        effects: null
+        attacks: []
+        buttons:
+        - label: Booming Blade
+          automation:
+          - type: variable
+            name: dice
+            value: (spell_dc+1)//6
+            onError: '0'
+          - type: target
+            target: self
+            effects:
+            - type: damage
+              damage: '{dice+1}d8 [magical thunder]'
+              overheal: false
+          verb: is hit with Booming Energy
+          style: '4'
+          defaultDC: level
+          defaultAttackBonus: null
+          defaultCastingMod: spell
+        end: true
+        conc: false
+        desc: null
+        stacking: false
+        save_as: null
+        parent: null
+        target_self: false
+        tick_on_caster: false
+      onFalse: []
+      errorBehaviour: 'false'
+    miss: []
+    attackBonus: dexterityMod+proficiencyBonus
+- type: text
+  text: Booming blade with a rapier.
+  title: Effect
+_v: 2
