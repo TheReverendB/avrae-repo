@@ -30,6 +30,7 @@ You can now add homebrew spells by making an `svar` or `uvar` named `MAHomebrew`
         "3": ["wind break", "fireballz"],
         "4": ["aura of stank"],
         "8": ["dominate momster"]
-  }```
+  }
+```
 You can use an empty list or remove the level completely if you have no spells for a level.
 Spell names should be all lowercase and server homebrew will take priority over personal homebrew.
