@@ -1,13 +1,12 @@
 !alias skillroll echo <drac2>
-# assign variables
-a,ch=argparse(&ARGS&), character()
+a =argparse(&ARGS&)
+ch=character()
 
-# grab the first argument and match it to a skill or default to perception.  Use `.replace()` to pull out any spaces and `.lower()` to make everything lowercase incase someone enters "SleighT of Hand".  You can skip this line if you are only going to be using a specific skill, and enter the skill manually in the vroll(), or make your own list of skills to pull from.
+# grab the first argument and match it to a skill or default to perception.  Use `.replace()` to pull out any spaces and `.lower()` to make everything lowercase in case someone enters "SleighT of Hand".  Skip this line if you are using a specific skill, and enter the skill manually: skill = 'sleightOfHand', or use your own list of skills: ([x for x in ['stealth', 'animalHandling'] if '&1&'.lower().replace(' ','') in x.lower()]+['stealth'])[0]
 
 skill = ([x for x,y in ch.skills if '&1&'.lower().replace(' ','') in x.lower()]+['perception'])[0]
 
-
-# construct our skill roll, adding proficiency or expertise automatically via .d20(), rerolling 1s for Halfling Luck, applying Reliable Talent if proficient or expertise found in skill along with parsing for advantage/disadvantage and bonuses from our args.
+# construct our skill roll, adding prof or exp automatically via .d20(), rerolling 1s for Halfling Luck, applying Reliable Talent if prof, along with parsing for adv/dis and bonuses from our args.
 
 # grab adv/dis from our parsed args and make it a boolean. adv=True, dis=False, neither is None.
 adv = a.adv(boolwise=True)
