@@ -1,0 +1,34 @@
+!alias mystic <drac2>
+ch = character()
+a  = argparse(&ARGS&)
+i  = a.get('i')
+n  = '\n'
+foot  = f' -footer "{ctx.prefix+ctx.alias} [spell] [casting args]"'
+flavor= f" -color {color} -thumb {image}"
+spells= {}
+
+# make a dict of our Mystic Arcanum spells and their associated counter names
+for x in ch.consumables:
+  if "Mystic Arcanum" in x.name:
+    spells[x.name.split(': ')[1]] = x.name
+
+sList = '\n'.join([f'`{s:22}{ch.cc_str(n)}`' for s,n in spells.items()]) if spells else '_None_'  # a list of our known MA spells or 'None'
+
+# help text with MA spell list and counter status
+Help = f"""embed -title "Trying to cast a Mystic Arcanum Spell?" -desc 《**Available spells:**\n{sList}\n\n- Use this alias just like you would use `!cast`\n\n{f'- You need to make counters for this alias for Gsheet and Dicecloud in this format: {n}`{ctx.prefix}cc create "Mystic Arcanum (6th level): Circle of Death" -min 0 -max 1 -reset long -type bubble`{n}Case sensitive and must have the colon and space before the spell name you chose.' if 'None' in sList else ''}》 {foot+flavor} """
+
+if spells and &ARGS&:  # do we have MA spells and are we trying to cast one
+  spell = ([s for s in spells if "&1&".lower() in s.lower()]+[0])[0]  # try to match our input to one of our MA spells
+  if spell:  # we got a match
+    cast_args = "&*&".strip("&1&")  # strip our spell name input from our output args
+    cc=spells[spell]  # set our counter name for easy reuse
+    if i or ch.get_cc(cc):  # are we ignoring a use if not, do we have a use
+      i or ch.mod_cc(cc, -1)  # ignore or mod our counter
+      return f"""cast "{spell}" i {cast_args} -phrase "using their {cc}!" -f "{cc}|{ch.cc_str(cc)} {'_use ignored_' if i else '(-1)'}" {flavor} """  # cast our spell
+    else:
+      return f'''embed -title "No uses of your {cc} remaining!" -desc "You can use `-i` to ignore a use or take a short rest." -f "Mystic Arcanum Spells|{sList}" {foot+flavor}'''  # we don't have a use remaining output
+  else:
+    return Help+f' -f "Unknown Arcanum Spell|Your entry `&1&` did not match any of your Arcanum spells and can not be cast.  Check spelling and try again." '  # we couldn't match our imput with a spell so return the entry and a list of their spells along with the help
+else:
+  return Help. # user typed nothing or has no MA spells and no args.
+</drac2>

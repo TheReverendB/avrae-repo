@@ -1,0 +1,106 @@
+<drac2>
+out    = []
+n      = '\n'
+gvar   = '083d037e-a027-41bb-9f10-42ae0dc0d740'
+g      = load_yaml(get_gvar(gvar))
+userID = str(ctx.author.id)
+GMlist = load_json(get_svar('GMlist'))
+guilds = ["azorius", "boros", "dimir", "golgari", "gruul", "guildless", "izzet", "orzhov", "rakdos", "selesnya", "simic"]
+a      = &ARGS&
+player = &ARGS&[0].strip('<@!>') if &ARGS& else ''
+guild  = ([x for x in guilds if '&2&'.lower() in x]+[None])[0]
+mod    = int('&3&') if '&3&'.strip('+-').isdigit() else 0
+thumb  = " -thumb https://cdn.discordapp.com/attachments/776578614983524374/936576940419207188/il_300x300.2845145066_4csi.webp"
+
+# GMlist translation: [
+# '431945849921077269' TheReverendB#1377, 
+# '478772577104429068' Nemeia#7487,
+# '267090176872808450' TheRougeRogue#7943,
+# '120240958343217153' Cardraul#1408,
+# '415171233186054155' PunDnD#1312,
+# '271071985562419201' Minkadin#0878,
+# '565983794352619550' Too Much Music#3917,
+# '318090207821955084' Spy#3045,
+# '179749386677387264' DeceptiveDin088#2198,
+# '686783882661593095' minime316#4903]
+
+# player use or GM to view their renown
+if userID not in GMlist or '&1&'.lower() in 'show' or not &ARGS&:
+  player = userID
+  if player in g:
+    return f"""embed -title "{name} checks their renown!" -f "**Current renown for <@{player}>:**\n{n.join([f'{x.title()}: {y}' for x,y in g[player].items() if x!="dimir"]) }" -footer "{ctx.prefix+ctx.alias} {'[add @player] or [@player guild mod] or [show]' if userID in GMlist else ''}" {thumb} """
+  else:
+    return f"""echo You have not been entered as a player yet.  Post in #❔questions to get added.  """
+
+# GM use
+if userID in GMlist:
+
+#  do a lookup of player renown by guild 
+  if "&1&".lower()=='guild':
+    # allow for a specific guild lookup
+    if guild:
+      out = ''
+      guild_peeps = []
+      for person in g:  # look through every player we're tracking
+        if renown:=g[person][guild]:  # if they have renown
+          guild_peeps.append([renown, f"<@{person}>"])  # make a tuple with their renown amount and name so we can sort by renown
+      if not guild_peeps:  # if we don't have anyone with renown for this guild
+        out += "_None_"
+      else:  # sort our list (this only sorts in ascending order so we have to reverse it later with [::-1])
+        guild_peeps.sort()
+        out += f"""{n.join([f'{ID}: {Number}' for Number,ID in guild_peeps[::-1]])}"""
+      return f"""embed -title "Let's see who's who in {guild.title()}:" -desc "**Player: Renown**\n{out}" -footer "{ctx.prefix+ctx.alias} `add [@player]` or `[@player] [guild] [mod]` or `guild [guild]`" {thumb} """
+
+    else:  # if we didn't specify a guild, we will display results for all guilds
+      out = []
+      for Guild in guilds:  # for every guild, we make a list of players like above
+        guild_peeps = []
+        for person in g:
+          if renown:=g[person][Guild]:
+            guild_peeps.append([renown, f"<@{person}>"])
+        if not guild_peeps:
+          out.append(f""" -f "{Guild.title()}:|_None_" """)  # append a field for our guild without results
+        else:
+          guild_peeps.sort()  # sort our list again
+          out.append(f""" -f "{Guild.title()}:|{n.join([f'{ID}: {Number}' for Number,ID in guild_peeps[::-1]])}" """)  # append a field for our guild with results
+      return f"""embed -title "A list of who's who, in all the guilds:" {' '.join(out)} -footer "{ctx.prefix+ctx.alias} `add [@player]` or `[@player] [guild] [mod]` or `guild [guild]`" {thumb} """
+
+
+  if '&1&'.lower()=='add':
+    if '&2&'[0]=='<':
+      player = '&2&'.strip('<@!>')
+      if player not in g:
+        g.update({player: {"azorius": 0, "boros": 0, "dimir": 0, "golgari": 0, "gruul": 0, "guildless": 0, "izzet": 0, "orzhov": 0, "rakdos": 0, "selesnya": 0, "simic": 0} })
+        return f"""multiline\n{ctx.prefix}embed -title "Added a player to Renown Tracker:" -f "**&2& added**\n{n.join([f'{x.title()}: {y}' for x,y in g[player].items()])}" {thumb} -footer "{ctx.prefix+ctx.alias} `add [@player]` or `[@player] [guild] [mod]` or `guild [guild]`"\n{ctx.prefix}gvar edit {gvar} {dump_yaml(g)} """
+      else:
+        return f"""echo &2& is already being tracked via `{ctx.prefix+ctx.alias}`.  Use `{ctx.prefix+ctx.alias} re-add @player` to reset all their renown to zero. **This cannot be undone!**"""
+
+  if '&1&'.lower()=='re-add':
+    if '&2&'[0]=='<':
+      player = '&2&'.strip('<@!>')
+      g.update({player: {"azorius": 0, "boros": 0, "dimir": 0, "golgari": 0, "gruul": 0, "guildless": 0, "izzet": 0, "orzhov": 0, "rakdos": 0, "selesnya": 0, "simic": 0} })
+      return f"""multiline\n{ctx.prefix}embed -title "A Player's Renown has been Reset!" -f "**&2& reset**\n{n.join([f'{x.title()}: {y}' for x,y in g[player].items()])}" {thumb} -footer "{ctx.prefix+ctx.alias} `add [@player]` or `[@player] [guild] [mod]` or `guild [guild]`"\n{ctx.prefix}gvar edit {gvar} {dump_yaml(g)} """
+
+  if '&1&'=='addGM':
+    if '&2&'[0]=='<':
+      GM = '&2&'.strip('<@!>')
+      if GM not in GMlist:
+        GMlist.append(GM)
+        return f"""multiline\n{ctx.prefix}embed -title "Added a GM to the list.  Copy & paste svar command." -f "**&2& added**" -f "Current GMs allowed to edit:|<@{f'>{n}<@'.join(GMlist)}>" -desc "`!svar GMlist {dump_json(GMlist)}`" {thumb} -footer "{ctx.prefix+ctx.alias} `add [@player]` or `[@player] [guild] [mod]` or `guild [guild]` {'or `addGM [@gm]`' if ctx.author.id=='431945849921077269' else ''}"\n{ctx.prefix}gvar editor {gvar} &2&"""
+      else:
+        return f"""echo &2& is already in the svar `GMlist`.  Add them to the gvar manually if they lost access.  `!gvar editor {gvar} &2&`  """
+
+  elif player and player in g:
+    if guild:
+      if mod:
+        g[player][guild]=g[player][guild]+mod
+        return f"""multiline
+        {ctx.prefix}embed -title "Updating player renown:" -f "<@{player}>\n{guild.title()}: {g[player][guild]} ({mod:+})" {thumb} -footer "{ctx.prefix+ctx.alias} [add @player] or [@player guild mod] or [show]"\n{ctx.prefix}gvar edit {gvar} {dump_yaml(g)} """
+      else:
+        return f"""embed -title "Checking player's {guild.title()} renown:" -f "<@{player}>\n{guild.title()}: {g[player][guild]}" {thumb} -footer "{ctx.prefix+ctx.alias} [add @player] or [@player guild mod] or [show]" """
+    else:
+      return f"""embed -title "Checking player's renown:" -f "<@{player}>\n{n.join([f'{x.title()}: {y}' for x,y in g[player].items()]) }" {thumb} -footer "{ctx.prefix+ctx.alias} [add @player] or [@player guild mod] or [show]" """
+  else:
+    return f"""embed -title "RENOWN SYSTEM ERROR!!" -desc "Your command `&*&` did not work properly.  Report this to the Tinkers unless you know what the oopsie was." -f "<@{player}> not found.  `{ctx.prefix+ctx.alias} add @player` to add the player to the list." -footer "{ctx.prefix+ctx.alias} [add @player] or [@player guild mod] or [show]" {thumb} """
+
+</drac2>

@@ -1,0 +1,19 @@
+!alias card embed <drac2>
+deck = get_gvar('b0cc9785-e09d-4b29-b86e-873a3661d86f').split('\n')[1:]  # make a list of our gvar items, splitting on every newline and slicing off the first one "Cards Gvar List"
+# You can also just use a list directly, instead of using a gvar: deck = ['ace of spades', 'one of spades', 'two of spades']
+
+number_requested=min(int("&1&".strip('&')), len(deck))  # grab our first argument as the number of cards we will draw using .strip() to make "&1&" into "1" if no arguments are passed
+
+card_results = []  # an empty list that we can .append() our results into
+
+while len(card_results)<number_requested:  # build our list until it has the number of cards we asked for
+  card = randchoice(deck)  # choose a random card from the deck
+  card_results.append(card)  # add it to our card_results list
+  deck.remove(card)  # remove it from the deck so we don't get double results
+
+desc = '\n'.join(card_results)  # make our description here because we can't use '\n' inside code in an f-string
+
+#  return our results with a title and footer:
+return f""" -title "{name} draws {number_requested} card{'s' if number_requested>1 else ''}!" -desc "{desc}" -footer {ctx.prefix+ctx.alias} """
+
+</drac2>

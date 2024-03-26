@@ -1,0 +1,64 @@
+tembed <drac2>
+args = &ARGS&
+n,nn = '\n', '\n\n'
+a    = argparse(&ARGS&)
+ch   = character()
+cc   = "Intoxication"
+rr   = a.last("rr", 1, int)
+g    = load_json(get_gvar("10727bcb-3b06-4ffd-89fc-805e8e7cba4d"))
+
+ch.create_cc_nx(cc, 0, 7,'short','bubble', reset_to=0)  # create our short rest intoxication counter
+if not ch.cc(cc).reset_on:  # if our character has a counter that doesn't reset
+  ccAmount = ch.get_cc(cc)  # grab their current setting
+  ch.create_cc(cc, 0, 7,'short','bubble', reset_to=0)  # replace their counter
+  ch.set_cc(cc, ccAmount)  # set their counter to the old amount
+
+
+drinkType = ([a for a in g.drinks if args[0].lower() == a] if args else []) or [a for a in g.drinks if args[0].lower() in a] if args else []
+
+if len(drinkType)>1:  # error if we matched more than one drink
+  err(f"_ _\nThe barkeep is confused.  There are many drinks that match that description: `{'`, `'.join(drinkType)}`.  Could you be more specific?")
+
+dc     = g.drinks[drinkType[0]]['dc'] if drinkType else a.last("dc", 13, int)
+effect = g.drinks[drinkType[0]]['effect'] if drinkType else "You're feeling that one."
+prevCC = ch.get_cc(cc)
+save   = f"{['1d20','2d20kh1','2d20kl1'][a.adv()]}+{constitutionSave}+{a.join('b', '+', '')}".rstrip('+')
+
+
+# let's build a menu from our gvar
+locationDict = {}
+if "&1&".lower()=="menu":
+  for drink in g.drinks:  # for each drink in the gvar
+    if 'bar' in g.drinks[drink]:  # if there is a bar listed in the JSON
+      if g.drinks[drink].bar not in locationDict:  # if the bar is not already in our dict
+        locationDict[g.drinks[drink].bar] = [f"and {g.drinks[drink].name}"]  # add the drink with the word 'and' in front to a list so our dict looks like {"bar name here": ['and drink name', 'drink name']}
+      else:
+        locationDict[g.drinks[drink].bar].append(g.drinks[drink].name)  # if the bar is in the dict already, just add the drink name to the list after the bar name
+
+  pubList = []
+  for tavern in locationDict:  # for each tavern in our locationDict above, we make an output and display the list in reverse ([::-1]) so the last drink has 'and' in front
+    pubList.append(f""" -f "The {tavern}|{', '.join([x for x in locationDict[tavern] ][::-1])}" """)
+
+  genericDrinks = [g.drinks[x].name for x in g.drinks if 'bar' not in g.drinks[x]]+['Coffee', "Tea", "Milk", "Whiskey"]  # make a list of the generic drinks
+  genericDrinks.sort()  # alphabetize the generic drinks
+  return f""" -title "{name} checks the menu!" -desc "***Try 'em all!*** _ _" -f "These drinks can be found at any tavern/bar|{', '.join(genericDrinks)}, and Water\n\n__**Specialty Drinks By Location:**__" {' '.join(pubList)} -image https://media.discordapp.net/attachments/710263803706736640/750493328679895129/tavern.jpg """
+
+
+# do our drink rollin' if we're not looking at the menu
+else:
+  out = []
+  total = 0
+  for i in range(rr):  # for every -rr
+    ro = vroll(save)  # roll our save
+    success = ro.total >= dc  # did we succeed?
+    incr = (2 if ro.result.crit == 2 else 1) if not success else 0  # add 1 for failure, 2 for a crit fail, 0 on success
+    result = ['Success!', 'Critical ' if incr==2 else 'Failure!'][success-1]  # grab our result text
+    total += incr  # add up our failures
+    ch.mod_cc(cc, incr)  # mod our counter according to our failures
+    out.append(f""" -f "Save {i+1 if rr>1 else ''}|{ro}; {result}" """)  # make a list of our rolls, the number of rolls, and the results
+
+  eff = nn.join(g.effects[0:ch.get_cc(cc)])  # display all our effects of intoxications
+
+  return f""" -title "{name} drinks{'' if not drinkType else (' an' if g.drinks[drinkType[0]].name[0].lower() in "aeiou" else ' a')} {f'''{g.drinks[drinkType[0]]['name']}''' if drinkType else 'an alcoholic beverage'}!" -f "Meta|DC: {dc+n}CON Save" {' '.join(out)} {f''' -f "Effect|{effect}"''' if effect and total else ''} {f'''-f "Effects|{eff}"''' if eff else ""} {f'''-f "Shenanigans|{g.drunken[roll('1d100')]}"''' if (prevCC<6 and ch.get_cc(cc)>=6) and get('total', 0) else ""} -f "{cc} {f'({total:+})' if total else ''}|{ch.cc_str(cc)}" -thumb https://cdn.discordapp.com/attachments/759950160980607008/938764362909351936/images.jpg """
+
+</drac2> -footer "!drink [drink] [adv/dis] [-dc] [-b] [-rr] or !drink menu" -thumb https://cdn.discordapp.com/attachments/759950160980607008/938764362909351936/images.jpg 

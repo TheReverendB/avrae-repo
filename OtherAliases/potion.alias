@@ -1,0 +1,131 @@
+<drac2>
+#-- LOAD CONVERSION MODULE --#
+using(cM = "cd24f070-fce4-4328-8f37-e238bf42bdb5")
+
+#-- VARIABLES --#
+args     = &ARGS&
+c        = combat()
+ch       = character()
+gvar     = load_json(get_gvar("397cdfba-cf9b-49c5-907e-3b4ac71063d8"))
+potions  = gvar.potions
+
+#-- LOAD HOMEBREW POTION GVARS --#
+for x in load_json(get('homebrewPotions','[]')):
+ if get_gvar(x):
+  potions += load_json(get_gvar(x))
+
+#-- MORE VARIABLES --#
+parsed        = argparse(args)
+inPotion      = [x.lower() for x in args if not ("-" in x or ("-" in args[args.index(x)-1] if args and args.index(x) else 0) or x in ['max','explode','adv','dis'])]
+potion        = {}
+target        = c.get_combatant(parsed.last('t',name)) if c else ''
+titleText     = name
+strengthBonus = ''
+
+#-- FUZZY MATCH INPUT TO POTION NAME --#
+for x in potions:
+ if inPotion and all([y in x.name.lower() for y in inPotion]):
+  potion = x
+  break
+outcomeText = ""
+
+#-- SPLIT AND ROLL OUR STRING DURATION --#
+if 'duration' in potion:
+ durationRoll = vroll(potion.duration.split()[0])
+ outcomeText += f' -f "Duration|{str(durationRoll)+" "+potion.duration.split()[-1] if "d" in potion.duration else potion.duration}"'
+potionName = potion.get('name','')
+
+#-- LONGEVITY --#
+if potionName == 'Longevity':
+ times = int(get("PoLT",0))
+ chanceRoll = vroll('1d100')
+ outcomeBool = chanceRoll.total > (times*10)
+ ch.set_cvar("PoLT",times+1)
+ outcomeText += f''' -f "Chance of Being Aged:|{times*10}% ({PoLT} Potions of Longevity drank)|inline" {f'-f "Percent Roll:|{chanceRoll}|inline"' if times else ''} -f "Age Change|You grow {vroll(potion.longevityRoll)} years {"younger" if outcomeBool else "older"}!"'''
+
+#-- VITALITY --#
+elif potionName == 'Vitality':
+ if ch.cc_exists('Exhaustion'):
+  oldExhaustion = get('Exhaustion')
+  ch.set_cc('Exhaustion',0)
+  outcomeText += f' -f "Exhaustion{f" (-{oldExhaustion})" if oldExhaustion else ""}|{ch.cc_str("Exhaustion")}|inline"'
+ if tx := get('tempexh'):
+  ch.set_cvar('tempexh',0)
+  outcomeText += f' -f "Temporary Exhaustion{f" (-{tx})" if int(tx) else ""}|{"〇"*6}|inline"'
+
+#-- HEROISM --#
+elif potionName == 'Heroism':
+ if target:
+  target.set_temp_hp(10)
+ else:
+  ch.set_temp_hp(10)
+
+#-- HEALING POTIONS --#
+elif "healing" in potion:
+ dieSize = potion.healing[potion.healing.find('d')+1:potion.healing.find('d')+2+(potion.healing[potion.healing.find('d')+2].isdigit())]
+ healRoll = vroll(potion.healing[:potion.healing.index(dieSize)+1]+('' if not parsed.get('max') else f'mi{dieSize}')+('' if not parsed.get('explode') else f'e{dieSize}')+potion.healing[potion.healing.index(dieSize)+1:]+('+'+parsed.join('b','+','') if parsed.get('b') else ''))
+ outcomeText += f' -f "Healing|{healRoll}|inline"'
+ if target:
+  target.modify_hp(healRoll.total,0, overflow=False)
+ else:
+  ch.modify_hp(healRoll.total,0, overflow=False)
+
+#-- STRENGTH POTIONS --#
+if 'strengthScore' in potion:
+ strengthBonus = str(max(0,(potion.strengthScore-strength)//2))
+ outcomeText += f' -f "Strength Change|{strength} - > {potion.strengthScore}\n+{strengthBonus} bonus to Strength rolls."' if potion.strengthScore > strength else f' -f "No Change|Your normal Strength score is {strength}. This potion has no effect on you."'
+
+#-- POTION EFFECTS --#
+if 'effect' in potion and target:
+ if not 'dc' in potion:
+  potArgs = ("" if "strengthScore" in potion and target.name!=name else potion.effect.replace('SB',strengthBonus)) if typeof(potion.effect)=="str" else ''
+  potDur  = roll(str(durationRoll.total)+potion.dur) if typeof(potion.dur)=='str' else potion.dur
+  passive, attacks = cM.parse_effect_args(argparse(potArgs)).values()
+  target.add_effect(
+    potion.ename,
+    passive_effects = potion.effect if typeof(potion.effect)=='SafeDict' else passive,
+    duration = potDur
+    )
+ else:
+  savingThrow = target.save(potion.save,parsed.adv())
+  outcomeText += f''' -f "DC {potion.dc}|**{potion.save.upper()}**: {savingThrow}; {"Failure" if savingThrow.total < potion.dc else "Success"}!"'''
+  if savingThrow.total < potion.dc:
+   potArgs = potion.effect if typeof(potion.effect)=='str' else ''
+   potDur  = roll(str(durationRoll.total)+potion.dur) if typeof(potion.dur)=='str' else potion.dur
+   passive, attacks = cM.parse_effect_args(argparse(potArgs)).values()
+   target.add_effect(
+    potion.ename,
+    passive_effects = potion.effect if typeof(potion.effect)=='SafeDict' else passive,
+    duration = potDur
+    )
+   if 'damage' in potion:
+    outcomeText += f' -f "Damage|{target.damage(potion.damage).damage}"'
+ outcomeText += f''' -f "Effect|{target.get_effect(potion.ename)}|inline"''' if target.get_effect(potion.ename) else ''
+
+#-- ADJUST TITLE FOR MATCHED POTION/OIL/OINTMENT/TARGET --#
+if potion:
+ potionType = 'oil' if 'oil' in potion.desc else 'ointment' if 'ointment' in potion.desc else 'potion'
+ nOrNot = 'n' if potionType=='oil' else ''
+ doseOrType = potionType if potionType in 'oilpotion' else 'dose'
+ if target and target.name != name:
+  titleText += f" administers a{nOrNot} {doseOrType} of {potion.name} to {target.name}!"
+  hpstr = f"{target}"
+ else:
+  titleText += f" {'drinks' if potionType=='potion' else 'applies'} a{nOrNot} {doseOrType} of {potion.name}!"
+  hpstr = f"{name}: <{ch.hp_str()}>"
+
+#-- LOOKING TO HOMEBREW --#
+elif parsed.get('homebrew'):
+ titleText += " wants to get brewing!"
+ q='\\\"'
+ b1,b2='{','}'
+ outcomeText += f'''-desc "**Step 1**\nCreate a gvar in the following format:{'`'*3}json\n[\n {b1}\n  {q}name{q}:{q}Identifier, don't include potion of or oil of{q},\n  {q}desc{q}:{q}-desc \{q}The description goes here, yes with the escaped quotes.\{q}{q},\n  {q}duration{q}:{q}This is for the verbose duration, like 1 hour or 30 minutes kind of text{q},\n  {q}ename{q}:{q}If it imparts an effect, name it.{q},\n  {q}effect{q}:{q}the arguments for the effect{q},\n  {q}dur{q}:The duration in rounds, or a multiplier as a string if the duration is like 1d4 hours,\n  {q}strengthScore{q}:Integer value for the giant strength potions like 20 - no quotes,\n  {q}healing{q}:{q}The amount of dice to roll for healing{q},\n  {q}longevityRoll{q}:{q}Strictly for the potion of longevity.{q},\n  {q}save{q}:{q}str/dex/con/int/wis/cha{q},\n  {q}dc{q}:Integer DC for the save like 18 - no quotes on this,\n  {q}damage{q}:{q}Damage dice/amount for if there's damage{q}\n {b2}\n]{'`'*3}**Note**: If a potion doesn't have something, like a `save` and `dc`, then **leave out the keys** entirely. Only include what the potion actually does." -f "Step 2|Reference the main gvar (`!gvar 397cdfba-cf9b-49c5-907e-3b4ac71063d8`) to see how the potions are set up." -f "Step 3|Once you have your own gvar set up and it looks more like `!gvar 1673d110-7d9e-445b-b24b-8bf0941cf5fe`, you'll store that address in a cvar or uvar like so: {'`'*3}json\n!cvar homebrewPotions [{q}1673d110-7d9e-445b-b24b-8bf0941cf5fe{q}]{'`'*3}" -f "Step 4|Chug!"'''
+
+#-- NO POTION MATCHED --#
+else:
+ titleText += " needs a drink!" if not args else " entered an unknown potion!"
+ potionList = [x.name for x in potions]
+ outcomeText = f''' -desc "One for you, two for me. Drink a potion!" -f "__Valid Arguments__|`-t [target]` - `!potion` now supports administering a potion or oil to a combatant during `!init` combat.\n\n`adv`/`dis` - For potions that have saving throws, if needed.\n\n`-b [#]` - For if you have a bonus to healing for some reason that would apply to a potion.\n\n`max` - For if you would heal the maximum amount from a potion.\n\n`explode` - For if you want your healing dice to explode for some reason." -f "Supported Potions:|{", ".join(potionList)}" -f "Brew Your Own!|See `!potion homebrew` for instructions on including your own potions." -f "Known Issues:|• The way that the Giant Strength potions work is jank. They will sort of work by determining the difference between your strength score and the score granted by the potion and then giving you a `-b` and `-d` effect. And there is currently no way to grab a combatant's strength score, so these potions will have no effect beyond adding a reminded effect to anyone you administer the potion to.\n• `!potion` has no integration with `!bag`. I might add this at a later date, but the full rewrite into drac2 was enough for now."'''
+outcomeText += f' -color dd0000 -thumb {gvar.image} -footer "{hpstr if potion else "@Derixyleth#0636"}"'
+return f'''embed -title "{titleText}" {potion.get("desc","")}{outcomeText}'''
+</drac2>

@@ -1,0 +1,40 @@
+!alias deck embed <drac2>
+ch,alias=character(),ctx.prefix+ctx.alias
+if '?' in get('deck',''):  # remove the old style deck cvar
+  ch.delete_cvar('deck')
+fulldeck = {"Black Joker": False, "Red Joker": False}
+fulldeck.update({f"{value} of {suit}":False for suit in ['Diamonds', 'Spades', 'Clubs', 'Hearts'] for value in ["Ace"]+range(2,11)+["Jack", "Queen", "King"]})  # use a dict comprehension to create our deck of cards.  We can also do:
+#  for suit in ["Spades", "Clubs", "Hearts", "Diamonds"]:
+#    for value in ["Ace"]+range(2,11)+["Jack", "Queen", "King"]:
+#        fulldeck.update({f"{value} of {suit}": False})
+ch.set_cvar_nx('deck', dump_yaml(fulldeck))
+
+a = &ARGS&
+n = int("&1&") if "&1&".isdigit() else 1  # number of cards to draw or 1
+cards  =load_yaml(ch.get_cvar('deck'))  # load our deck
+reset  ='reset' in "&*&"
+unused =[card for card in cards if not cards[card]]
+
+n = min(n, len(unused))  # don't draw more cards than we have left
+
+cardOut = []  # an empty list for results
+for i in range(n):  # cards we are drawing
+  drawn = randchoice(unused)  # choose a card
+  cardOut.append(drawn)  # add it to our card list
+  cards[drawn] = True  # update our cards dict
+  unused.remove(drawn)  # update our unused cards for output
+
+if reset:
+  ch.set_cvar('deck', dump_yaml(fulldeck))  # reset the deck and set our cvar to match
+  desc = "You reshuffle your cards until they are thoroughly mixed."
+else:
+  ch.set_cvar('deck', dump_yaml(cards))  # set our cvar
+  desc = '\n'.join(cardOut)
+
+desc += f"\n\nCards Remaining: {'54' if reset else len(unused)}"  # display our remaining cards
+</drac2>
+
+-title "<name> {{"resets the Deck" if reset else f"{'draws' if cardOut else 'tries to draw'} {n if n>1 else 'a'} Card{'s' if n>1 else ''}"}}!"
+-desc "{{desc}}"
+-footer "{{alias}} [number] | {{alias}} [reset]"
+-color <color> -thumb <image>
