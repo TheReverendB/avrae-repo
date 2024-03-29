@@ -1,99 +1,89 @@
 name: Pyroconverger
 automation:
-- type: counter
-  counter: Pyroconverger Uses
-  amount: '-1'
-  allowOverflow: true
-  errorBehaviour: warn
-- type: variable
-  name: uses
-  value: lastCounterRemaining
-- type: roll
-  dice: 1d10
-  name: Malfunction
-  hidden: true
-- type: condition
-  condition: '{{lastCounterRemaining<10}}'
-  onTrue:
+  - type: counter
+    counter: Pyroconverger Uses
+    amount: "-1"
+    allowOverflow: true
+    errorBehaviour: warn
+  - type: variable
+    name: uses
+    value: lastCounterRemaining
   - type: roll
-    dice: 4d6[fire]
-    name: damage
-    hidden: false
-  - type: target
-    target: all
-    effects:
-    - type: save
-      stat: dex
-      fail:
-      - type: damage
-        damage: '{damage}'
-        overheal: false
-      success:
-      - type: damage
-        damage: ({damage})/2
-        overheal: false
-      dc: '13'
+    dice: 1d10
+    name: Malfunction
+    hidden: true
   - type: condition
-    condition: '{{int(Malfunction)+int(lastCounterRemaining)>=11}}'
+    condition: "{{lastCounterRemaining<10}}"
     onTrue:
-    - type: counter
-      counter: Pyroconverger Uses
-      amount: '-10'
-      allowOverflow: true
-      errorBehaviour: warn
-    - type: target
-      target: self
-      effects:
-      - type: damage
-        damage: 4d6 [fire]
-        overheal: false
-    - type: text
-      text: 'Malfunction Roll: 1d10 ({Malfunction}) + {uses} [uses] = `{{int(Malfunction)+uses}}`
+      - type: roll
+        dice: 4d6[fire]
+        name: damage
+        hidden: false
+      - type: target
+        target: all
+        effects:
+          - type: save
+            stat: dex
+            fail:
+              - type: damage
+                damage: "{damage}"
+                overheal: false
+            success:
+              - type: damage
+                damage: ({damage})/2
+                overheal: false
+            dc: "13"
+      - type: condition
+        condition: "{{int(Malfunction)+int(lastCounterRemaining)>=11}}"
+        onTrue:
+          - type: counter
+            counter: Pyroconverger Uses
+            amount: "-10"
+            allowOverflow: true
+            errorBehaviour: warn
+          - type: target
+            target: self
+            effects:
+              - type: damage
+                damage: 4d6 [fire]
+                overheal: false
+          - type: text
+            text: >-
+              Malfunction Roll: 1d10 ({Malfunction}) + {uses} [uses] =
+              `{{int(Malfunction)+uses}}`
 
 
-        Your Pyroconverger malfunctions and explodes in your hands!
+              Your Pyroconverger malfunctions and explodes in your hands!
 
 
-        As an action, you can cause the Pyroconverger to project fire in a 10-foot
-        cone. Each creature in that area must make a DC 13 Dexterity saving throw,
-        taking 4d6 fire damage on a failed save, or half as much damage on a successful
-        one.
+              As an action, you can cause the Pyroconverger to project fire in a 10-foot cone. Each creature in that area must make a DC 13 Dexterity saving throw, taking 4d6 fire damage on a failed save, or half as much damage on a successful one.
 
 
-        Each time you use the Pyroconverger, roll a d10 and add the number of times
-        you have used it since your last long rest. If the total is 11 or higher,
-        the Pyroconverger malfunctions: you take 4d6 fire damage, and you can''t use
-        the Pyroconverger again until you finish a long rest.'
-      title: Effect
+              Each time you use the Pyroconverger, roll a d10 and add the number of times you have used it since your last long rest. If the total is 11 or higher, the Pyroconverger malfunctions: you take 4d6 fire damage, and you can't use the Pyroconverger again until you finish a long rest.
+            title: Effect
+        onFalse:
+          - type: text
+            text: >-
+              Malfunction Roll: 1d10 ({Malfunction}) + {uses} [uses] =
+              `{{int(Malfunction)+uses}}`
+
+
+              As an action, you can cause the Pyroconverger to project fire in a 10-foot cone. Each creature in that area must make a DC 13 Dexterity saving throw, taking 4d6 fire damage on a failed save, or half as much damage on a successful one.
+
+
+              Each time you use the Pyroconverger, roll a d10 and add the number of times you have used it since your last long rest. If the total is 11 or higher, the Pyroconverger malfunctions: you take 4d6 fire damage, and you can't use the Pyroconverger again until you finish a long rest.
+            title: Effect
+        errorBehaviour: raise
     onFalse:
-    - type: text
-      text: 'Malfunction Roll: 1d10 ({Malfunction}) + {uses} [uses] = `{{int(Malfunction)+uses}}`
+      - type: text
+        text: >-
+          Your pyroconverger is in an advanced state of disrepair. It should be all
+          better after a long rest.
 
 
-        As an action, you can cause the Pyroconverger to project fire in a 10-foot
-        cone. Each creature in that area must make a DC 13 Dexterity saving throw,
-        taking 4d6 fire damage on a failed save, or half as much damage on a successful
-        one.
-
-
-        Each time you use the Pyroconverger, roll a d10 and add the number of times
-        you have used it since your last long rest. If the total is 11 or higher,
-        the Pyroconverger malfunctions: you take 4d6 fire damage, and you can''t use
-        the Pyroconverger again until you finish a long rest.'
-      title: Effect
-    errorBehaviour: raise
-  onFalse:
-  - type: text
-    text: 'Your pyroconverger is in an advanced state of disrepair. It should be all
-      better after a long rest.
-
-
-      Each time you use the Pyroconverger, roll a d10 and add the number of times
-      you have used it since your last long rest. If the total is 11 or higher, the
-      Pyroconverger malfunctions: you take 4d6 fire damage, and you can''t use the
-      Pyroconverger again until you finish a long rest.'
-    title: Effect
-  errorBehaviour: 'false'
+          Each time you use the Pyroconverger, roll a d10 and add the number of times you have used it since your last long rest. If the total is 11 or higher, the Pyroconverger malfunctions: you take 4d6 fire damage, and you can't use the Pyroconverger again until you finish a long rest.
+        title: Effect
+    errorBehaviour: "false"
 _v: 2
 verb: shoots a cone of fire with
 thumb: https://media.discordapp.net/attachments/759950160980607008/977290904123625512/kill-it-with-fire-fire.gif
