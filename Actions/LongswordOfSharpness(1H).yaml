@@ -1,0 +1,50 @@
+name: Longsword of Sharpness (1H)
+automation:
+  - type: variable
+    name: Lop
+    value: "0"
+    onError: "0"
+  - type: target
+    target: each
+    effects:
+      - type: attack
+        hit:
+          - type: condition
+            condition: lastAttackNaturalRoll==20
+            onTrue:
+              - type: damage
+                damage: 1d8mi8+{strengthMod}+14[magical slashing]
+                overheal: false
+              - type: roll
+                dice: 1d20
+                name: Lop
+                hidden: true
+              - type: condition
+                condition: int(Lop)==20
+                onTrue: []
+                onFalse: []
+                errorBehaviour: "false"
+            onFalse:
+              - type: damage
+                damage: 1d8mi8+{strengthMod}[magical slashing]
+                overheal: false
+            errorBehaviour: "false"
+        miss: []
+        attackBonus: strengthMod+proficiencyBonus
+  - type: text
+    text: >-
+      When you attack an object with this magic sword and hit, maximize your
+      weapon damage dice against the target.
+
+
+      {{f"**Additional Roll:** 1d20 ({Lop}) = `{Lop}`  \n{'_You manage to sever a limb!_' if int(Lop)==20 else ''}\n" if Lop else ''}}
+
+      When you attack a creature with this weapon and roll a 20 on the attack roll, that target takes an extra 14 slashing damage. Then roll another d20. If you roll a 20, you lop off one of the target's limbs, with the effect of such loss determined by the GM. If the creature has no limb to sever, you lop off a portion of its body instead.
+
+
+      In addition, you can speak the sword's command word to cause the blade to shed bright light in a 10-foot radius and dim light for an additional 10 feet. Speaking the command word again or sheathing the sword puts out the light.
+    title: Effect
+_v: 2
+proper: true
+verb: strikes with the
+thumb: https://media-waterdeep.cursecdn.com/avatars/thumbnails/19/264/315/315/636382375131575300.jpeg
