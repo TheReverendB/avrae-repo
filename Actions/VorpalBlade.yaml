@@ -1,0 +1,40 @@
+name: Vorpal Blade
+automation:
+  - type: target
+    target: each
+    effects:
+      - type: variable
+        name: isResistant
+        value: "0"
+        onError: "0"
+      - type: attack
+        hit:
+          - type: variable
+            name: isResistant
+            value: target.resistances.is_resistant('magical slashing')
+            onError: "0"
+          - type: condition
+            condition: lastAttackNaturalRoll==20
+            onTrue:
+              - type: damage
+                damage: 1d8+{3+strengthMod}+6d8[magical slashing{{'^' if isResistant else ''}}]
+                overheal: false
+            onFalse:
+              - type: damage
+                damage: 1d8+{3+strengthMod}[magical slashing{{'^' if isResistant else ''}}]
+                overheal: false
+            errorBehaviour: "false"
+        miss: []
+        attackBonus: 3+strengthMod+proficiencyBonus
+  - type: text
+    text: >-
+      You gain a +3 bonus to attack and damage rolls made with this magic
+      weapon. In addition, the weapon ignores resistance to slashing damage.
+
+
+      When you attack a creature that has at least one head with this weapon and roll a 20 on the attack roll, you cut off one of the creature's heads. The creature dies if it can't survive without the lost head. A creature is immune to this effect if it is immune to slashing damage, doesn't have or need a head, has legendary actions, or the GM decides that the creature is too big for its head to be cut off with this weapon. Such a creature instead takes an extra 6d8 slashing damage from the hit.
+    title: Effect
+_v: 2
+proper: true
+verb: strikes with the
+thumb: https://media-waterdeep.cursecdn.com/avatars/thumbnails/19/264/315/315/636382375131575300.jpeg
