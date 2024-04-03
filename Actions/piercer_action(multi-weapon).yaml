@@ -1,0 +1,61 @@
+name: Piercer
+automation:
+- type: counter
+  counter: This sure aint exist, fam
+  amount: '0'
+  allowOverflow: false
+  errorBehaviour: ignore
+- type: roll
+  dice: '{{lastCounterRequestedAmount}}'
+  name: lastDamage
+  hidden: false
+  cantripScale: false
+  displayName: Previous Roll
+- type: condition
+  condition: lastDamage
+  onTrue:
+  - type: condition
+    condition: choice and choice in 'hand'
+    onTrue:
+    - type: target
+      target: each
+      effects:
+      - type: damage
+        damage: 1d6 - {lastDamage} [hand crossbow piercing]
+        overheal: false
+        cantripScale: false
+    onFalse:
+    - type: condition
+      condition: choice and choice in 'rapier'
+      onTrue:
+      - type: target
+        target: each
+        effects:
+        - type: damage
+          damage: 1d8 - {lastDamage} [magical silvered rapier piercing]
+          overheal: false
+          cantripScale: false
+      onFalse:
+      - type: target
+        target: each
+        effects:
+        - type: damage
+          damage: 1d10 - {lastDamage} [heavy crossbow piercing]
+          overheal: false
+          cantripScale: false
+      errorBehaviour: 'false'
+    errorBehaviour: 'false'
+  onFalse:
+  - type: text
+    text: The `-amt` arg is mandatory (`-choice` is optional, defaults to Heavy Crossbow)
+    title: Effect
+  errorBehaviour: 'false'
+- type: text
+  text: Once per turn, when you hit a creature with an attack that deals piercing
+    damage, you can reroll one of the attack's damage dice, and you must use the new
+    roll.
+  title: Effect
+_v: 2
+proper: true
+verb: uses
+activation_type: 8
