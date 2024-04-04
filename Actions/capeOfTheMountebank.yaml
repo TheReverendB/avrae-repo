@@ -1,0 +1,51 @@
+name: Cape of the Mountebank
+automation:
+  - type: counter
+    counter: Cape of the Mountebank
+    amount: "1"
+    allowOverflow: false
+    errorBehaviour: raise
+  - type: spell
+    id: 2068
+    level: null
+    dc: null
+    attackBonus: null
+    castingMod: null
+    parent: null
+  - type: text
+    text: >
+      This cape smells faintly of brimstone. While wearing it, you can use it to
+      cast the dimension door spell as an action. This property of the cape
+      can't be used again until the next dawn.
+
+
+      When you disappear, you leave behind a cloud of smoke, and you appear in a similar cloud of smoke at your destination. The smoke lightly obscures the space you left and the space you appear in, and it dissipates at the end of your next turn. A light or stronger wind disperses the smoke.
+
+
+      _Dimention door has a 500' range_
+    title: Cape of the Montebank
+  - type: target
+    target: self
+    effects:
+      - type: ieffect2
+        name: Lightly Obscured in Smoke
+        duration: "2"
+        effects: null
+        attacks: []
+        buttons: []
+        end: true
+        conc: false
+        desc: This smoke lightly obscures the space you left and the space you appear
+          in, and it dissipates at the end of your next turn. A light or
+          stronger wind disperses the smoke.
+        stacking: false
+        save_as: null
+        parent: null
+        target_self: false
+        tick_on_caster: false
+_v: 2
+proper: true
+verb: uses the
+phrase: disappearing and reappearing in a puff of smoke!
+thumb: https://www.dndbeyond.com/avatars/thumbnails/19/212/315/315/636382363006704382.jpeg
+activation_type: 1
