@@ -5,19 +5,15 @@ automation:
     effects:
       - type: variable
         name: isResistant
-        value: "0"
+        value: target.resistances.is_resistant('magical slashing')
         onError: "0"
       - type: attack
         hit:
-          - type: variable
-            name: isResistant
-            value: target.resistances.is_resistant('magical slashing')
-            onError: "0"
           - type: condition
             condition: lastAttackNaturalRoll==20
             onTrue:
               - type: damage
-                damage: 1d8+{3+strengthMod}+6d8[magical slashing{{'^' if isResistant else ''}}]
+                damage: 1d8+{3+strengthMod}+3d8[magical slashing{{'^' if isResistant else ''}}]
                 overheal: false
             onFalse:
               - type: damage
