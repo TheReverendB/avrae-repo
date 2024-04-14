@@ -1,3 +1,4 @@
+_v: 2
 name: Greatsword of Life Stealing
 automation:
   - type: target
@@ -11,8 +12,9 @@ automation:
               target.creature_type.lower() or 'undead' in
               target.creature_type.lower() ) and lastAttackNaturalRoll == 20
               else ""}}
+            overheal: false
         miss: []
-        attackBonus: "strengthMod +proficiencyBonus "
+        attackBonus: strengthMod +proficiencyBonus
   - type: condition
     condition: lastAttackNaturalRoll == 20
     onTrue:
@@ -27,5 +29,5 @@ automation:
     text: When you attack a creature with this magic weapon and roll a 20 on the
       attack roll, that target takes an extra 10 necrotic damage if it isn't a
       construct or an undead. You also gain 10 temporary hit points.
-_v: 2
-proper: false
+    title: Effect
+thumb: https://www.dndbeyond.com/avatars/thumbnails/18/911/315/315/636381757412406581.jpeg
