@@ -1,0 +1,29 @@
+name: Mace of Smiting
+automation:
+  - type: target
+    target: all
+    effects:
+      - type: variable
+        name: isConstruct
+        value: target.creature_type and 'construct' in target.creature_type
+        onError: "0"
+      - type: attack
+        hit:
+          - type: damage
+            damage: 1d6 + {{strengthMod + 1 + 2*isConstruct}} [magical
+              bludgeoning]  {{('+14' if isConstruct else '+7') if
+              lastAttackNaturalRoll==20 else ''}}
+          - type: condition
+            condition: isConstruct and target.hp <= 25
+            onTrue:
+              - type: damage
+                damage: "{target.hp + target.temp_hp} [destroyed]"
+                fixedValue: true
+            onFalse: []
+            errorBehaviour: "false"
+        miss: []
+        attackBonus: strengthMod + proficiencyBonus + 1 + 2*isConstruct
+_v: 2
+proper: true
+verb: attacks with the
+thumb: https://www.dndbeyond.com/avatars/thumbnails/19/249/315/315/636382372853260603.jpeg
