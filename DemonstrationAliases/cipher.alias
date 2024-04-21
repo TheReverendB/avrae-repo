@@ -1,0 +1,37 @@
+!alias cipher echo <drac2>
+alpha   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQURSTVWXYZ"
+args    = &ARGS& + ["default"] # assign our args
+command = args.pop(0)  # separate our command from the rest of the text
+a       = argparse(args)
+acopy   = list(alpha)  # a list of the Latin Alphabet since strings are immutable
+cipher  = a.last('-key', character().get_cvar("newCipherKey",""))  # get our saved key unless overridden on input
+
+# assign the string of words between our command and -key
+inText  = "&*&"[len(command)+1:args.index("-key") if "-key" in args else None] if &ARGS& else ""
+
+output  = f"""
+`{ctx.prefix+ctx.alias} make` a cipher to encode your messages.
+`{ctx.prefix+ctx.alias} view` your cipher.
+`{ctx.prefix+ctx.alias} encode` your text using your cipher.
+`{ctx.prefix+ctx.alias} decode` the input using your cipher, or
+`{ctx.prefix+ctx.alias} <encoded text> -key <cipher>` to decode using another cipher."""
+
+if command=='make':  # make a random string of upper and lowercase letters for a decoding key and save it
+  cipher = ''.join([acopy.pop(randint(len(acopy))) for x in range(52)]) 
+  character().set_cvar("newCipherKey", cipher)
+  output = f"Your key: {cipher}"
+
+if cipher and len(cipher)==52:  # do we have a decoding/encoding key and is it the correct length
+  if command=='view':
+    output = cipher  # display our current cipher for copy/pasting
+
+  if command=="encode":
+    encode = str.maketrans(alpha, cipher)  # make the dictionary for translation
+    output = inText.translate(encode)
+
+  if command=='decode':
+    decode = str.maketrans(cipher, alpha)
+    output = f'''||{inText.translate(decode)}||'''
+
+return f'''_ _\n## CIPHERS\n{output}\n\n`{ctx.prefix+ctx.alias} [make | view | encode | decode]`'''
+</drac2>
