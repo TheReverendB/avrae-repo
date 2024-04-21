@@ -13,16 +13,27 @@ automation:
             damage: 1d6 + {{strengthMod + 1 + 2*isConstruct}} [magical
               bludgeoning]  {{('+14' if isConstruct else '+7') if
               lastAttackNaturalRoll==20 else ''}}
+            overheal: false
           - type: condition
             condition: isConstruct and target.hp <= 25
             onTrue:
               - type: damage
                 damage: "{target.hp + target.temp_hp} [destroyed]"
+                overheal: false
                 fixedValue: true
             onFalse: []
             errorBehaviour: "false"
         miss: []
         attackBonus: strengthMod + proficiencyBonus + 1 + 2*isConstruct
+  - type: text
+    text: >-
+      You gain a +1 bonus to attack and damage rolls made with this magic
+      weapon. The bonus increases to +3 when you use the mace to attack a
+      construct.
+
+
+      When you roll a 20 on an attack roll made with this weapon, the target takes an extra 7 bludgeoning damage, or 14 bludgeoning damage if it's a construct. If a construct has 25 hit points or fewer after taking this damage, it is destroyed.
+    title: Mace of Smiting
 _v: 2
 proper: true
 verb: attacks with the
