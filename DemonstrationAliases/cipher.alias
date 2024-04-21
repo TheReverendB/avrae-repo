@@ -33,5 +33,5 @@ if cipher and len(cipher)==52:  # do we have a decoding/encoding key and is it t
     decode = str.maketrans(cipher, alpha)
     output = f'''||{inText.translate(decode)}||'''
 
-return f'''_ _\n## CIPHERS\n{output}\n\n`{ctx.prefix+ctx.alias} [make | view | encode | decode]`'''
+return f'''_ _\n### CIPHER\n{output}\n\n`{ctx.prefix+ctx.alias} [make | view | encode | decode]`'''
 </drac2>
