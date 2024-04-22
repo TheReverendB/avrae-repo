@@ -9,16 +9,20 @@ automation:
         onError: "0"
       - type: attack
         hit:
+          - type: variable
+            name: nat20
+            value: lastAttackNaturalRoll==20
+            onError: "0"
           - type: damage
             damage: 1d6 + {{strengthMod + 1 + 2*isConstruct}} [magical
-              bludgeoning]  {{('+14' if isConstruct else '+7') if
-              lastAttackNaturalRoll==20 else ''}}
+              bludgeoning]  {{('+14' if isConstruct else '+7') if nat20 else
+              ''}}
             overheal: false
           - type: condition
             condition: isConstruct and target.hp <= 25
             onTrue:
               - type: damage
-                damage: "{target.hp + target.temp_hp} [destroyed]"
+                damage: '{target.hp + target.temp_hp if isConstruct else ""} [destroyed]'
                 overheal: false
                 fixedValue: true
             onFalse: []
