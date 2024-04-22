@@ -9,25 +9,29 @@ automation:
     effects:
       - type: attack
         hit:
+          - type: variable
+            name: nat20
+            value: lastAttackNaturalRoll==20
+            onError: "0"
+          - type: damage
+            damage: 1d10+{strengthMod}+{{'14' if nat20 else ''}}[magical slashing]
           - type: condition
             condition: lastAttackNaturalRoll==20
             onTrue:
-              - type: damage
-                damage: 1d10mi10+{strengthMod}+14[magical slashing]
-                overheal: false
               - type: roll
                 dice: 1d20
                 name: Lop
                 hidden: true
               - type: condition
                 condition: int(Lop)==20
-                onTrue: []
+                onTrue:
+                  - type: ieffect2
+                    name: Severed Limb
+                    stacking: true
+                    desc: Effect determined by GM
                 onFalse: []
                 errorBehaviour: "false"
-            onFalse:
-              - type: damage
-                damage: 1d10mi10+{strengthMod}[magical slashing]
-                overheal: false
+            onFalse: []
             errorBehaviour: "false"
         miss: []
         attackBonus: strengthMod+proficiencyBonus
