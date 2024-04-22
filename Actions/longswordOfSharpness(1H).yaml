@@ -14,7 +14,7 @@ automation:
             value: lastAttackNaturalRoll==20
             onError: "0"
           - type: damage
-            damage: 1d8{{mi8}}+{strengthMod}+{{'14' if nat20 else ''}}[magical slashing]
+            damage: 1d8+{strengthMod}+{{'14' if nat20 else ''}}[magical slashing]
           - type: condition
             condition: lastAttackNaturalRoll==20
             onTrue:
