@@ -1,0 +1,29 @@
+name: Wave
+automation:
+  - type: target
+    target: all
+    effects:
+      - type: attack
+        hit:
+          - type: variable
+            name: crit
+            value: lastAttackDidCrit and target.max_hp
+            onError: "0"
+          - type: damage
+            damage: 1d6 + {strengthMod+3}[magical piercing]{{f'+{crit}/2[magical necrotic]'
+              if crit else ""}}
+            overheal: false
+        miss: []
+        attackBonus: strengthMod + proficiencyBonus + 3
+  - type: text
+    text: >-
+      You gain a +3 bonus to attack and damage rolls made with this magic
+      weapon. If you score a critical hit with it, the target takes extra
+      necrotic damage equal to half its hit point maximum.
+
+
+      The weapon also functions as a trident of fish command and a weapon of warning. It can confer the benefit of a cap of water breathing while you hold it, and you can use it as a cube of force by choosing the effect, instead of pressing cube sides to select it.
+    title: Effect
+_v: 2
+proper: true
+thumb: https://www.dndbeyond.com/avatars/thumbnails/8777/179/1000/1000/637174481526236347.png
