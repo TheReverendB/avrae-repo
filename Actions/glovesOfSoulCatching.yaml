@@ -52,6 +52,18 @@ automation:
             miss: []
             attackBonus: modifier+proficiencyBonus
         errorBehaviour: "false"
+      - type: condition
+        condition: lastAttackDidHit and "save" in choice
+        onTrue:
+          - type: ieffect2
+            name: Transient Inspiration
+            target_self: true
+            duration: "2"
+            tick_on_caster: false
+            desc: You can choose to gain advantage on one attack roll, ability check, or
+              saving throw you make before the end of your next turn.
+        onFalse: []
+        errorBehaviour: "false"
       - type: variable
         name: doesHeal
         value: doesHeal if not lastAttackDidHit else doesHeal+lastDamage
