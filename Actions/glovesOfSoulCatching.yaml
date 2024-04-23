@@ -1,0 +1,81 @@
+_v: 2
+name: Gloves of Soul Catching
+automation:
+  - type: variable
+    name: isMonk
+    value: 4+2*((MonkLevel+1)//6)
+    onError: "0"
+  - type: variable
+    name: hasUnarmedFighting
+    value: 8 if "unarmed" in fightingstyles.lower() else 0
+    onError: "0"
+  - type: variable
+    name: hasTavernBrawler
+    value: 4 if "tavern" in feats.lower() else 0
+    onError: "0"
+  - type: variable
+    name: modifier
+    value: max(strengthMod,dexterityMod) if isMonk else strengthMod
+    onError: strengthMod
+  - type: variable
+    name: doesHeal
+    value: "0"
+    onError: "0"
+  - type: target
+    target: all
+    effects:
+      - type: condition
+        condition: lastAttackDidHit and "adv" in choice
+        onTrue:
+          - type: attack
+            hit:
+              - type: damage
+                damage: 1{{f'd{max(isMonk, hasUnarmedFighting, hasTavernBrawler)}' if isMonk or
+                  hasUnarmedFighting or hasTavernBrawler else ""}} + {modifier}
+                  [bludgeoning]
+              - type: damage
+                damage: 2d10[force]
+                fixedValue: true
+            miss: []
+            attackBonus: modifier+proficiencyBonus
+            adv: "1"
+        onFalse:
+          - type: attack
+            hit:
+              - type: damage
+                damage: 1{{f'd{max(isMonk, hasUnarmedFighting, hasTavernBrawler)}' if isMonk or
+                  hasUnarmedFighting or hasTavernBrawler else ""}} + {modifier}
+                  [bludgeoning]
+              - type: damage
+                damage: 2d10[force]
+                fixedValue: true
+            miss: []
+            attackBonus: modifier+proficiencyBonus
+        errorBehaviour: "false"
+      - type: variable
+        name: doesHeal
+        value: doesHeal if not lastAttackDidHit else doesHeal+lastDamage
+        onError: ""
+  - type: condition
+    condition: doesHeal>0 and not "adv" in choice and not "save" in choice
+    onTrue:
+      - type: target
+        target: self
+        effects:
+          - type: condition
+            condition: targetIteration==1
+            onTrue:
+              - type: damage
+                damage: -{doesHeal}[heal]
+                overheal: false
+                fixedValue: true
+            onFalse: []
+            errorBehaviour: "false"
+    onFalse: []
+    errorBehaviour: "false"
+  - type: text
+    text: After making a successful unarmed strike while wearing these gloves, you
+      can use the gloves to deal an extra 2d10 force damage to the target, and
+      you regain a number of hit points equal to the force damage dealt.
+    title: Effect
+proper: true
