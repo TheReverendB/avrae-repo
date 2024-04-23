@@ -34,7 +34,7 @@ automation:
       - type: attack
         hit:
           - type: damage
-            damage: 2d6+{strengthMod}+3[magical slashing]
+            damage: 2d6 + {strengthMod + 3} [magical slashing]
           - type: variable
             name: targetCurrentHp
             value: target.hp
