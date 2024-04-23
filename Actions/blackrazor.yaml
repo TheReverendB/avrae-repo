@@ -1,0 +1,129 @@
+_v: 2
+name: Blackrazor
+automation:
+  - type: text
+    text: You gain a +3 bonus to attack and damage rolls made with this magic weapon.
+  - type: text
+    text: >-
+      While you hold the weapon, you are aware of the presence of Tiny or larger
+      creatures within 60 feet of you that aren't constructs or undead. You also
+      can't be charmed or frightened.
+
+
+      Blackrazor can cast the haste spell on you once per day. It decides when to cast the spell and maintains concentration on it so that you don't have to.
+    title: Soul Hunter
+  - type: variable
+    name: hitUndead
+    value: "0"
+    onError: "0"
+  - type: variable
+    name: targetMaxHp
+    value: "0"
+    onError: "0"
+  - type: target
+    target: all
+    effects:
+      - type: variable
+        name: isConstruct
+        value: target.creature_type and "construct" in target.creature_type.lower()
+        onError: "0"
+      - type: variable
+        name: isUndead
+        value: target.creature_type and "undead" in target.creature_type.lower()
+        onError: "0"
+      - type: attack
+        hit:
+          - type: damage
+            damage: 2d6 + {strengthMod + 3} [magical slashing]
+          - type: variable
+            name: targetCurrentHp
+            value: target.hp
+            onError: "0"
+          - type: variable
+            name: targetMaxHp
+            value: 0 if isUndead or isConstruct or targetCurrentHp > 0 else
+              max(targetMaxHp,target.max_hp)
+            onError: "0"
+        miss: []
+        attackBonus: strengthMod + proficiencyBonus + 3
+      - type: condition
+        condition: isUndead and lastAttackDidHit
+        onTrue:
+          - type: text
+            text: If you hit an undead with this weapon, you take 1d10 necrotic damage and
+              the target regains 1d10 hit points. If this necrotic damage
+              reduces you to 0 hit points, Blackrazor devours your soul.
+            title: Backlash
+          - type: variable
+            name: hitUndead
+            value: hitUndead+1
+            onError: hitUndead
+          - type: damage
+            damage: "{{f'{targetCurrentHp}[set to 0]' if targetCurrentHp < 0 else
+              \"\"}}-{\"1d10[heal]\" if isUndead else \"\"}"
+            fixedValue: true
+        onFalse: []
+        errorBehaviour: "false"
+  - type: condition
+    condition: hitUndead
+    onTrue:
+      - type: target
+        target: self
+        effects:
+          - type: variable
+            name: test
+            value: targetIteration
+            onError: "0"
+          - type: condition
+            condition: test == 1
+            onTrue:
+              - type: damage
+                damage: "{{f'{hitUndead}d10[magical necrotic]' if test else \"\"}}"
+                fixedValue: true
+            onFalse: []
+    onFalse: []
+    errorBehaviour: "false"
+  - type: condition
+    condition: targetMaxHp
+    onTrue:
+      - type: text
+        text: >-
+          Whenever you use it to reduce a creature to 0 hit points, the sword slays
+          the creature and devours its soul, unless it is a construct or an
+          undead. A creature whose soul has been devoured by Blackrazor can be
+          restored to life only by a wish spell.
+
+
+          When it devours a soul, Blackrazor grants you temporary hit points equal to the slain  creature's hit point maximum. These hit points fade after 24 hours. As long as these temporary  hit points last and you keep Blackrazor in hand, you have advantage on attack rolls, saving  throws, and ability checks.
+        title: Devour Soul
+      - type: target
+        target: self
+        effects:
+          - type: condition
+            condition: targetIteration == 1
+            onTrue:
+              - type: ieffect2
+                name: Blackrazor Temp HP advantage
+                effects:
+                  attack_advantage: "1"
+                  save_adv:
+                    - all
+                  check_adv:
+                    - all
+                buttons:
+                  - automation:
+                      - type: remove_ieffect
+                    label: Remove Advantage
+                    verb: loses advantage from Blackrazor
+                    style: "4"
+                desc: Advantage on attack rolls, saving throws, and ability checks, as long as
+                  thp remain and Blackrazor is in hand.
+              - type: temphp
+                amount: "{{\"\" if not targetMaxHp else f'({targetMaxHp}[target max hp],
+                  {caster.temp_hp}[current thp])kh1' if caster.temp_hp else
+                  f'{targetMaxHp}[target max hp]'}}"
+            onFalse: []
+            errorBehaviour: "false"
+    onFalse: []
+    errorBehaviour: "false"
+proper: true
