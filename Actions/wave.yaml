@@ -10,7 +10,7 @@ automation:
             value: lastAttackDidCrit and target.max_hp
             onError: "0"
           - type: damage
-            damage: 1d6 + {strengthMod+3}[magical piercing]{{f'+{crit}/2[magical necrotic]'
+            damage: 1d6 + {strengthMod+3} [magical piercing]{{f'+{crit}/2[magical necrotic]'
               if crit else ""}}
             overheal: false
         miss: []
