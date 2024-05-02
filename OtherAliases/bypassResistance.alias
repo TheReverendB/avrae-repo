@@ -1,0 +1,36 @@
+!alias bypassResistance <drac2>
+a = argparse(&ARGS&)
+targets = a.get('t')
+c = combat()
+
+# bypass select resistances or all of them:
+dtypeList = load_json(character().get_cvar('bypassResist', '["acid","bludgeoning","cold","fire","force","lightning","necrotic","piercing","poison","radiant","slashing","thunder","psychic"]'))
+
+out = []
+
+if not c:
+  return "techo 10 This alias only works in combat"
+if not &ARGS& or &ARGS&[0][0] not in ['a', 'c'] or not targets:
+  return f"""techo 30 _ _\n**Using this alias:** `{ctx.prefix +ctx.alias} <action/cast> "<action/spell name>" -t "<targets>"`\n\n`!cvar bypassResist ["fire", "cold"]` to only bypass fire and cold. """
+
+
+targs_n_args = {}  # a dict to store target specific args
+
+for targ in targets:
+  tName, tArgs = (targ.split('|')+[''])[:2]
+  if group:=c.get_group(tName):  # target a group
+    for t in group.combatants:  # loop over each combatant
+      targs_n_args[t.name] = tArgs  # save group args for each
+  else:
+    targs_n_args[tName] = tArgs  # single target
+
+for t in targs_n_args:
+  neut = []
+  if cmbt:=c.get_combatant(t):
+    for dtype in dtypeList:
+      if cmbt.resistances.is_resistant(dtype) and not cmbt.resistances.is_immune(dtype):
+        neut.append(dtype)
+  out.append(f''' -t "{t}|{targs_n_args[t]} {' '.join(f'-neutral {x}' for x in neut)}" ''')
+
+return f"""{&ARGS&[0]} {' '.join([f'"{x}"' if ' ' in x else x for x in &ARGS&[1:] if x not in targets and x!='-t'])} {' '.join(out)}"""
+</drac2>
