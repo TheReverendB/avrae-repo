@@ -1,45 +1,79 @@
-_v: 2
 name: Longsword of Wounding
 automation:
+  - type: variable
+    name: lastDamage
+    value: "0"
   - type: target
-    target: each
+    target: all
     effects:
       - type: attack
         hit:
+          - type: variable
+            name: lastDamage
+            value: "0"
           - type: damage
-            damage: 1d8 + {strengthMod} [magical slashing]
+            damage: 1d8+{strengthMod} [magical slashing]
+            overheal: false
           - type: ieffect2
             name: Wounded
-            stacking: true
-            buttons:
-              - label: Bleeding Wounds
-                verb: is bleeding from their wounds
-                automation:
-                  - type: target
-                    target: self
-                    effects:
-                      - type: damage
-                        damage: "{{len(ieffect.children)+1}}d4 [necrotic]"
-              - label: Close Wounds
-                verb: attempts to mend their wounds
-                automation:
-                  - type: target
-                    target: self
-                    effects:
-                      - type: save
-                        stat: con
-                        dc: 15
-                        success:
-                          - type: remove_ieffect
-                        fail: []
+            duration: null
             effects:
               max_hp_bonus: -lastDamage
+            attacks: []
+            buttons: []
+            end: false
+            conc: false
+            desc: null
+            stacking: true
+            save_as: null
+            parent: null
+            target_self: false
+            tick_on_caster: false
+          - type: ieffect2
+            name: Bleeding
+            duration: null
+            effects: null
+            attacks: []
+            buttons:
+              - label: Bleed
+                automation:
+                  - type: target
+                    target: self
+                    effects:
+                      - type: variable
+                        name: lastDamage
+                        value: "0"
+                      - type: damage
+                        damage: "{{1 + len(ieffect.children)}}d4 [necrotic]"
+                        overheal: false
+                      - type: save
+                        stat: con
+                        fail: []
+                        success:
+                          - type: remove_ieffect
+                        dc: "15"
+                verb: bleeds
+                style: "4"
+                defaultDC: null
+                defaultAttackBonus: null
+                defaultCastingMod: null
+            end: false
+            conc: false
+            desc: null
+            stacking: true
+            save_as: null
+            parent: null
+            target_self: false
+            tick_on_caster: false
+          - type: text
+            text: >-
+              Hit points lost to this weapon's damage can be regained only through a
+              short or long rest, rather than by regeneration, magic, or any
+              other means.
+
+
+              Once per turn, when you hit a creature with an attack using this magic weapon, you can wound the target. At the start of each of the wounded creature's turns, it takes 1d4 necrotic damage for each time you've wounded it, and it can then make a DC 15 Constitution saving throw, ending the effect of all such wounds on itself on a success. Alternatively, the wounded creature, or a creature within 5 feet of it, can use an action to make a DC 15 Wisdom (Medicine) check, ending the effect of such wounds on it on a success.
+            title: Effect
         miss: []
-        attackBonus: strengthMod + proficiencyBonus
-  - type: text
-    text: >-
-      
-      Hit points lost to this weapon's damage can be regained only through a short or long rest, rather than by regeneration, magic, or any other means.
-
-
-      Once per turn, when you hit a creature with an attack using this magic weapon, you can wound the target. At the start of each of the wounded creature's turns, it takes 1d4 necrotic damage for each time you've wounded it, and it can then make a DC 15 Constitution saving throw, ending the effect of all such wounds on itself on a success. Alternatively, the wounded creature, or a creature within 5 feet of it, can use an action to make a DC 15 Wisdom (Medicine) check, ending the effect of such wounds on it on a success.
+        attackBonus: strengthMod+proficiencyBonus
+_v: 2
