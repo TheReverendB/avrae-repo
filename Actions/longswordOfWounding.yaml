@@ -1,0 +1,45 @@
+_v: 2
+name: Longsword of Wounding
+automation:
+  - type: target
+    target: each
+    effects:
+      - type: attack
+        hit:
+          - type: damage
+            damage: 1d8 + {strengthMod} [magical slashing]
+          - type: ieffect2
+            name: Wounded
+            stacking: true
+            buttons:
+              - label: Bleeding Wounds
+                verb: is bleeding from their wounds
+                automation:
+                  - type: target
+                    target: self
+                    effects:
+                      - type: damage
+                        damage: "{{len(ieffect.children)+1}}d4 [necrotic]"
+              - label: Close Wounds
+                verb: attempts to mend their wounds
+                automation:
+                  - type: target
+                    target: self
+                    effects:
+                      - type: save
+                        stat: con
+                        dc: 15
+                        success:
+                          - type: remove_ieffect
+                        fail: []
+            effects:
+              max_hp_bonus: -lastDamage
+        miss: []
+        attackBonus: strengthMod + proficiencyBonus
+  - type: text
+    text: >-
+      
+      Hit points lost to this weapon's damage can be regained only through a short or long rest, rather than by regeneration, magic, or any other means.
+
+
+      Once per turn, when you hit a creature with an attack using this magic weapon, you can wound the target. At the start of each of the wounded creature's turns, it takes 1d4 necrotic damage for each time you've wounded it, and it can then make a DC 15 Constitution saving throw, ending the effect of all such wounds on itself on a success. Alternatively, the wounded creature, or a creature within 5 feet of it, can use an action to make a DC 15 Wisdom (Medicine) check, ending the effect of such wounds on it on a success.
