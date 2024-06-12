@@ -1,10 +1,11 @@
-name: Pyroconverger
+name: Pyroconverger  # !cc create "Pyroconverger Uses" -min 0 -max 10 -reset long -resetto 0 #
 automation:
   - type: counter
     counter: Pyroconverger Uses
     amount: "-1"
     allowOverflow: true
     errorBehaviour: warn
+    fixedValue: true
   - type: variable
     name: uses
     value: lastCounterRemaining
@@ -12,6 +13,7 @@ automation:
     dice: 1d10
     name: Malfunction
     hidden: true
+    fixedValue: true
   - type: condition
     condition: "{{lastCounterRemaining<10}}"
     onTrue:
@@ -34,22 +36,25 @@ automation:
                 overheal: false
             dc: "13"
       - type: condition
-        condition: "{{int(Malfunction)+int(lastCounterRemaining)>=11}}"
+        condition: (int(Malfunction)+lastCounterRemaining) >= 11
         onTrue:
           - type: counter
             counter: Pyroconverger Uses
             amount: "-10"
             allowOverflow: true
             errorBehaviour: warn
+            fixedValue: true
           - type: target
             target: self
             effects:
               - type: damage
                 damage: 4d6 [fire]
                 overheal: false
+                fixedValue: true
           - type: text
             text: >-
-              Malfunction Roll: 1d10 ({Malfunction}) + {uses} [uses] =
+              Malfunction Roll: 1d10 ({{f'**{Malfunction}**' if Malfunction==10 or
+              Malfunction==1 else Malfunction}}) + {uses} [uses] =
               `{{int(Malfunction)+uses}}`
 
 
@@ -64,7 +69,8 @@ automation:
         onFalse:
           - type: text
             text: >-
-              Malfunction Roll: 1d10 ({Malfunction}) + {uses} [uses] =
+              Malfunction Roll: 1d10 ({{f'**{Malfunction}**' if Malfunction==10 or
+              Malfunction==1 else Malfunction}}) + {uses} [uses] =
               `{{int(Malfunction)+uses}}`
 
 
