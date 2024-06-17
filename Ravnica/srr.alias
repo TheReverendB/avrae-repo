@@ -1,4 +1,5 @@
 embed <drac2>
+# variables!
 cc, ch, sb = "Spell Refueling Ring", character(), character().spellbook
 ch.create_cc_nx(cc,0, 1, "long", "bubble")
 v,re,desc = ch.get_cc(cc),'&1&'=='recharge',"While this ring is on your person, you can use an action to speak its command word and regain one expended spell slot. If the expended slot was of 4th level or higher, the new slot is 3rd level. Once you use the ring, it can't be used again until the next dawn."
