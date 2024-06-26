@@ -78,8 +78,21 @@ if userID in GMlist:
   if '&1&'.lower()=='re-add':
     if '&2&'[0]=='<':
       player = '&2&'.strip('<@!>')
+      prevRenown = ''
+      if player in g:
+        prevRenown = f''' -f "Past Renown:|{n.join([f'~~{x.title()}: {y}~~' for x,y in g[player].items()])}" '''
       g.update({player: {"azorius": 0, "boros": 0, "dimir": 0, "golgari": 0, "gruul": 0, "guildless": 0, "izzet": 0, "orzhov": 0, "rakdos": 0, "selesnya": 0, "simic": 0} })
-      return f"""multiline\n{ctx.prefix}embed -title "A Player's Renown has been Reset!" -f "**&2& reset**\n{n.join([f'{x.title()}: {y}' for x,y in g[player].items()])}" {thumb} -footer "{ctx.prefix+ctx.alias} `add [@player]` or `[@player] [guild] [mod]` or `guild [guild]`"\n{ctx.prefix}gvar edit {gvar} {dump_yaml(g)} """
+      return f"""multiline\n{ctx.prefix}embed -title "A Player's Renown has been Reset!" {prevRenown} -f "**&2& reset**\n{n.join([f'{x.title()}: {y}' for x,y in g[player].items()])}" {thumb} -footer "{ctx.prefix+ctx.alias} `add [@player]` or `[@player] [guild] [mod]` or `guild [guild]`"\n{ctx.prefix}gvar edit {gvar} {dump_yaml(g)} """
+
+  if '&1&'.lower()=='delete':
+    if '&2&'[0]=='<' or '&2&'[0].isdigit():
+      player = '&2&'.strip('<@!>')
+      if player in g:
+        prevRenown = n.join([f'~~{x.title()}: {y}~~' for x,y in g[player].items()])
+        g.pop(player)
+        return f"""multiline\n{ctx.prefix}embed -title "Removed a player from the Renown Tracker:" -f "**&2& removed**\nForgotten Renown:\n{prevRenown}" {thumb} -footer "{ctx.prefix+ctx.alias} `add [@player]` or `[@player] [guild] [mod]` or `guild [guild]`"\n{ctx.prefix}gvar edit {gvar} {dump_yaml(g)} """
+      else:
+        return f"""echo &2& was not found in `{ctx.prefix+ctx.alias}`.  Check their ID and try again.\n\n`!{ctx.prefix+ctx.alias} @player or 20398429805` (Discord ID)"""
 
   if '&1&'=='addGM':
     if '&2&'[0]=='<':
