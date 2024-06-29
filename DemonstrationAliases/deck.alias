@@ -31,10 +31,8 @@ else:
   ch.set_cvar('deck', dump_yaml(cards))  # set our cvar
   desc = '\n'.join(cardOut)
 
-desc += f"\n\nCards Remaining: {'54' if reset else len(unused)}"  # display our remaining cards
-</drac2>
+desc += f"\n\nCards Remaining: {54 if reset else len(unused)}"  # display our remaining cards
+title = f"""{name} {'resets the Deck' if reset else f"{'draws' if cardOut else 'tries to draw'} {n if n>1 else 'a'} Card{'s' if n>1 else ''}"}!"""
 
--title "<name> {{"resets the Deck" if reset else f"{'draws' if cardOut else 'tries to draw'} {n if n>1 else 'a'} Card{'s' if n>1 else ''}"}}!"
--desc "{{desc}}"
--footer "{{alias}} [number] | {{alias}} [reset]"
--color <color> -thumb <image>
+return f'''-title "{title}" -desc "{desc}" -footer "{alias} [number] | {alias} [reset]" -color {color} -thumb {image} '''
+</drac2>
