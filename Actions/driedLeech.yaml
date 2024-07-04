@@ -1,0 +1,77 @@
+name: Dried Leech  # created by @justhalf
+automation:
+  - type: target
+    target: all
+    effects:
+      - type: ieffect2
+        name: Dried Leech
+        duration: null
+        effects: null
+        attacks: []
+        buttons:
+          - label: Dried Leech Damage (Start of Turn)
+            automation:
+              - type: target
+                target: self
+                effects:
+                  - type: damage
+                    damage: 1d4[magical piercing]
+                    overheal: false
+                    fixedValue: false
+                  - type: variable
+                    name: totalDmg
+                    value: lastDamage + (int(ieffect.children[0].desc.split()[0]) if
+                      ieffect.children else 0)
+                  - type: text
+                    text: >-
+                      The leech deals **1d4 piercing** damage at the start of each of the target’s turns. If the leech has dealt at least 10 damage in total or the target dies, the leech falls off.
+
+                      A creature, including the target, can use its action to detach the leech. Once a leech is no longer attached to its target, the leech dies and is no longer magical.
+
+                      The leech has dealt **{{totalDmg}} damage** so far.
+                    title: Dried Leech
+                  - type: condition
+                    condition: totalDmg >= 10
+                    onTrue:
+                      - type: remove_ieffect
+                      - type: text
+                        text: The leech has dealt at least 10 damage to this target, so it falls off.
+                        title: Leech falls off!
+                    onFalse:
+                      - type: ieffect2
+                        name: Dried Leech Counter
+                        parent: ieffect
+                        desc: "{{totalDmg}} damage dealt"
+            verb: takes damage from Dried Leech!
+            style: "4"
+            defaultDC: null
+            defaultAttackBonus: null
+            defaultCastingMod: null
+          - label: Detach Leech
+            automation:
+              - type: remove_ieffect
+              - type: text
+                text: A creature, including the target, can use its action to detach the leech.  Once a leech is no longer attached to its target, the leech dies and is no longer magical.
+                title: Dried Leech - Detached
+            verb: detaches a Dried Leech!
+            style: "1"
+            defaultDC: null
+            defaultAttackBonus: null
+            defaultCastingMod: null
+        end: false
+        conc: false
+        desc: null
+        stacking: false
+        parent: null
+        target_self: false
+        tick_on_caster: false
+      - type: text
+        text: >-
+          This leech has been dried and imbued with a mote of animating magic. If you hit a creature with a ranged attack roll using this ammunition, the leech springs to life and sinks its teeth into the target, dealing **1d4 piercing** damage at the start of each of the target’s turns (button: __`Dried Leech Damage`__).
+
+          If the leech has dealt at least 10 damage in total or the target dies, the leech falls off. A creature, including the target, can use its action to detach the leech (button: __`Detach Leech`__).
+
+          Once a leech is no longer attached to its target, the leech dies and is no longer magical.
+        title: Effect
+_v: 2
+phrase: "*slurp*"
