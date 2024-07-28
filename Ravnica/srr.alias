@@ -1,36 +1,57 @@
 embed <drac2>
 # variables!
-cc, ch, sb = "Spell Refueling Ring", character(), character().spellbook
+cc = "Spell Refueling Ring"
+ch = character()
+sb = character().spellbook
+
+# a counter!
 ch.create_cc_nx(cc,0, 1, "long", "bubble")
-v,re,desc = ch.get_cc(cc),'&1&'=='recharge',"While this ring is on your person, you can use an action to speak its command word and regain one expended spell slot. If the expended slot was of 4th level or higher, the new slot is 3rd level. Once you use the ring, it can't be used again until the next dawn."
-slotsUsed = [(sb.get_slots(x) < sb.get_max_slots(x)) for x in range(1,4)]
+
+# more variables!
+v    = ch.get_cc(cc)
+re   = '&1&'=='recharge'
+desc = "While this ring is on your person, you can use an action to speak its command word and regain one expended spell slot. If the expended slot was of 4th level or higher, the new slot is 3rd level. Once you use the ring, it can't be used again until the next dawn."
+
+# a list comprehension!
+slotsUsed    = [(sb.get_slots(x) < sb.get_max_slots(x)) for x in range(1,4)]
+
+# more vairables!
 slotRestored = 0
-out = []
+out          = []
+
+# do we have a use and any open slots?
 if v and (slotsUsed[0] or slotsUsed[1] or slotsUsed[2]):
     out.append(f"-title '{name} speaks the command word and releases the magic in their {cc}!'")
     out.append(f'-desc "{desc}"')
+    # which level to restore?
     for x in range(3,0,-1):
         if slotsUsed[x-1]:
             slotRestored = x
             break
+    # do the restoration and add text
     if slotRestored:
         sb.set_slots(slotRestored, sb.get_slots(slotRestored) + 1)
         character().mod_cc(cc,-1)
         out.append(f"-f 'Spell Slots (+1)|{sb.slots_str(slotRestored)}'")
         out.append(f"-f '{cc} (-1)|{ch.cc_str(cc)}'")
+# no slots to recharge but our counter is full
 elif v:
     out.append(f"-title '{name} attempts to use the magic of their {cc}!'")
-    out.append(f'''-desc """You haven't used any spell slots that can be restored!\n\nYou need to have an empty slot of 3rd level or less to use the {cc}.""" ''')
+    out.append(f'''-desc "You haven't used any spell slots that can be restored!\n\nYou need to have an empty slot of 3rd level or less to use the {cc}." ''')
     out.append(f"-f 'Spell Slots|{sb.slots_str(1)}\n{sb.slots_str(2)}\n{sb.slots_str(3)}'")
     out.append(f"-f '{cc}|{ch.cc_str(cc)}'")
+# recharge the counter
 elif re:
     character().mod_cc(cc,+1)
     out.append(f"-title '{name} can feel power returning to the {cc}!'")
     out.append(f'-desc "{desc}"')
     out.append(f"-f '{cc} (+1)|{ch.cc_str(cc)}'")
+# no uses in the ring
 else:
     out.append(f'''-title "{name}'s {cc} is out of power!" ''')
     out.append(f"-desc 'Your {cc} is exhausted.  `!srr recharge` to charge it at dawn.'")
     out.append(f"-f '{cc}|{ch.cc_str(cc)}'")
+
+# return our text
 return "\n".join(out)
 </drac2> -color <color> -thumb <image>
