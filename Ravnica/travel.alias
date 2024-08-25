@@ -6,13 +6,13 @@ n      = '\n'
 gvar   = '083d037e-a027-41bb-9f10-42ae0dc0d740'
 g      = load_yaml(get_gvar(gvar))
 userID = str(ctx.author.id)
-Golgari= g[userID].golgari if userID in g and g[userID].golgari else 0  # do you have golgari renown?
-Gruul  = g[userID].gruul if userID in g and g[userID].gruul else 0  # do you have gruul renown?
+Golgari= g.get(userID, {}).get('golgari', 0) # g[userID].golgari if userID in g and g[userID].golgari else 0  # do you have golgari renown?
+Gruul  = g.get(userID, {}).get('gruul', 0) # g[userID].gruul if userID in g and g[userID].gruul else 0  # do you have gruul renown?
 skill  = 'survival' if ch.skills.survival.value>ch.skills.nature.value else 'nature'
 adv    = a.adv(boolwise=True)
 rr_num = ch.csettings.get("reroll", None)
 min_ck = a.last('mc', None, int) or (10 if ch.csettings.get("talent", False) and ch.skills[skill].prof>=1 else None)
-bonus  = ("+"+a.join('b', '+', '') if a.get('b') else '') + ('+1d4[guidance]' if a.get('guidance') else '') + (f'+{ceil(Golgari/3) if Golgari<13 else ceil(Golgari/4) if Golgari<21 else ceil(Golgari/5)}[Golgari Bonus]' if Golgari else '')
+bonus  = ("+"+a.join('b', '+', '') if a.get('b') else '') + ('+1d4[guidance]' if a.get('guidance') else '') + (f'+{int((Golgari+8)//5.5)}[Golgari Bonus]' if Golgari else '')
 r      = vroll(ch.skills[skill].d20(adv, rr_num, min_ck)+bonus)
 footer = ' -footer "!travel [#destination] [sewers]" '
 wRoll  = vroll('(1d30+30)/2[Gruul]' if Gruul else '1d30+30')
@@ -20,106 +20,332 @@ wTime  = wRoll.total
 
 
 destination_precinct = {
-    "The Tinkerers Shed": ["<#895097045541613594>"],
-"Precinct One": [
-"<#895097051375865881>",
-"<#895097050960654448>",
-"<#895097050960654446>",
-"<#895097050960654451>",
-"<#895097050960654450>",
-"<#895097050960654452>",
-"<#895097050528645238>",
-"<#895097050528645239>",
-"<#895097051375865878>", 
-"<#937850065500909608>"
-],
-"Precinct Two": [
-"<#895097051828862999>",
-"<#895097052319604806>",
-"<#895097052319604808>",
-"<#935033117834625085>",
-"<#895097052319604809>",
-"<#895097051828863001>"
-],
-"Precinct Three": [
-"<#895097052705484881>",
-"<#895097052705484885>",
-"<#895097052705484883>",
-"<#895097052705484884>",
-"<#933878622987636796>",
-"<#895097052705484882>"
-],
-"Precinct Four": [
-"<#895097052936146947>",
-"<#895097053108121600>",
-"<#895097053108121608>",
-"<#895097053322043425>"
-],
-"Precinct Five": [
-"<#895097053489811478>",
-"<#895097053489811481>",
-"<#895097053489811480>",
-"<#895097053322043429>",
-"<#895097053322043430>",
-"<#933902730072850473>"
-],
-"Precinct Six": [
-"<#934499096922837022>",
-"<#895097053489811485>",
-"<#895097053678563332>",
-"<#895097053678563333>",
-"<#895097053678563334>",
-"<#895097053678563335>",
-"<#895097053678563336>",
-"<#938159697243021382>"
-],
-"Undercity": [
-"<#895097053905039373>",
-"<#895097053905039378>",
-"<#937862699939954698>",
-"<#895097053905039379>",
-"<#925637819374915644>"
-],
-"The Rubblebelt": [
-"<#895097053108121603>",
-"<#895097053108121605>",
-"<#895097053108121604>",
-"<#895097053108121606>",
-"<#895097053108121607>"]
+  "The Tinkerers Shed":
+  [
+    "<#895097045541613594>"
+  ],
+  "Precinct One":
+  [
+    "<#895097051375865881>",
+    "<#895097050960654448>",
+    "<#895097050960654446>",
+    "<#895097050960654451>",
+    "<#895097050960654450>",
+    "<#895097050960654452>",
+    "<#895097050528645238>",
+    "<#895097050528645239>",
+    "<#895097051375865878>",
+    "<#937850065500909608>"
+  ],
+  "Precinct Two":
+  [
+    "<#895097051828862999>",
+    "<#895097052319604806>",
+    "<#895097052319604808>",
+    "<#935033117834625085>",
+    "<#895097052319604809>",
+    "<#895097051828863001>"
+  ],
+  "Precinct Three":
+  [
+    "<#895097052705484881>",
+    "<#895097052705484885>",
+    "<#895097052705484883>",
+    "<#895097052705484884>",
+    "<#933878622987636796>",
+    "<#895097052705484882>"
+  ],
+  "Precinct Four":
+  [
+    "<#895097052936146947>",
+    "<#895097053108121600>",
+    "<#895097053108121608>",
+    "<#895097053322043425>"
+  ],
+  "Precinct Five":
+  [
+    "<#895097053489811478>",
+    "<#895097053489811481>",
+    "<#895097053489811480>",
+    "<#895097053322043429>",
+    "<#895097053322043430>",
+    "<#933902730072850473>"
+  ],
+  "Precinct Six":
+  [
+    "<#934499096922837022>",
+    "<#895097053489811485>",
+    "<#895097053678563332>",
+    "<#895097053678563333>",
+    "<#895097053678563334>",
+    "<#895097053678563335>",
+    "<#895097053678563336>",
+    "<#938159697243021382>"
+  ],
+  "Undercity":
+  [
+    "<#895097053905039373>",
+    "<#895097053905039378>",
+    "<#937862699939954698>",
+    "<#895097053905039379>",
+    "<#925637819374915644>"
+  ],
+  "The Rubblebelt":
+  [
+    "<#895097053108121603>",
+    "<#895097053108121605>",
+    "<#895097053108121604>",
+    "<#895097053108121606>",
+    "<#895097053108121607>"
+  ]
 }
 
 Precinct2Precinct = {
-"The Tinkerers Shed": {"Precinct One": 1000, "Precinct Two": 2000, "Precinct Three": 3000, "Precinct Four": 4000, "Precinct Five": 5000,"Precinct Six": 6000, "The Rubblebelt": 7000, "Undercity": 10000},
-"Precinct One": {"Precinct Two": 40, "Precinct Three": 100, "Precinct Four": 60, "Precinct Five": 180, "Precinct Six": 90, "The Rubblebelt": 90, "Undercity": 105},
-"Precinct Two": {"Precinct One": 40, "Precinct Three": 90, "Precinct Four": 90, "Precinct Five": 150, "Precinct Six": 120, "The Rubblebelt": 120, "Undercity": 120},
-"Precinct Three": {"Precinct One": 100, "Precinct Two": 90, "Precinct Four": 60, "Precinct Five": 240, "Precinct Six": 200, "The Rubblebelt": 90, "Undercity": 130},
-"Precinct Four": {"Precinct One": 60, "Precinct Two": 90, "Precinct Three": 60, "Precinct Five": 90, "Precinct Six": 75, "The Rubblebelt": 30, "Undercity": 110},
-"Precinct Five": {"Precinct One": 180, "Precinct Two": 150, "Precinct Three": 240, "Precinct Four": 90, "Precinct Six": 30, "The Rubblebelt": 120, "Undercity": 45},
-"Precinct Six": {"Precinct One": 90, "Precinct Two": 120, "Precinct Three": 200, "Precinct Four": 75, "Precinct Five": 30, "The Rubblebelt": 105, "Undercity": 40},
-"Undercity": {"Precinct One": 105, "Precinct Two": 120, "Precinct Three": 130, "Precinct Four": 110, "Precinct Five": 45, "The Rubblebelt": 140,"Precinct Six": 40},
-"The Rubblebelt": {"Precinct One": 90, "Precinct Two": 120, "Precinct Three": 90, "Precinct Four": 30, "Precinct Five": 120, "Precinct Six": 105, "Undercity": 140}
+  "The Tinkerers Shed":
+  {
+    "Precinct One": 1000,
+    "Precinct Two": 2000,
+    "Precinct Three": 3000,
+    "Precinct Four": 4000,
+    "Precinct Five": 5000,
+    "Precinct Six": 6000,
+    "The Rubblebelt": 7000,
+    "Undercity": 10000
+  },
+  "Precinct One":
+  {
+    "Precinct Two": 40,
+    "Precinct Three": 100,
+    "Precinct Four": 60,
+    "Precinct Five": 180,
+    "Precinct Six": 90,
+    "The Rubblebelt": 90,
+    "Undercity": 105
+  },
+  "Precinct Two":
+  {
+    "Precinct One": 40,
+    "Precinct Three": 90,
+    "Precinct Four": 90,
+    "Precinct Five": 150,
+    "Precinct Six": 120,
+    "The Rubblebelt": 120,
+    "Undercity": 120
+  },
+  "Precinct Three":
+  {
+    "Precinct One": 100,
+    "Precinct Two": 90,
+    "Precinct Four": 60,
+    "Precinct Five": 240,
+    "Precinct Six": 200,
+    "The Rubblebelt": 90,
+    "Undercity": 130
+  },
+  "Precinct Four":
+  {
+    "Precinct One": 60,
+    "Precinct Two": 90,
+    "Precinct Three": 60,
+    "Precinct Five": 90,
+    "Precinct Six": 75,
+    "The Rubblebelt": 30,
+    "Undercity": 110
+  },
+  "Precinct Five":
+  {
+    "Precinct One": 180,
+    "Precinct Two": 150,
+    "Precinct Three": 240,
+    "Precinct Four": 90,
+    "Precinct Six": 30,
+    "The Rubblebelt": 120,
+    "Undercity": 45
+  },
+  "Precinct Six":
+  {
+    "Precinct One": 90,
+    "Precinct Two": 120,
+    "Precinct Three": 200,
+    "Precinct Four": 75,
+    "Precinct Five": 30,
+    "The Rubblebelt": 105,
+    "Undercity": 40
+  },
+  "Undercity":
+  {
+    "Precinct One": 105,
+    "Precinct Two": 120,
+    "Precinct Three": 130,
+    "Precinct Four": 110,
+    "Precinct Five": 45,
+    "The Rubblebelt": 140,
+    "Precinct Six": 40
+  },
+  "The Rubblebelt":
+  {
+    "Precinct One": 90,
+    "Precinct Two": 120,
+    "Precinct Three": 90,
+    "Precinct Four": 30,
+    "Precinct Five": 120,
+    "Precinct Six": 105,
+    "Undercity": 140
+  }
 }
 
 last_mile = {
-"Precinct One": {"<#895097051375865881>": 5, "<#895097050960654448>": 0, "<#895097050960654446>": 5, "<#895097050960654451>": 15, "<#895097050960654450>": 5, "<#895097050960654452>": 20, "<#895097050528645238>": 5, "<#895097050528645239>": 5, "<#895097051375865878>": 5, "<#937850065500909608>": 20},
-"Precinct Two": {"<#895097051828862999>": 30, "<#895097052319604806>": 20,  "<#935033117834625085>": 0, "<#895097052319604808>": 25, "<#895097052319604809>":0, "<#895097051828863001>": 20},
-"Precinct Three": {"<#895097052705484881>": 20, "<#895097052705484885>": 20, "<#895097052705484883>": 15, "<#895097052705484884>": 0, "<#933878622987636796>": 0,"<#895097052705484882>":35},
-"Precinct Four": {"<#895097052936146947>": 40, "<#895097053108121600>": 20, "<#895097053108121608>": 0, "<#895097053322043425>": 0},
-"Precinct Five": {"<#895097053489811478>": 25, "<#895097053489811481>": 0, "<#895097053489811480>": 35, "<#895097053322043429>": 35, "<#895097053322043430>": 45, "<#933902730072850473>": 0},
-"Precinct Six": {"<#934499096922837022>": 0, "<#895097053489811485>": 0, "<#895097053678563332>": 20, "<#895097053678563333>": 40, "<#895097053678563334>": 50, "<#895097053678563335>": 60, "<#895097053678563336>": 65, "<#938159697243021382>": 20},
-"Undercity": {"<#895097053905039373>": 10, "<#895097053905039378>": 15, "<#937862699939954698>": 12, "<#895097053905039379>": 0, "<#925637819374915644>": 10},
-"The Rubblebelt": {"<#895097053108121603>": 0, "<#895097053108121605>": wTime, "<#895097053108121604>": wTime, "<#895097053108121606>": wTime, "<#895097053108121607>": wTime}
+  "Precinct One":
+  {
+    "<#895097051375865881>": 5,
+    "<#895097050960654448>": 0,
+    "<#895097050960654446>": 5,
+    "<#895097050960654451>": 15,
+    "<#895097050960654450>": 5,
+    "<#895097050960654452>": 20,
+    "<#895097050528645238>": 5,
+    "<#895097050528645239>": 5,
+    "<#895097051375865878>": 5,
+    "<#937850065500909608>": 20
+  },
+  "Precinct Two":
+  {
+    "<#895097051828862999>": 30,
+    "<#895097052319604806>": 20,
+    "<#935033117834625085>": 0,
+    "<#895097052319604808>": 25,
+    "<#895097052319604809>": 0,
+    "<#895097051828863001>": 20
+  },
+  "Precinct Three":
+  {
+    "<#895097052705484881>": 20,
+    "<#895097052705484885>": 20,
+    "<#895097052705484883>": 15,
+    "<#895097052705484884>": 0,
+    "<#933878622987636796>": 0,
+    "<#895097052705484882>": 35
+  },
+  "Precinct Four":
+  {
+    "<#895097052936146947>": 40,
+    "<#895097053108121600>": 20,
+    "<#895097053108121608>": 0,
+    "<#895097053322043425>": 0
+  },
+  "Precinct Five":
+  {
+    "<#895097053489811478>": 25,
+    "<#895097053489811481>": 0,
+    "<#895097053489811480>": 35,
+    "<#895097053322043429>": 35,
+    "<#895097053322043430>": 45,
+    "<#933902730072850473>": 0
+  },
+  "Precinct Six":
+  {
+    "<#934499096922837022>": 0,
+    "<#895097053489811485>": 0,
+    "<#895097053678563332>": 20,
+    "<#895097053678563333>": 40,
+    "<#895097053678563334>": 50,
+    "<#895097053678563335>": 60,
+    "<#895097053678563336>": 65,
+    "<#938159697243021382>": 20
+  },
+  "Undercity":
+  {
+    "<#895097053905039373>": 10,
+    "<#895097053905039378>": 15,
+    "<#937862699939954698>": 12,
+    "<#895097053905039379>": 0,
+    "<#925637819374915644>": 10
+  },
+  "The Rubblebelt":
+  {
+    "<#895097053108121603>": 0,
+    "<#895097053108121605>": wTime,
+    "<#895097053108121604>": wTime,
+    "<#895097053108121606>": wTime,
+    "<#895097053108121607>": wTime
+  }
 }
 
 LM = {
-"Precinct One": {"the-ravens-return": 5, "tenth-district-plaza": 0, "chamber-of-the-guildpact": 5, "plaza-east": 15, "plaza-west": 5, "plaza-south": 20, "outside-orzhova": 5, "vizkopa-bank": 5, "tenth-district-post-office": 5, "the-turpitudinal": 20},
-"Precinct Two": {"outside-new-prahv": 30, "whitestone": 20,  "griffin-heights": 0, "the-lawgivers-break": 25, "augustin-station":0, "statue-of-argus-kos": 20},
-"Precinct Three": {"outside-vitu-ghazi": 20, "the-great-concourse": 20, "concordance": 15, "beast-haven": 0, "the-tree-house-tavern": 0,"the-canopy":35},
-"Precinct Four": {"outside-sunhome": 40, "outside-nivix": 20, "the-bulwark": 0, "the-restful-inn": 0},
-"Precinct Five": {"outside-zonot-seven": 25, "the-blistercoils": 0, "hightower": 35, "prism-university": 35, "ismeri-library": 45, "the-sandbar": 0},
-"Precinct Six": {"the-bloody-knuckle-blues": 0, "smelting-quarter": 0, "medori-park": 20, "outside-gore-house": 40, "deadbridge-chasm": 50, "wayport": 60, "benzers-bridge": 65, "the-prison-break": 20},
-"Undercity": {"sewers": 10, "outside-korozda": 15, "the-rotting-respite ": 12, "the-Undercity": 0, "the-rot-farms": 10},
-"The Rubblebelt": {"outside-skarrg": 0, "red-wastes-south": "1d30+30", "red-wastes-east": "1d30+30", "red-wastes-north": "1d30+30", "red-wastes-west": "1d30+30"}
+  "Precinct One":
+  {
+    "the-ravens-return": 5,
+    "tenth-district-plaza": 0,
+    "chamber-of-the-guildpact": 5,
+    "plaza-east": 15,
+    "plaza-west": 5,
+    "plaza-south": 20,
+    "outside-orzhova": 5,
+    "vizkopa-bank": 5,
+    "tenth-district-post-office": 5,
+    "the-turpitudinal": 20
+  },
+  "Precinct Two":
+  {
+    "outside-new-prahv": 30,
+    "whitestone": 20,
+    "griffin-heights": 25,
+    "the-lawgivers-break": 0,
+    "augustin-station": 0,
+    "statue-of-argus-kos": 20
+  },
+  "Precinct Three":
+  {
+    "outside-vitu-ghazi": 20,
+    "the-great-concourse": 20,
+    "concordance": 15,
+    "beast-haven": 0,
+    "the-tree-house-tavern": 0,
+    "the-canopy": 35
+  },
+  "Precinct Four":
+  {
+    "outside-sunhome": 40,
+    "outside-nivix": 20,
+    "the-bulwark": 0,
+    "the-restful-inn": 0
+  },
+  "Precinct Five":
+  {
+    "outside-zonot-seven": 25,
+    "the-blistercoils": 0,
+    "hightower": 35,
+    "prism-university": 35,
+    "ismeri-library": 45,
+    "the-sandbar": 0
+  },
+  "Precinct Six":
+  {
+    "the-bloody-knuckle-blues": 0,
+    "smelting-quarter": 0,
+    "medori-park": 20,
+    "outside-gore-house": 40,
+    "deadbridge-chasm": 50,
+    "wayport": 60,
+    "benzers-bridge": 65,
+    "the-prison-break": 20
+  },
+  "Undercity":
+  {
+    "sewers": 10,
+    "outside-korozda": 15,
+    "the-rotting-respite ": 12,
+    "the-Undercity": 0,
+    "the-rot-farms": 10
+  },
+  "The Rubblebelt":
+  {
+    "outside-skarrg": 0,
+    "red-wastes-south": "1d30+30",
+    "red-wastes-east": "1d30+30",
+    "red-wastes-north": "1d30+30",
+    "red-wastes-west": "1d30+30"
+  }
 }
 
 # post all the travel times
@@ -202,19 +428,59 @@ if "&1&".lower() in "times":
 #   "the-Undercity   <#895097053905039379>",
 #   "the-rot-farms   <#925637819374915644>"]
 
-# Channel ID Translation #
-# "Precinct One": {"the-ravens-return": 5, "tenth-district-plaza": 0, "🔘chamber-of-the-guildpact": 5, "plaza-east": 15, "plaza-west": 5, "plaza-south": 20, "⚪outside-orzhova": 5, "⚪vizkopa-bank": 5, "tenth-district-post-office": 5, "⚪the-turpitudinal": 20},
-# "Precinct Two": {"🔵outside-new-prahv": 30, "whitestone": 20,  "#🔵the-lawgivers-break": 0, "griffin-heights": 25, "augustin-station":0, "statue-of-argus-kos": 20},
-# "Precinct Three": {"🟩outside-vitu-ghazi": 20, "the-great-concourse": 20, "concordance": 15, "beast-haven": 0, "🟩the-tree-house-tavern": 0},
-# "Precinct Four": {"🟠outside-sunhome": 40, "🟣outside-nivix": 20, "red-wastes-south": 65, "the-bulwark": 0, "🔴outside-skarrg": 75, "the-restful-inn": 0},
-# "Precinct Five": {"🟦outside-zonot-seven": 25, "the-blistercoils": 0, "hightower": 35, "🔘prism-university": 35, "🔘ismeri-library": 45, "🟦the-sandbar": 0},
-# "Precinct Six": {"🟥the-bloody-knuckle-blues": 0, "smelting-quarter": 0, "🟥outside-gore-house": 20, "medori-park": 40, "deadbridge-chasm": 50, "wayport": 60, "benzers-bridge": 65, "🟠the-prison-break": 20},
-# "Undercity": ["sewers", "outside-korozda", "🟢the-rotting-respite", "the-undercity", "the-rot-farms"]
 
+
+
+
+# let's do this
 
 finalDestination = "&1&" if &ARGS& else err("You need to enter a destination like: `!travel` <#895097051375865881>")  # where are we heading?
 destLocation     = ([P for P in destination_precinct if finalDestination in destination_precinct[P]]+[0])[0]  # in what precinct is our finalDestination located?
 curLocation      = str(ctx.channel.category).strip('-')  # what precinct are we in now?
+departureTimes   = {"Precinct One": 10, "Precinct Two": 20, "Precinct Three": 30, "Precinct Four": 40, "Precinct Five": 50, "Precinct Six": 60}
+
+# f'''
+#  -title "{name} trys to plan their route!" 
+#  -desc "Here are the travel times from {curLocation} to {finalDestination}:" 
+#  -f "Walking|{travelTime} min\nArrival: <t:{int(time())+(travelTime)*60}:t>|inline" 
+#  -f "Mounted|{ceil(travelTime/2)} min\nArrival: <t:{int(time())+ceil(travelTime/2)*60}:t>|inline" 
+#  -f "Phantom Steed|{ceil(travelTime/4)} min\nArrival: <t:{int(time())+ceil(travelTime/4)*60}:t>|inline"
+#  -f "Carriage|{(t:=int(travelTime/3))} min\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{int(time())+t*60}:t>|inline" '''
+
+def walk_time(amount):
+  return int(time()+amount*60)
+
+def mounted_min(amount):
+  return ceil(amount/2)
+
+def mounted_time(amount):
+  return int(time()+ceil(amount/2)*60)
+
+def phantom_min(amount):
+  return ceil(amount/4)
+
+def phantom_time(amount):
+  return int(time())+ceil(amount/4)*60
+
+def carriage_min(amount, extra = 0):
+  return int(amount/3)
+
+def carriage_time(amount, extra = 0):
+  return int(time()+amount*60+extra)
+
+def transix_min(amount):
+  return floor(amount/10)*60
+
+def transix_time(amount, extra = 0):
+  return int(time())+(amount//10)*60+extra
+
+def station(precinct):
+  possibleStations = []
+  for i in precinct.keys():
+    if not precinct[i]:
+      possibleStations.append(i)
+  possibleStations.sort()
+  return possibleStations[0]
 
 # handle no arguments or no match for input destination 
 
@@ -227,7 +493,14 @@ if not destLocation:
 if not 'sewer' in '&*&'.lower() and str(ctx.channel.id) == '895097053678563334':  # from deadbridge-chasm
   if finalDestination == '<#895097053905039379>':  # heading to the undercity
     travelTime = (Precinct2Precinct[curLocation][destLocation]+last_mile[destLocation][finalDestination])//2
-    return f"""embed -title "You've picked a{randchoice([' lovely', ' right peach', ' bugger of a', 'n amaging'])} day to decend the chasm!"  -desc "Here are the travel times from {curLocation} to {finalDestination}:" -f "Walking|{travelTime} min\nArrival: <t:{int(time())+int(travelTime)*60}:t>|inline" -f "Mounted|{ceil(travelTime/2)} min\nArrival: <t:{int(time())+ceil(travelTime/2)*60}:t>|inline" -f "Phantom Steed|{ceil(travelTime/4)} min\nArrival: <t:{int(time())+ceil(travelTime/4)*60}:t>|inline"  -f "Carriage|_You Wish._\nCarriages cannot decend the chasm.|inline"  {footer}  -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color}  """
+    return f"""embed 
+    -title "You've picked a{randchoice([' lovely', ' right peach', ' bugger of a', 'n amaging'])} day to decend the chasm!"  
+    -desc "Here are the travel times from {curLocation} to {finalDestination}:" 
+    -f "Walking|{travelTime} min\nArrival: <t:{walk_time(travelTime)}:t>|inline" 
+    -f "Mounted|{mounted_min(travelTime)} min\nArrival: <t:{mounted_time(travelTime)}:t>|inline" 
+    -f "Phantom Steed|{phantom_min(travelTime)} min\nArrival: <t:{phantom_time(travelTime)}:t>|inline" 
+    -f "Carriage|_You Wish._\nCarriages cannot decend the chasm.|inline"  
+    {footer}  -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color}  """
 
 
 
@@ -236,7 +509,13 @@ if not 'sewer' in '&*&'.lower() and str(ctx.channel.id) == '895097053678563334':
 if not 'sewer' in '&*&'.lower() and str(ctx.channel.id) == '895097053905039379':
   if finalDestination == '<#895097053678563334>':  # if you're heading to deadbridge chasm 
     travelTime = (Precinct2Precinct[curLocation][destLocation]+last_mile[destLocation][finalDestination])//1.75
-    return f"""embed -title "{name} {randchoice(['hikes', 'plods', 'trudges', 'shuffles'])} up the chasm!" -desc "Here are the travel times from {curLocation} to the top of {finalDestination}:" -f "Walking|{travelTime} min\nArrival: <t:{int(time())+int(travelTime)*60}:t>|inline" -f "Mounted|{ceil(travelTime/2)} min\nArrival: <t:{int(time())+ceil(travelTime/2)*60}:t>|inline" -f "Phantom Steed|{ceil(travelTime/4)} min\nArrival: <t:{int(time())+ceil(travelTime/4)*60}:t>|inline" {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
+    return f"""embed 
+    -title "{name} {randchoice(['hikes', 'plods', 'trudges', 'shuffles'])} up the chasm!" 
+    -desc "Here are the travel times from {curLocation} to the top of {finalDestination}:" 
+    -f "Walking|{travelTime} min\nArrival: <t:{int(time())+int(travelTime)*60}:t>|inline" 
+    -f "Mounted|{mounted_min(travelTime)} min\nArrival: <t:{mounted_time(travelTime)}:t>|inline" 
+    -f "Phantom Steed|{phantom_min(travelTime)} min\nArrival: <t:{phantom_time(travelTime)}:t>|inline" 
+    {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
 
 
 
@@ -246,25 +525,64 @@ if 'sewer' in '&*&'.lower():
   if destLocation=='The Rubblebelt':
     return f"""techo 20 The sewer system doesn't extend past the Bulwark.  You can only take the sewers that far and you'll have to head to the surface from there.  """
   travelTime = Precinct2Precinct[curLocation][destLocation]+last_mile[destLocation][finalDestination] if destLocation!=curLocation else 15
-  sewerTravelTime = ceil(travelTime/2)
+  sewerTravelTime = mounted_min(travelTime)
   intendedDest    = finalDestination
   DC = min(10+sewerTravelTime//5, 29)
+
   if (not Golgari and r.total<=DC-8) or r.result.crit==2:  
     destLocation     = randchoice(list(last_mile)[1:-1]) if Golgari else randchoice(list(last_mile)[1:-2])
     finalDestination = randchoice(destination_precinct[destLocation])
     failTravelTime   = ceil((Precinct2Precinct[curLocation][destLocation]+last_mile[destLocation][finalDestination])*1.5)
-    return f"""embed -title "{name} tries to navigate the sewers!" -desc "**Intended Destination:** {intendedDest}\n**Normal travel time on foot:** {travelTime}\n**DC:** {DC}\n\n**{skill.title()} Roll:** {r} _You got suuuuper lost._\n**Exit Location:** {finalDestination}\n**Travel Time:** {failTravelTime}\n**Arrival:** <t:{int(time()+(failTravelTime*60))}:t>" {footer} -thumb https://media.discordapp.net/attachments/776578614983524374/942930346515783720/download.jpg -color {color}  """
+    return f"""embed 
+    -title "{name} tries to navigate the sewers!" 
+    -desc "**Intended Destination:** {intendedDest}
+    **Normal travel time on foot:** {travelTime}
+    **DC:** {DC}
+
+    **{skill.title()} Roll:** {r} _You got suuuuper lost._
+    **Exit Location:** {finalDestination}
+    **Travel Time:** {failTravelTime}
+    **Arrival:** <t:{walk_time(failTravelTime)}:t>" 
+    {footer} -thumb https://media.discordapp.net/attachments/776578614983524374/942930346515783720/download.jpg -color {color}  """
+
   elif r.total<DC:
     finalDestination = randchoice([x for x in list(last_mile[destLocation]) if x!=finalDestination])
     failTravelTime   = Precinct2Precinct[curLocation][destLocation]+last_mile[destLocation][finalDestination]
-    return f"""embed -title "{name} tries to navigate the sewers!" -desc "**Intended Destination:** {intendedDest}\n**Normal travel time on foot:** {travelTime}\n**DC:** {DC}\n\n**{skill.title()} Roll:** {r} _You almost made it!_\n**Exit Location:** {finalDestination}\n**Travel Time:** {failTravelTime}\n**Arrival:** <t:{int(time()+(failTravelTime*60))}:t>" {footer} -thumb https://media.discordapp.net/attachments/776578614983524374/942930346515783720/download.jpg -color {color}  """
+    return f"""embed 
+    -title "{name} tries to navigate the sewers!" 
+    -desc "**Intended Destination:** {intendedDest}
+    **Normal travel time on foot:** {travelTime}
+    **DC:** {DC}
+
+    **{skill.title()} Roll:** {r} _You almost made it!_
+    **Exit Location:** {finalDestination}
+    **Travel Time:** {failTravelTime}
+    **Arrival:** <t:{walk_time(failTravelTime)}:t>" 
+    {footer} -thumb https://media.discordapp.net/attachments/776578614983524374/942930346515783720/download.jpg -color {color} """
+
   elif r.total>=DC:
-    return f"""embed -title "{name} tries to navigate the sewers!" -desc "**Intended Destination:** {intendedDest}\n**Normal travel time on foot:** {travelTime}\n**DC:** {DC}\n\n**{skill.title()} Roll:** {r} _Success!_\n**Exit Location:** {finalDestination}\n**Travel Time:** {sewerTravelTime}\n**Arrival:** <t:{int(time()+(sewerTravelTime*60))}:t>" {footer} -thumb https://media.discordapp.net/attachments/776578614983524374/942930346515783720/download.jpg -color {color} """
+    return f"""embed 
+    -title "{name} tries to navigate the sewers!" 
+    -desc "**Intended Destination:** {intendedDest}
+    **Normal travel time on foot:** {travelTime}
+    **DC:** {DC}
+    **{skill.title()} Roll:** {r} _Success!_
+    **Exit Location:** {finalDestination}
+    **Travel Time:** {sewerTravelTime}
+    **Arrival:** <t:{walk_time(sewerTravelTime)}:t>" 
+    {footer} -thumb https://media.discordapp.net/attachments/776578614983524374/942930346515783720/download.jpg -color {color} """
 
 # travel within the undercity
 if Golgari and destLocation == 'Undercity' and curLocation == 'Undercity':
     travelTime = 15
-    return f"""embed -title "{name} is traveling inside the same Precinct!" -desc "All travel within the same Precinct is 15 min to your destination, except outside guildhall to inside (0 min) or general area to a bar/shop (5 min).  Converted times:" -f "Walking|{travelTime} min\nArrival: <t:{int(time())+travelTime*60}:t>|inline" -f "Mounted|{ceil(travelTime/2)} min\nArrival: <t:{int(time())+ceil(travelTime/2)*60}:t>|inline" -f "Phantom Steed|{ceil(travelTime/4)} min\nArrival: <t:{int(time())+ceil(travelTime/4)*60}:t>|inline" -f "Giant Vole Rickshaw|{(t:=int(travelTime/3))} min\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{int(time())+t*60}:t>|inline" {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
+    return f"""embed 
+    -title "{name} is traveling inside the same Precinct!" 
+    -desc "All travel within the same Precinct is 15 min to your destination, except outside guildhall to inside (0 min) or general area to a bar/shop (5 min).  Converted times:" 
+    -f "Walking|{travelTime} min\nArrival: <t:{walk_time(travelTime)}:t>|inline" 
+    -f "Mounted|{mounted_min(travelTime)} min\nArrival: <t:{mounted_time(travelTime)}:t>|inline" 
+    -f "Phantom Steed|{phantom_min(travelTime)} min\nArrival: <t:{phantom_time(travelTime)}:t>|inline" 
+    -f "Giant Vole Rickshaw|{(t:=int(travelTime/3))} min\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{carriage_time(t)}:t>|inline" {footer} 
+    -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
 
 
 # -___-------------- #
@@ -275,23 +593,78 @@ if Golgari and destLocation == 'Undercity' and curLocation == 'Undercity':
 # wastes to wastes
 if curLocation=="The Rubblebelt" and destLocation=="The Rubblebelt":
   travelTime = wTime
-  return f"""embed -title "{name} wanders The Rubblebelt!" -desc "**Wastes travel roll:** {wRoll}\n{wTime} min\n\nThe path is {'like an old friend' if wTime<15 else 'easy for you' if wTime<30 else 'clear' if wTime<40 else 'winding' if wTime<50 else 'rough'} from <#{str(ctx.channel.id)}> to {finalDestination}:" -f "Walking|{travelTime} min\nArrival: <t:{int(time())+travelTime*60}:t>|inline" -f "Mounted|{ceil(travelTime/2)} min\nArrival: <t:{int(time())+ceil(travelTime/2)*60}:t>|inline" -f "Phantom Steed|{ceil(travelTime/4)} min\nArrival: <t:{int(time())+ceil(travelTime/4)*60}:t>|inline" {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
+  path_feel  = 'like an old friend' if wTime<15 else 'easy for you' if wTime<30 else 'clear' if wTime<40 else 'winding' if wTime<50 else 'rough'
+  return f"""embed 
+  -title "{name} wanders The Rubblebelt!" 
+  -desc "**Wastes travel roll:** {wRoll}\n{wTime} min\n\nThe path is {path_feel} from <#{str(ctx.channel.id)}> to {finalDestination}:" 
+  -f "Walking|{travelTime} min\nArrival: <t:{walk_time(travelTime)}:t>|inline" 
+  -f "Mounted|{mounted_min(travelTime)} min\nArrival: <t:{mounted_time(travelTime)}:t>|inline" 
+  -f "Phantom Steed|{phantom_min(travelTime)} min\nArrival: <t:{phantom_time(travelTime)}:t>|inline" 
+  {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
+
+
+
 
 # wastes as a destination
 if destLocation == "The Rubblebelt":
-  travelTime = Precinct2Precinct[curLocation][destLocation]
+  TXtext     = ''
+  travelTime = Precinct2Precinct[curLocation][destLocation]  # direct travel to destination
+
+  if curLocation!="Precinct Four":
+    wait  = randint(20) # abs(departureTimes[destLocation] - ((int(time()%86400)%3600)//600)*10 ) # wait time for next shuttle
+    Tx    = Precinct2Precinct[curLocation]["Precinct Four"]//10  # shuttle time to Bulwark
+    walk  = Precinct2Precinct["Precinct Four"]["The Rubblebelt"]
+    TXtext= f""" -f "Transix|The shuttle to Bulwark takes {Tx} min.
+Next shuttle is {f'in {wait} min' if wait else 'boarding now!'}
+The ride will cost {ceil(Tx/3)}gp and you'll arrive at <t:{int(time())+(Tx+wait)*60}:t>" """
+
+# heading to Skarrg
   if finalDestination=="<#895097053108121603>":
-    return f"""embed -title "{name} heads to The Rubblebelt!" -desc "Here are the travel times from {curLocation} to {finalDestination}:" -f "Walking|{travelTime} min\nArrival: <t:{int(time())+(travelTime)*60}:t>|inline" -f "Mounted|{(mounted:=ceil((travelTime)/2))} min\nArrival: <t:{int(time())+mounted*60}:t>|inline" -f "Phantom Steed|{(steed:=ceil((travelTime)/4))} min\nArrival: <t:{int(time())+steed*60}:t>|inline"  -f "Carriage|{(t:=int(travelTime/3))} min.\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{int(time())+t*60}:t>|inline" {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
-  return f"""embed -title "{name} heads to The Rubblebelt!" -desc "**Wastes travel roll:** {wRoll}\n+{wRoll.total} min\n\nHere are the travel times from {curLocation} to {finalDestination}:" -f "Walking|{travelTime}+{wTime} min\nArrival: <t:{int(time())+(travelTime+wTime)*60}:t>|inline" -f "Mounted|{(mounted:=ceil((travelTime+wTime)/2))} min\nArrival: <t:{int(time())+mounted*60}:t>|inline" -f "Phantom Steed|{(steed:=ceil((travelTime+wTime)/4))} min\nArrival: <t:{int(time())+steed*60}:t>|inline"  -f "Carriage|{(t:=int(travelTime/3))} min to Skarrg\nPlus {wTime} min on foot.\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{int(time())+(t+wTime)*60}:t>|inline" {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
+    return f"""embed 
+    -title "{name} heads to The Rubblebelt!" 
+    -desc "Here are the travel times from {curLocation} to {finalDestination}:" 
+    -f "Walking|{travelTime} min\nArrival: <t:{walk_time(travelTime)}:t>|inline" 
+    -f "Mounted|{(mounted:=ceil((travelTime)/2))} min\nArrival: <t:{int(time())+mounted*60}:t>|inline" 
+    -f "Phantom Steed|{(steed:=ceil((travelTime)/4))} min\nArrival: <t:{int(time())+steed*60}:t>|inline"  
+    -f "Carriage|{(t:=carriage_min(travelTime))} min.\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{carriage_time(t)}:t>|inline"
+    {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} {TXtext} """
+
+
+# heading past Skarrg
+  return f"""embed 
+  -title "{name} heads to The Rubblebelt!" 
+  -desc "**Wastes travel roll:** {wRoll}\n+{wRoll.total} min\n\nHere are the travel times from {curLocation} to {finalDestination}:" 
+  -f "Walking|{travelTime}+{wTime} min\nArrival: <t:{walk_time(travelTime+wTime)}:t>|inline" 
+  -f "Mounted|{(mounted:=ceil((travelTime+wTime)/2))} min\nArrival: <t:{int(time())+mounted*60}:t>|inline" 
+  -f "Phantom Steed|{(steed:=ceil((travelTime+wTime)/4))} min\nArrival: <t:{int(time())+steed*60}:t>|inline"  
+  -f "Carriage|{(t:=carriage_min(travelTime))} min to Skarrg\nPlus {wTime} min on foot.\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{int(time())+(t+wTime)*60}:t>|inline"
+  {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color}  {TXtext} """
+
 
 # leaving The Rubblebelt
 if str(ctx.channel.id) == "895097053108121603":  # leaving from outside-Skarrg
   travelTime = Precinct2Precinct[curLocation][destLocation]+last_mile[destLocation][finalDestination]
-  return f"""embed -title "{name} trys to plan their route!" -desc "Here are the travel times from {curLocation} to {finalDestination}:" -f "Walking|{travelTime} min\nArrival: <t:{int(time())+travelTime*60}:t>|inline" -f "Mounted|{ceil(travelTime/2)} min\nArrival: <t:{int(time())+ceil(travelTime/2)*60}:t>|inline" -f "Phantom Steed|{ceil(travelTime/4)} min\nArrival: <t:{int(time())+ceil(travelTime/4)*60}:t>|inline"  -f "Carriage|{(t:=int(travelTime/3))} min\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{int(time())+t*60}:t>|inline" {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
+  return f"""embed 
+  -title "{name} trys to plan their route!" 
+  -desc "Here are the travel times from {curLocation} to {finalDestination}:" 
+  -f "Walking|{travelTime} min\nArrival: <t:{walk_time(travelTime)}:t>|inline" 
+  -f "Mounted|{mounted_min(travelTime)} min\nArrival: <t:{mounted_time(travelTime)}:t>|inline" 
+  -f "Phantom Steed|{phantom_min(travelTime)} min\nArrival: <t:{phantom_time(travelTime)}:t>|inline"  
+  -f "Carriage|{(t:=carriage_min(travelTime))} min\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{carriage_time(t)}:t>|inline"
+  -f "Transix|Head to <#895097053108121608> first to get a shuttle.|inline"
+  {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
 
-if str(ctx.channel.id) in ["895097053108121605","895097053108121604","895097053108121606","895097053108121607"] and destLocation!="The Rubblebelt":  # leaving from wastes
+# leaving from wastes
+if str(ctx.channel.id) in ["895097053108121605","895097053108121604","895097053108121606","895097053108121607"] and destLocation!="The Rubblebelt":
   travelTime = Precinct2Precinct[curLocation][destLocation]+last_mile[destLocation][finalDestination]
-  return f"""embed -title "{name} heads back to the city!" -desc "**Wastes travel roll:** {wRoll}\n+{wTime} min\n\nHere are the travel times from <#{str(ctx.channel.id)}> to {finalDestination}:" -f "Walking|{wTime}+{travelTime} min\nArrival: <t:{int(time())+(travelTime+wTime)*60}:t>|inline" -f "Mounted|{(mounted:=ceil((travelTime+wTime)/2))} min\nArrival: <t:{int(time())+mounted*60}:t>|inline" -f "Phantom Steed|{(steed:=ceil((travelTime+wTime)/4))} min\nArrival: <t:{int(time())+steed*60}:t>|inline"  -f "Carriage|{wTime} min to Skarrg on foot\nPlus {(t:=int(travelTime/3))} min by carriage.\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{int(time())+(t+wTime)*60}:t>|inline" {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
+  return f"""embed 
+  -title "{name} heads back to the city!" 
+  -desc "**Wastes travel roll:** {wRoll}\n+{wTime} min\n\nHere are the travel times from <#{str(ctx.channel.id)}> to {finalDestination}:" 
+  -f "Walking|{wTime}+{travelTime} min\nArrival: <t:{walk_time(travelTime+wTime)}:t>|inline" 
+  -f "Mounted|{(mounted:=ceil((travelTime+wTime)/2))} min\nArrival: <t:{int(time())+mounted*60}:t>|inline" 
+  -f "Phantom Steed|{(steed:=ceil((travelTime+wTime)/4))} min\nArrival: <t:{int(time())+steed*60}:t>|inline"  
+  -f "Carriage|{wTime} min to Skarrg on foot\nPlus {(t:=carriage_min(travelTime))} min by carriage.\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{int(time())+(t+wTime)*60}:t>|inline" 
+  -f "Transix|Head to <#895097053108121608> first to get a shuttle.|inline" {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
   
 
 
@@ -300,7 +673,14 @@ if str(ctx.channel.id) in ["895097053108121605","895097053108121604","8950970531
 
 if curLocation == destLocation and destLocation!='The Rubblebelt':
   travelTime = 15
-  return f"""embed -title "{name} is traveling inside the same Precinct!" -desc "All travel within the same Precinct is 15 min to your destination, except outside guildhall to inside (0 min) or general area to a bar/shop (5 min).  Converted times:" -f "Walking|{travelTime} min\nArrival: <t:{int(time())+travelTime*60}:t>|inline" -f "Mounted|{ceil(travelTime/2)} min\nArrival: <t:{int(time())+ceil(travelTime/2)*60}:t>|inline" -f "Phantom Steed|{ceil(travelTime/4)} min\nArrival: <t:{int(time())+ceil(travelTime/4)*60}:t>|inline" -f "Carriage|{(t:=int(travelTime/3))} min\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{int(time())+t*60}:t>|inline" {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
+  return f"""embed 
+  -title "{name} is traveling inside the same Precinct!" 
+  -desc "All travel within the same Precinct is 15 min to your destination, except outside guildhall to inside (0 min) or general area to a bar/shop (5 min).  Converted times:" 
+  -f "Walking|{travelTime} min\nArrival: <t:{walk_time(travelTime)}:t>|inline" 
+  -f "Mounted|{mounted_min(travelTime)} min\nArrival: <t:{mounted_time(travelTime)}:t>|inline" 
+  -f "Phantom Steed|{phantom_min(travelTime)} min\nArrival: <t:{phantom_time(travelTime)}:t>|inline" 
+  -f "Carriage|{(t:=carriage_min(travelTime))} min\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{carriage_time(t)}:t>|inline" 
+  {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
 
 
 # handle starting in an unsupported area
@@ -319,7 +699,24 @@ travelTime = Precinct2Precinct[curLocation][destLocation]+last_mile[destLocation
 
 # return the results for a proper destination in another district
 if destLocation!="Undercity" and curLocation!="Undercity":
-  return f"""embed -title "{name} trys to plan their route!" -desc "Here are the travel times from {curLocation} to {finalDestination}:" -f "Walking|{travelTime} min\nArrival: <t:{int(time())+travelTime*60}:t>|inline" -f "Mounted|{ceil(travelTime/2)} min\nArrival: <t:{int(time())+ceil(travelTime/2)*60}:t>|inline" -f "Phantom Steed|{ceil(travelTime/4)} min\nArrival: <t:{int(time())+ceil(travelTime/4)*60}:t>|inline"  -f "Carriage|{(t:=int(travelTime/3))} min\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{int(time())+t*60}:t>|inline" {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
+  wait = randint(15)  # wait time for next shuttle
+  travelTime = Precinct2Precinct[curLocation][destLocation]+last_mile[destLocation][finalDestination]
+  Tx   = Precinct2Precinct[curLocation][destLocation]//10  # shuttle time to Bulwark
+  walk = last_mile[destLocation][finalDestination]
+  text = f"""embed -title "{name} trys to plan their route!" 
+  -desc "Here are the travel times from {curLocation} to {finalDestination}:" 
+  -f "Walking|{travelTime} min\nArrival: <t:{walk_time(travelTime)}:t>|inline" 
+  -f "Mounted|{mounted_min(travelTime)} min\nArrival: <t:{mounted_time(travelTime)}:t>|inline" 
+  -f "Phantom Steed|{phantom_min(travelTime)} min\nArrival: <t:{phantom_time(travelTime)}:t>|inline"
+  -f "Carriage|{(t:=carriage_min(travelTime))} min\nThe ride will cost {ceil(t/5)}sp\nArrival: <t:{carriage_time(t)}:t>|inline"
+  {footer} -thumb https://i.imgur.com/dMMwzdT.jpeg -color {color} """
+ 
+
+  if ctx.channel.name in ["tenth-district-plaza", "augustin-station", "the-bulwark", "the-blistercoils", "smelting-quarter"]:
+    text += f""" -f "Transix|The shuttle to {station(last_mile[destLocation])} takes {Tx} min.  Next shuttle is {f'in {wait} min' if wait else 'boarding now'}.  The ride will cost {ceil(Tx/2)}gp and you'll arrive at <t:{int(time())+(Tx+wait)*60}:t> (this includes waiting for the train to arrive).\n\n{f"You'll still need to `{ctx.prefix+ctx.alias}` {finalDestination} once you get to the other station."*bool(walk)}" """
+  
+  return text
+
 else:
   return f"""techo 15 The only route you know of between the surface and the Undercity is via <#895097053678563334>.  You _could_  try the sewers, but they're dangerous. """
 
