@@ -53,7 +53,7 @@ def check(skill_name: str, parsed_args: dict, custom_args: dict={}):
   # grab bonuses and add them to our roll.  We can also parse our args for the commonly used 'guidance' snippet.
   bonus_arg     = custom_args.get('b', 'b')
   guidance_arg  = custom_args.get('guidance', 'guidance')
-  jackBonus     = f"+{proficiencyBonus//2}[jack of all trades]" if character().levels.get('Bard') >= 2 and not character().skills[skill].prof else ''
+  jackBonus     = f"+{character().stats.prof_bonus//2}[jack of all trades]" if character().levels.get('Bard') >= 2 and not character().skills[skill].prof else ''
   guidance      = '+1d4[guidance]' if parsed_args.get(guidance_arg) else ''
   bonus         = ''.join(parsed_args.get(bonus_arg,type_=lambda x: "+"+x if x[0] not in "+-" else x)) + guidance + jackBonus
 
