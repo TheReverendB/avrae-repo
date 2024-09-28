@@ -15,6 +15,7 @@ def check(skill_name: str, parsed_args: dict, custom_args: dict={}):
   """
   Rolls a check taking arguments like `adv`/`dis`, `-b`, `-mc` and `guidance`
   Automatically rerolls 1s for Haflings (with the reroll csetting) and adds minimum checks for Reliable Talent
+  Handles adding 1/2 proficiency for checks that are not already adding a proficiecy bonus for Jack of all Trades
   Returns a dict with the check name and SimpleRollResult
   Partial matching allows users/aliasers to enter 'sleight' or 'sleight of hand' or 'sleightOfHand'
 
@@ -52,7 +53,9 @@ def check(skill_name: str, parsed_args: dict, custom_args: dict={}):
   # grab bonuses and add them to our roll.  We can also parse our args for the commonly used 'guidance' snippet.
   bonus_arg     = custom_args.get('b', 'b')
   guidance_arg  = custom_args.get('guidance', 'guidance')
-  bonus         = ''.join(parsed_args.get(bonus_arg,type_=lambda x: "+"+x if x[0] not in "+-" else x)) + ('+1d4[guidance]' if parsed_args.get(guidance_arg) else '')
+  jackBonus     = f"+{proficiencyBonus//2}[jack of all trades]" if character().levels.get('Bard') >= 2 and not character().skills[skill].prof else ''
+  guidance      = '+1d4[guidance]' if parsed_args.get(guidance_arg) else ''
+  bonus         = ''.join(parsed_args.get(bonus_arg,type_=lambda x: "+"+x if x[0] not in "+-" else x)) + guidance + jackBonus
 
   # put all those arguments in the proper places in our d20() function, inside vroll().
   r             = vroll(character().skills[skill].d20(adv, reroll_number, minimum_check)+bonus)
