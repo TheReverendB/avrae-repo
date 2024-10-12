@@ -1,0 +1,564 @@
+Acid Splash: 0  # ALL SPELLS AND LEVELS #
+Blade Ward: 0
+Booming Blade: 0
+Chill Touch: 0
+Control Flames: 0
+Create Bonfire: 0
+Dancing Lights: 0
+Druidcraft: 0
+Eldritch Blast: 0
+Elementalism: 0
+Encode Thoughts: 0
+Fire Bolt: 0
+Friends: 0
+Frostbite: 0
+Green-Flame Blade: 0
+Guidance: 0
+Gust: 0
+Gust Barrier: 0
+Hunter Sense: 0
+Infestation: 0
+Light: 0
+Lightning Lure: 0
+Mage Hand: 0
+Magic Stone: 0
+Mending: 0
+Message: 0
+Mind Sliver: 0
+Minor Illusion: 0
+Mold Earth: 0
+Poison Spray: 0
+Prestidigitation: 0
+Primal Savagery: 0
+Produce Flame: 0
+Ray of Frost: 0
+Resistance: 0
+Sacred Flame: 0
+Sapping Sting: 0
+Shape Water: 0
+Shillelagh: 0
+Shocking Grasp: 0
+Sorcerous Burst: 0
+Spare the Dying: 0
+Starry Wisp: 0
+Sword Burst: 0
+Thaumaturgy: 0
+Thorn Whip: 0
+Thunderclap: 0
+Toll the Dead: 0
+True Strike: 0
+Vicious Mockery: 0
+Word of Radiance: 0
+Absorb Elements: 1
+Alarm: 1
+Animal Friendship: 1
+Armor of Agathys: 1
+Arms of Hadar: 1
+Bane: 1
+Beast Bond: 1
+Bless: 1
+Burning Hands: 1
+Catapult: 1
+Cause Fear: 1
+Ceremony: 1
+Chaos Bolt: 1
+Charm Person: 1
+Chromatic Orb: 1
+Color Spray: 1
+Command: 1
+Compelled Duel: 1
+Comprehend Languages: 1
+Create or Destroy Water: 1
+Cure Wounds: 1
+Delerium Orb: 1
+Detect Evil and Good: 1
+Detect Magic: 1
+Detect Poison and Disease: 1
+Disguise Self: 1
+Dissonant Whispers: 1
+Distort Value: 1
+Divine Favor: 1
+Divine Smite: 1
+Earth Tremor: 1
+Elevated Sight: 1
+Ensnaring Strike: 1
+Entangle: 1
+Expeditious Retreat: 1
+Faerie Fire: 1
+False Life: 1
+Feather Fall: 1
+Find Familiar: 1
+Fog Cloud: 1
+Frost Fingers: 1
+Gift of Alacrity: 1
+Goodberry: 1
+Grease: 1
+Guiding Bolt: 1
+Hail of Thorns: 1
+Healing Word: 1
+Hellish Rebuke: 1
+Heroism: 1
+Hex: 1
+Hunter's Mark: 1
+Ice Knife: 1
+Identify: 1
+Illusory Script: 1
+Inflict Wounds: 1
+Jim's Magic Missile: 1
+Jump: 1
+Longstrider: 1
+Mage Armor: 1
+Magic Missile: 1
+Magnify Gravity: 1
+Protection from Evil and Good: 1
+Purify Food and Drink: 1
+Ray of Sickness: 1
+Sanctuary: 1
+Searing Smite: 1
+Shield: 1
+Shield of Faith: 1
+Silent Image: 1
+Silvery Barbs: 1
+Sleep: 1
+Snare: 1
+Speak with Animals: 1
+Spiny Shield: 1
+Tasha's Caustic Brew: 1
+Tasha's Hideous Laughter: 1
+Tenser's Floating Disk: 1
+Thunderous Smite: 1
+Thunderwave: 1
+Unseen Servant: 1
+Veil of Dusk: 1
+Witch Bolt: 1
+Wrathful Smite: 1
+Zephyr Strike: 1
+Aganazzar's Scorcher: 2
+Aid: 2
+Air Bubble: 2
+Alter Self: 2
+Ambush Prey: 2
+Animal Messenger: 2
+Arcane Lock: 2
+Arcane Vigor: 2
+Augury: 2
+Barkskin: 2
+Beast Sense: 2
+Blindness/Deafness: 2
+Blur: 2
+Borrowed Knowledge: 2
+Calm Emotions: 2
+Cloud of Daggers: 2
+Continual Flame: 2
+Cordon of Arrows: 2
+Crown of Madness: 2
+Darkness: 2
+Darkvision: 2
+Detect Thoughts: 2
+Dragon's Breath: 2
+Dust Devil: 2
+Earthbind: 2
+Enhance Ability: 2
+Enlarge/Reduce: 2
+Enthrall: 2
+Find Steed: 2
+Find Traps: 2
+Flame Blade: 2
+Flaming Sphere: 2
+Fortune's Favor: 2
+Gentle Repose: 2
+Gift of Gab: 2
+Gust of Wind: 2
+Healing Spirit: 2
+Heat Metal: 2
+Hold Person: 2
+Immovable Object: 2
+Invisibility: 2
+Jim's Glowing Coin: 2
+Kinetic Jaunt: 2
+Knock: 2
+Lesser Restoration: 2
+Levitate: 2
+Locate Animals or Plants: 2
+Locate Object: 2
+Magic Mouth: 2
+Magic Weapon: 2
+Maximilian's Earthen Grasp: 2
+Melf's Acid Arrow: 2
+Mind Spike: 2
+Mirror Image: 2
+Misty Step: 2
+Moonbeam: 2
+Nathair's Mischief: 2
+Nystul's Magic Aura: 2
+Pass without Trace: 2
+Phantasmal Force: 2
+Prayer of Healing: 2
+Protection from Poison: 2
+Pyrotechnics: 2
+Ray of Enfeeblement: 2
+Rime's Binding Ice: 2
+Rope Trick: 2
+Scorching Ray: 2
+See Invisibility: 2
+Shadow Blade: 2
+Shatter: 2
+Shining Smite: 2
+Silence: 2
+Skywrite: 2
+Snilloc's Snowball Swarm: 2
+Spider Climb: 2
+Spike Growth: 2
+Spiritual Weapon: 2
+Spray of Cards: 2
+Suggestion: 2
+Summon Beast: 2
+Tasha's Mind Whip: 2
+Vortex Warp: 2
+Warding Bond: 2
+Warding Wind: 2
+Warp Bolt: 2
+Warp Sense: 2
+Web: 2
+Wither and Bloom: 2
+Wrack: 2
+Wristpocket: 2
+Zone of Truth: 2
+Animate Dead: 3
+Antagonize: 3
+Ashardalon's Stride: 3
+Aura of Vitality: 3
+Beacon of Hope: 3
+Bestow Curse: 3
+Blinding Smite: 3
+Blink: 3
+Call Lightning: 3
+Catnap: 3
+Clairvoyance: 3
+Conjure Animals: 3
+Conjure Barrage: 3
+Counterspell: 3
+Create Food and Water: 3
+Crusader's Mantle: 3
+Daylight: 3
+Dispel Magic: 3
+Elemental Weapon: 3
+Enemies Abound: 3
+Erupting Earth: 3
+Fast Friends: 3
+Fear: 3
+Feathered Reach: 3
+Feign Death: 3
+Fireball: 3
+Flame Arrows: 3
+Fly: 3
+Freedom of the Waves: 3
+Gaseous Form: 3
+Globe of Twilight: 3
+Glyph of Warding: 3
+Haste: 3
+Hunger of Hadar: 3
+Hypnotic Pattern: 3
+Incite Greed: 3
+Intellect Fortress: 3
+Invoke the Amaranthine: 3
+Leomund's Tiny Hut: 3
+Life Transference: 3
+Lightning Arrow: 3
+Lightning Bolt: 3
+Magic Circle: 3
+Major Image: 3
+Mass Healing Word: 3
+Meld into Stone: 3
+Melf's Minute Meteors: 3
+Motivational Speech: 3
+Nondetection: 3
+Phantom Steed: 3
+Plant Growth: 3
+Protection from Energy: 3
+Pulse Wave: 3
+Purge Contamination: 3
+Remove Curse: 3
+Revivify: 3
+Ride the Rifts: 3
+Sending: 3
+Sleet Storm: 3
+Slow: 3
+Speak with Dead: 3
+Speak with Plants: 3
+Spirit Guardians: 3
+Spirit Shroud: 3
+Stinking Cloud: 3
+Suffocate: 3
+Summon Fey: 3
+Summon Lesser Demons: 3
+Summon Shadowspawn: 3
+Summon Undead: 3
+Thunder Step: 3
+Tidal Wave: 3
+Tiny Servant: 3
+Tongues: 3
+Vampiric Touch: 3
+Wall of Sand: 3
+Wall of Water: 3
+Water Breathing: 3
+Water Walk: 3
+Wind Wall: 3
+Arcane Eye: 4
+Aura of Life: 4
+Aura of Purity: 4
+Banishment: 4
+Blight: 4
+Charm Monster: 4
+Compulsion: 4
+Confusion: 4
+Conjure Minor Elementals: 4
+Conjure Woodland Beings: 4
+Consume Mind: 4
+Control Water: 4
+Death Ward: 4
+Delerium Blast: 4
+Dimension Door: 4
+Divination: 4
+Dominate Beast: 4
+Elemental Bane: 4
+Evard's Black Tentacles: 4
+Fabricate: 4
+Find Greater Steed: 4
+Fire Shield: 4
+Forced Evolution: 4
+Fount of Moonlight: 4
+Freedom of Movement: 4
+Gate Seal: 4
+Giant Insect: 4
+Grasping Vine: 4
+Gravity Sinkhole: 4
+Greater Invisibility: 4
+Guardian of Faith: 4
+Guardian of Nature: 4
+Hallucinatory Terrain: 4
+Ice Storm: 4
+Leomund's Secret Chest: 4
+Locate Creature: 4
+Mordenkainen's Faithful Hound: 4
+Mordenkainen's Private Sanctum: 4
+Otiluke's Resilient Sphere: 4
+Phantasmal Killer: 4
+Polymorph: 4
+Raulothim's Psychic Lance: 4
+Shadow of Moil: 4
+Shape Plants: 4
+Sickening Radiance: 4
+Spirit of Death: 4
+Staggering Smite: 4
+Stellar Bodies: 4
+Stone Shape: 4
+Stoneskin: 4
+Storm Sphere: 4
+Summon Aberration: 4
+Summon Construct: 4
+Summon Elemental: 4
+Summon Greater Demon: 4
+Vitriolic Sphere: 4
+Wall of Fire: 4
+Watery Sphere: 4
+Animate Objects: 5
+Antilife Shell: 5
+Awaken: 5
+Banishing Smite: 5
+Bigby's Hand: 5
+Circle of Power: 5
+Cloudkill: 5
+Commune: 5
+Commune with Nature: 5
+Cone of Cold: 5
+Conjure Elemental: 5
+Conjure the Deep Haze: 5
+Conjure Volley: 5
+Contact Other Plane: 5
+Contagion: 5
+Control Winds: 5
+Create Spelljamming Helm: 5
+Creation: 5
+Danse Macabre: 5
+Dawn: 5
+Destructive Wave: 5
+Dispel Evil and Good: 5
+Dominate Person: 5
+Dream: 5
+Enervation: 5
+Far Step: 5
+Flame Strike: 5
+Freedom of the Winds: 5
+Geas: 5
+Greater Restoration: 5
+Hallow: 5
+Hold Monster: 5
+Holy Weapon: 5
+Immolation: 5
+Infernal Calling: 5
+Insect Plague: 5
+Jallarzi's Storm of Radiance: 5
+Legend Lore: 5
+Maelstrom: 5
+Magic Mirror: 5
+Mass Cure Wounds: 5
+Mislead: 5
+Modify Memory: 5
+Negative Energy Flood: 5
+Neutralizing Field: 5
+Passwall: 5
+Planar Binding: 5
+Raise Dead: 5
+Rary's Telepathic Bond: 5
+Reincarnate: 5
+Scrying: 5
+Seeming: 5
+Skill Empowerment: 5
+Steel Wind Strike: 5
+Summon Celestial: 5
+Summon Dragon: 5
+Swift Quiver: 5
+Synaptic Static: 5
+Telekinesis: 5
+Teleportation Circle: 5
+Temporal Shunt: 5
+Transmute Rock: 5
+Tree Stride: 5
+Wall of Force: 5
+Wall of Light: 5
+Wall of Stone: 5
+Wrath of Nature: 5
+Yolande's Regal Presence: 5
+Arcane Gate: 6
+Blade Barrier: 6
+Bones of the Earth: 6
+Chain Lightning: 6
+Circle of Death: 6
+Conjure Fey: 6
+Contingency: 6
+Create Homunculus: 6
+Create Undead: 6
+Disintegrate: 6
+Drawmij's Instant Summons: 6
+Druid Grove: 6
+Eyebite: 6
+Find the Path: 6
+Fizban's Platinum Shield: 6
+Flesh to Stone: 6
+Forbiddance: 6
+Globe of Invulnerability: 6
+Gravity Fissure: 6
+Guards and Wards: 6
+Harm: 6
+Heal: 6
+Heartseeker: 6
+Heroes' Feast: 6
+Investiture of Flame: 6
+Investiture of Ice: 6
+Investiture of Stone: 6
+Investiture of Wind: 6
+Magic Jar: 6
+Mass Suggestion: 6
+Mental Prison: 6
+Move Earth: 6
+Otiluke's Freezing Sphere: 6
+Otto's Irresistible Dance: 6
+Planar Ally: 6
+Primordial Ward: 6
+Programmed Illusion: 6
+Ray of Contamination: 6
+Scatter: 6
+Siphon Contamination: 6
+Soul Cage: 6
+Summon Fiend: 6
+Sunbeam: 6
+Tasha's Bubbling Cauldron: 6
+Tasha's Otherworldly Guise: 6
+Tenser's Transformation: 6
+Transport via Plants: 6
+True Seeing: 6
+Wall of Ice: 6
+Wall of Thorns: 6
+Wind Walk: 6
+Word of Recall: 6
+Arboreal Curse: 7
+Conjure Celestial: 7
+Contamination Immunity: 7
+Create Magen: 7
+Crown of Stars: 7
+Delayed Blast Fireball: 7
+Divine Word: 7
+Draconic Transformation: 7
+Dream of the Blue Veil: 7
+Etherealness: 7
+Finger of Death: 7
+Fire Storm: 7
+Forcecage: 7
+Mirage Arcane: 7
+Mordenkainen's Magnificent Mansion: 7
+Mordenkainen's Sword: 7
+Octarine Spray: 7
+Plane Shift: 7
+Power Word Fortify: 7
+Power Word Pain: 7
+Prismatic Spray: 7
+Project Image: 7
+Regenerate: 7
+Resurrection: 7
+Reverse Gravity: 7
+Sequester: 7
+Simulacrum: 7
+Symbol: 7
+Teleport: 7
+Temple of the Gods: 7
+Tether Essence: 7
+Whirlwind: 7
+Abi-Dalzim's Horrid Wilting: 8
+Animal Shapes: 8
+Antimagic Field: 8
+Antipathy/Sympathy: 8
+Befuddlement: 8
+Clone: 8
+Contaminated Power: 8
+Control Weather: 8
+Dark Star: 8
+Demiplane: 8
+Dominate Monster: 8
+Earthquake: 8
+Glibness: 8
+Holy Aura: 8
+Illusory Dragon: 8
+Incendiary Cloud: 8
+Maddening Darkness: 8
+Maze: 8
+Mighty Fortress: 8
+Mind Blank: 8
+Power Word Stun: 8
+Reality Break: 8
+Sunburst: 8
+Telepathy: 8
+Tsunami: 8
+Astral Projection: 9
+Blade of Disaster: 9
+Foresight: 9
+Gate: 9
+Imprisonment: 9
+Invulnerability: 9
+Mass Heal: 9
+Mass Polymorph: 9
+Meteor Swarm: 9
+Power Word Heal: 9
+Power Word Kill: 9
+Prismatic Wall: 9
+Psychic Scream: 9
+Ravenous Void: 9
+Sacrament of the Falling Fire: 9
+Shapechange: 9
+Storm of Vengeance: 9
+Time Ravage: 9
+Time Stop: 9
+True Polymorph: 9
+True Resurrection: 9
+Weird: 9
+Wish: 9
