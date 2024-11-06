@@ -1,0 +1,42 @@
+# ========= #
+# Targeting #
+# ========= #
+
+def get_targs_and_args(args: list = []):
+  """ Takes unparsed arguments as input, grabs all targets and arguments
+  returns a dictionary of {combatantName: arg_string}, breaking groups 
+  down into individual targets.  Each combatant gets coupled with the args
+  from the group.  Recommend using `clean_args()` to remove all of the
+  original targets and their argumnets from your args list if replacing"""
+
+  a        = argparse(args)
+  tDict    = {}
+
+  for t in a.get('t'):  # for everyone we targeted
+    tName, tArgs = (t.split('|')+[''])[:2]
+    tDict[tName] = tArgs
+
+    # split groups into individual targets to check for intelligence
+    if combat() and (target:=combat().get_group(tName)):
+      for gt in target.combatants:  # for each combatant in the group
+        tDict[gt.name] = tDict[tName]  # we add the group's specific arguments to each combatant
+      tDict.pop(tName)  # remove the group as a target from our tDict once we're done with every individual
+
+    # individual combatants
+    if combat() and combat().get_combatant(tName):
+      tDict[tName] = tArgs
+
+  return tDict
+
+
+
+  def clean_args(args: list = []):
+    """ removes targets and '-t' from arguments """
+    a = argparse(args)
+
+    for t in a.get('t'):
+      args.remove(t)
+    while '-t' in args:
+      args.remove('-t')
+
+    return args
