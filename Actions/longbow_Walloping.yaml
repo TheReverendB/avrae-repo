@@ -57,6 +57,6 @@ automation:
     miss: []
     attackBonus: dexterityMod+proficiencyBonus
 - type: text
-  text: Weapon: Martial, Ammunition, Heavy, Range, Two-Handed, Range (150/600).
+  text: 'Weapon: Martial, Ammunition, Heavy, Range, Two-Handed, Range (150/600).'
   title: Effect
 _v: 2
