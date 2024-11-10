@@ -1,0 +1,118 @@
+name: Tentacle Rod
+automation:
+  - type: variable
+    name: totalHits
+    value: "0"
+    onError: ""
+  - type: variable
+    name: curTarget
+    value: "0"
+    onError: ""
+  - type: target
+    target: each
+    effects:
+      - type: attack
+        hit:
+          - type: damage
+            damage: 1d6 [psychic]
+            overheal: false
+          - type: condition
+            condition: targets and str(targets[curTarget]) == str(targets[targetIndex])
+            onTrue:
+              - type: variable
+                name: totalHits
+                value: totalHits + 1
+                onError: "1"
+            onFalse:
+              - type: variable
+                name: curTarget
+                value: targetIndex
+              - type: variable
+                name: totalHits
+                value: "1"
+            errorBehaviour: "false"
+          - type: condition
+            condition: totalHits == 3
+            onTrue:
+              - type: save
+                stat: dex
+                fail:
+                  - type: ieffect2
+                    name: Restraining {target.name}
+                    target_self: true
+                    save_as: rodHolder
+                    buttons:
+                      - label: Release {target.name}
+                        automation:
+                          - type: remove_ieffect
+                        verb: releases {target.name} from the Tentacle Rod
+                        style: "2"
+                  - type: ieffect2
+                    name: Restrained (Tentacle Rod)
+                    effects:
+                      save_dis:
+                        - dex
+                      attack_advantage: "-1"
+                    attacks: []
+                    buttons:
+                      - label: Escape Restraining Tentacles
+                        automation:
+                          - type: target
+                            target: self
+                            effects:
+                              - type: save
+                                stat: dex
+                                fail: []
+                                success:
+                                  - type: remove_ieffect
+                                    removeParent: if_no_children
+                        verb: attempts to escape the grasp of the Tentacle Rod
+                        style: "1"
+                        defaultDC: lastSaveDC
+                      - label: Start of turn Tentacle Damage
+                        automation:
+                          - type: target
+                            target: self
+                            effects:
+                              - type: damage
+                                damage: 3d6 [psychic]
+                        verb: takes damage from the restraining tentacles
+                        style: "4"
+                    end: false
+                    conc: false
+                    desc: If you hit the same target with all three tentacles, the target must
+                      succeed on a DC 15 Dexterity saving throw or have the
+                      Restrained condition until you have the Incapacitated
+                      condition, until you take a Bonus Action to release the
+                      target, or until the target is no longer within 15 feet of
+                      you. While Restrained in this way, the target takes 3d6
+                      Psychic damage at the start of each of its turns. At the
+                      end of each of its turns, the target repeats the save,
+                      ending the effect on itself on a success
+                    stacking: false
+                    save_as: null
+                    parent: rodHolder
+                    target_self: false
+                    tick_on_caster: false
+                success: []
+                dc: "15"
+            onFalse: []
+            errorBehaviour: "false"
+        miss: []
+        attackBonus: "9"
+        adv: "0"
+  - type: text
+    text: This rod ends in three rubbery tentacles. While holding the rod, you can
+      take a Magic action to direct the tentacles to stretch outward, each one
+      attacking a creature you can see within 15 feet of yourself. For each
+      tentacle, make a melee attack roll with a +9 bonus. A tentacle deals 1d6
+      Psychic damage on a hit. If you hit the same target with all three
+      tentacles, the target must succeed on a DC 15 Dexterity saving throw or
+      have the Restrained condition until you have the Incapacitated condition,
+      until you take a Bonus Action to release the target, or until the target
+      is no longer within 15 feet of you. While Restrained in this way, the
+      target takes 3d6 Psychic damage at the start of each of its turns. At the
+      end of each of its turns, the target repeats the save, ending the effect
+      on itself on a success.
+    title: Effect
+_v: 2
