@@ -4,14 +4,17 @@ automation:
   - type: target
     target: all
     effects:
+      - type: variable
+        name: not_construct_or_undead
+        value: not target.creature_type or not ('construct' in
+          target.creature_type.lower() or 'undead' in
+          target.creature_type.lower() )
+        onError: "0"
       - type: attack
         hit:
           - type: damage
-            damage: 2d6 +{strengthMod} [slashing] {{"+10 [necrotic] " if not
-              target.creature_type or not ('construct' in
-              target.creature_type.lower() or 'undead' in
-              target.creature_type.lower() ) and lastAttackNaturalRoll == 20
-              else ""}}
+            damage: 2d6 +{strengthMod} [slashing] {{"+10 [necrotic] " if
+              not_construct_or_undead and lastAttackNaturalRoll == 20 else ""}}
             overheal: false
         miss: []
         attackBonus: strengthMod +proficiencyBonus
