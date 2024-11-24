@@ -8,7 +8,7 @@ automation:
         hit:
           - type: damage
             damage: 2d6 +{strengthMod} [slashing] {{"+10 [necrotic] " if
-              target.creature_type and not ('construct' in
+              target.creature_type or not ('construct' in
               target.creature_type.lower() or 'undead' in
               target.creature_type.lower() ) and lastAttackNaturalRoll == 20
               else ""}}
