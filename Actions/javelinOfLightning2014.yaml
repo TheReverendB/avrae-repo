@@ -1,0 +1,60 @@
+name: Javelin of Lightning
+automation:
+- type: counter
+  counter: Javelin of Lightning
+  amount: '1'
+  allowOverflow: false
+  errorBehaviour: warn
+- type: roll
+  dice: 4d6
+  name: LightningDamage
+  hidden: false
+- type: text
+  text: 'This Javelin is a Magic Weapon. When you hurl it and speak its Command Word,
+    it transforms into a bolt of lightning, forming a line 5 feet wide that extends
+    out from you to a target within 120 feet. Each creature in the line excluding
+    you and the target must make a DC 13 Dexterity saving throw, taking 4d6 lightning
+    damage on a failed save, and half as much damage on a successful one. The Lightning
+    Bolt turns back into a Javelin when it reaches the target. Make a ranged weapon
+    Attack against the target. On a hit, the target takes damage from the Javelin
+    plus 4d6 lightning damage.
+
+
+    The javelin''s property can''t be used again until the next dawn. In the meantime,
+    the Javelin can still be used as a Magic Weapon.'
+  title: Effect
+- type: variable
+  name: numTarg
+  value: '0'
+- type: target
+  target: each
+  effects:
+  - type: condition
+    condition: not numTarg
+    onTrue:
+    - type: attack
+      hit:
+      - type: damage
+        damage: 1d6+{strengthMod}[magical piercing]+4d6[lightning]
+        overheal: false
+      miss: []
+      attackBonus: strengthMod+proficiencyBonus
+    - type: variable
+      name: numTarg
+      value: '1'
+    onFalse:
+    - type: save
+      stat: dex
+      fail:
+      - type: damage
+        damage: '{LightningDamage}[lightning]'
+        overheal: false
+      success:
+      - type: damage
+        damage: ({LightningDamage}/2)[lightning]
+        overheal: false
+      dc: '13'
+    errorBehaviour: 'false'
+_v: 2
+proper: true
+verb: attacks with the
