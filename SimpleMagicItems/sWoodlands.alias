@@ -1,5 +1,6 @@
 <drac2>
 # data
+PwT = 0 if character().csettings['version'] == '2014' else 2
 tree_form="Tree Form"
 spells={
   "Animal Friendship":1,
@@ -9,7 +10,7 @@ spells={
   "Speak with Animals":1,
   "Speak with Plants":3,
   "Wall of Thorns":6,
-  "Pass without Trace":0,
+  "Pass without Trace":PwT,
   tree_form:1
 }
 flavor = '-color <color> -thumb https://cdn.discordapp.com/attachments/776578614983524374/816856158925095002/636284770809045580.jpg'
@@ -36,7 +37,7 @@ match=match[0]
 cost=spells[match]
 
 if argparse(a).last('i') or cost==0:
-  fields=f'-f  "{cc}|No charges used|inline" '
+  fields=f'-f  "{cc}|_no charges used_|inline" '
 else:
   # remove the charges
   current=C.get_cc(cc)
