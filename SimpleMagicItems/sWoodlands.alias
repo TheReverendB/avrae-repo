@@ -1,7 +1,8 @@
 <drac2>
 # data
 tree_form = "Tree Form"
-PwT_cost  = 0 if character().csettings['version']=='2014' else 2
+v2014     = character().csettings['version']=='2014'
+PwT_cost  = 0 if v2014 else 2
 spells    = {
   "Animal Friendship":1,
   "Awaken":5,
@@ -27,7 +28,7 @@ cast_args="""&*&"""
 # create the CC
 cc = 'Staff of the Woodlands'
 C  = character()
-C.create_cc_nx(cc, 0, 10, 'long', 'bubble', reset_by='1d6+4')
+C.create_cc_nx(cc, 0, 10 if v2014 else 6, 'long', 'bubble', reset_by='1d6+4' if v2014 else '1d6')
 
 # match the spell name
 spell = a[0]

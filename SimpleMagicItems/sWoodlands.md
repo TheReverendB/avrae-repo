@@ -16,8 +16,16 @@ Tree Form - `!sWoodlands tree`
 Syntax and spells - `!sWoodlands ?` 
  
  
-This alias will create a counter that recharges 1d6+4 on long rest. If you use the last charge it will tell you whether the staff loses its properties.
+### This alias will create a counter and use charges based on your character sheet version.
+The default version in Avrae currently is 2024.
+The 2024 Staff of the Woodlands has a different total uses, reset and cost for casting Pass without Trace.
+If your counter has the wrong amount of charges you can delete it, change your settings and run the alias again or edit the counter (see `!help cc edit`).
  
-Alias written by @Velglarn#4688  Thanks so much for sharing!
+Otherwise:
+`!csettings version 2014` will set your character sheet version to 2014 (you can also set this to 2024 in the same way)
+`!cc delete woodlands` will delete your counter
+`!sWoodlands` will create a new counter for your character
+ 
+Alias written by @Velglarn#4688 Thanks so much for sharing!
  
 The code behind these aliases will be posted as available on my [Github](https://github.com/TheReverendB/avrae-aliases)
