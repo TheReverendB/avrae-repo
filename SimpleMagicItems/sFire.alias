@@ -1,0 +1,61 @@
+<drac2>
+a      = &ARGS&
+ch     = character()
+n      = '\n'
+spells ={
+  "Burning Hands": 1,
+  "Fireball": 3,
+  "Wall of Fire": 4
+}
+
+# create the cc
+
+cc= "Staff of Fire"
+desc   = """The staff has 10 charges. While holding the staff, you can cast one of the spells on the following table from it, using your spell save DC. The table indicates how many charges you must expend to cast the spell.\n\n**Spell Charge Cost**:\nBurning Hands  1\nFireball  3\nWall of Fire  4\n\n**Regaining Charges**: The staff regains 1d6 + 4 expended charges daily at dawn. If you expend the last charge, roll 1d20. On a 1, the staff crumbles into cinders and is destroyed."""
+ch.create_cc_nx(cc, 0, 10, 'long', 'bubble', reset_by='1d6+4', desc = desc)
+
+
+flavor = f'-color {color} -thumb https://www.dndbeyond.com/avatars/45205/854/638657414116024673.png'
+
+# parse arguments
+syntax=f'`{ctx.prefix+ctx.alias} "<spell>" [<cast arguments>][-i]`'
+
+
+if not a or a[0].lower() in ['?','help']:
+  return f'echo _ _\nUse: {syntax}.\nSupported options: {", ".join(spells.keys())}.\n\n**{cc}**\n{ch.cc_str(cc)}'
+
+
+# match the spell name
+spell     = a[0].lower()
+cast_args = ' '.join([f'"{x}"' if ' ' in x else x for x in a[1:]])
+
+match = [sn for sn in spells if spell.lower() == sn.lower()]
+
+if not match:
+  match += [sn for sn in spells if spell.lower() in sn.lower()]
+  if not match:
+    return f'echo _ _\nUse: {syntax}.\n\nSupported spells: {", ".join(spells.keys())}\nCase insensitive and partial name matching is supported.' + f'\n\n`Your entry: {spell}` did not match any spells.' if spell else ''
+  if len(match)>1:
+    return f'echo _ _\nMultiple spells match your entry `{spell}`: {", ".join(match)}.  Be more specific to cast.'
+
+# spell name matched; spend the counter
+match = match[0]
+cost  = spells[match]
+ignore= argparse(a).get('i')
+
+if ignore:
+  fields = f'''-f  "{cc}|{ch.cc_str(cc)} _use ignored_" '''
+else:
+  # remove the charges
+  current = ch.get_cc(cc)
+  if cost>current:
+    return f'echo _ _\nYou do not have enough ({cost}) charges left on your {cc} to cast {match}:\n\n**{cc}**\n{ch.cc_str(cc)}'
+  remaining = ch.mod_cc(cc,-cost)
+  fields = f' -f "{cc} (-{cost})|{ch.cc_str(cc)}" '
+
+
+#output alias
+nn = '\n\n'
+
+return f'''cast "{match}" {cast_args} -phrase "with their {cc}" -i -f "{desc}" {fields} {flavor} '''
+</drac2>
