@@ -135,12 +135,11 @@ elif '&1&'.lower() in 'thunderclap':
     return f'''-title "{name} already used their {cc} to Thunderclap!" -desc "You need to wait until dawn to use this feature again.\n\n`{alias} thunderclap -i` to ignore the counter." -f "{ccTC}|{character().cc_str(ccTC)}" {footer} '''
 
 
-
-
 elif '&1&'.lower() in 'dual':
+  v2014 = character().csettings['version'] == '2014'
   if vTL or i:
     character().mod_cc(ccTL,-1) if not i else ''
-    return f'''-title "{name} uses Thunder and Lightning at the same time!" -phrase "with the {cc}" -f "You can use an action to use the Lightning Strike and Thunderclap properties at the same time. Doing so doesn't expend the daily use of those properties, only the use of this one. (use `{alias} clap -i [-t target(s)]` and `{alias} strike -i [-t target(s)]` to not expend a use, and target the two effects separately.)" -f "{ccTL}|{character().cc_str(ccTL)} {'_use ignored_' if i else '(-1)'}|inline" {footer}'''
+    return f'''-title "{name} uses Thunder and Lightning at the same time!" -phrase "with the {cc}" -f "You can use an action to use the Lightning Strike and Thunderclap properties at the same time. Doing so doesn't expend the daily use of those properties, only the use of this one. (use `{alias} {'clap' if v2014 else 'thunder'} -i [-t target(s)]` and `{alias} {'strike' if v2014 else 'lightning'} -i [-t target(s)]` to not expend a use, and target the two effects separately.)" -f "{ccTL}|{character().cc_str(ccTL)} {'_use ignored_' if i else '(-1)'}|inline" {footer}'''
   else:
     return f"""-title "{name} tries to use Thunder and Lightning at the same time!" -f "You need to wait until dawn to use this feature again.\n\n`{alias} dual -i` to ignore the counter." -f "{ccTL}|{character().cc_str(ccTL)}|inline" {footer} """
 else:
