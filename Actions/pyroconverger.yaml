@@ -94,3 +94,4 @@ _v: 2
 verb: shoots a cone of fire with
 thumb: https://media.discordapp.net/attachments/759950160980607008/977290904123625512/kill-it-with-fire-fire.gif
 activation_type: 3
+list_display_override: 'Makes an attack with Izzet''s second best flamethrower (because Niv is the first): The Pyroconverger!  You do need a counter named "Pyroconverger Uses"'

@@ -62,3 +62,4 @@ automation:
   text: Booming blade with a rapier.
   title: Effect
 _v: 2
+list_display_override: 'A rapier attack that includes Booming Blade and handles multiple targets or `-rr`.  Adds a button to apply the additional damage when a target is hit.'
