@@ -1,8 +1,13 @@
+_v: 2
 name: Longsword of Wounding
 automation:
   - type: variable
     name: lastDamage
     value: "0"
+  - type: variable
+    name: applied_wound
+    value: "0"
+    onError: "0"
   - type: target
     target: all
     effects:
@@ -14,57 +19,53 @@ automation:
           - type: damage
             damage: 1d8+{strengthMod} [magical slashing]
             overheal: false
-          - type: ieffect2
-            name: Wounded
-            duration: null
-            effects:
-              max_hp_bonus: -lastDamage
-            attacks: []
-            buttons: []
-            end: false
-            conc: false
-            desc: null
-            stacking: true
-            save_as: null
-            parent: null
-            target_self: false
-            tick_on_caster: false
-          - type: ieffect2
-            name: Bleeding
-            duration: null
-            effects: null
-            attacks: []
-            buttons:
-              - label: Bleed
-                automation:
-                  - type: target
-                    target: self
-                    effects:
-                      - type: variable
-                        name: lastDamage
-                        value: "0"
-                      - type: damage
-                        damage: "{{1 + len(ieffect.children)}}d4 [necrotic]"
-                        overheal: false
-                      - type: save
-                        stat: con
-                        fail: []
-                        success:
-                          - type: remove_ieffect
-                        dc: "15"
-                verb: bleeds
-                style: "4"
-                defaultDC: null
-                defaultAttackBonus: null
-                defaultCastingMod: null
-            end: false
-            conc: false
-            desc: null
-            stacking: true
-            save_as: null
-            parent: null
-            target_self: false
-            tick_on_caster: false
+          - type: condition
+            condition: not applied_wound and not (choice and choice in 'nowound')
+            onTrue:
+              - type: variable
+                name: applied_wound
+                value: "1"
+                onError: "1"
+              - type: ieffect2
+                name: Wounded
+                effects:
+                  max_hp_bonus: -lastDamage
+                attacks: []
+                buttons: []
+                end: false
+                conc: false
+                stacking: true
+                target_self: false
+                tick_on_caster: false
+              - type: ieffect2
+                name: Bleeding
+                attacks: []
+                buttons:
+                  - automation:
+                      - type: target
+                        target: self
+                        effects:
+                          - type: variable
+                            name: lastDamage
+                            value: "0"
+                          - type: damage
+                            damage: "{{1 + len(ieffect.children)}}d4 [necrotic]"
+                            overheal: false
+                          - type: save
+                            stat: con
+                            fail: []
+                            success:
+                              - type: remove_ieffect
+                            dc: "15"
+                    label: Bleed
+                    verb: bleeds
+                    style: "4"
+                end: false
+                conc: false
+                stacking: true
+                target_self: false
+                tick_on_caster: false
+            onFalse: []
           - type: text
             text: >-
               Hit points lost to this weapon's damage can be regained only through a
@@ -76,4 +77,7 @@ automation:
             title: Effect
         miss: []
         attackBonus: strengthMod+proficiencyBonus
-_v: 2
+list_display_override: Attacks with the 2014 Longsword of Wounding, applying a
+  wound, max hp penalty and bleeding effect with button.  If you already wounded
+  someone this turn, use `-choice NoWound` to stop the attack from making a
+  wound.
