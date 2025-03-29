@@ -48,3 +48,4 @@ automation:
         attackBonus: dexterityMod + proficiencyBonus + 1
 _v: 2
 verb: attacks with the
+list_display_override: When you score a critical hit using this whip, the target is restrained until the start of your next turn.
