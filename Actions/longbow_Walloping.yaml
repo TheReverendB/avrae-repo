@@ -60,3 +60,4 @@ automation:
   text: 'Weapon: Martial, Ammunition, Heavy, Range, Two-Handed, Range (150/600).'
   title: Effect
 _v: 2
+list_display_override: Longbow attack with the option to use a Walloping Arrow.  Use `-choice wallop` to add the save and Prone effects.
