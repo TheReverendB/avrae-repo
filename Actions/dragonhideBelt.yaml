@@ -29,3 +29,4 @@ _v: 2
 proper: true
 verb: tightens their
 activation_type: 1
+list_display_override: Recover 1d{4+2*((MonkLevel+1)//6)} Ki Points until the next dawn.
