@@ -3,7 +3,7 @@ An alias for using the Mizzium Apparatus.  This will make the Arcana roll and de
 **3/30/25 UPDATE: Random leveled spells will no longer be `!cast`!!**
 Due to the issues with different spells being able to target differently, failed arcana checks will return a command you can copy/paste with targets included.  This will allow you to adjust the targeting for different spells when going from something like Chaos Bolt to Burning Hands.  Reach out to me on the [Avrae Development Server](<http://support.avrae.io/>) if you notice any issues.
  
-**Now with partial spell name matching!**
+**Partial spell name matching!**
 Keep in mind you are matching spells against all official 5e spells so you will still need to be pretty specific.  Also important to use double quotes around the spell name - especially if there is an apostrophe in the spell name.
  
 `!mizapp "spell name" [spell args]`
@@ -33,8 +33,8 @@ You can now add homebrew spells by making an `svar` or `uvar` named `MAHomebrew`
 You can use an empty list or remove the level completely if you have no spells for a level.
 Spell names should be all lowercase and server homebrew will take priority over personal homebrew.
 
-----------------------Previous----------------------
-----------------------Updates----------------------
+------------------Previous------------------
+------------------Updates------------------
 
 added `-i` support
 added support for `-mc` argument for the Arcana check
