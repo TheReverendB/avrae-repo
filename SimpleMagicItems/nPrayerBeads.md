@@ -1,5 +1,5 @@
 An alias for the Neclace of Prayer Beads.
-
+ 
 **April 2024 Update:**  Should support changes for the 2024 version of this item.
  
 `!nPrayerBeads roll new`
