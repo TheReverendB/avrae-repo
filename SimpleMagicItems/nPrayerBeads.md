@@ -1,5 +1,6 @@
 An alias for the Neclace of Prayer Beads.
-Updated to reset the beads on your necklace following the description of the item.
+
+**April 2024 Update:**  Should support changes for the 2024 version of this item.
  
 `!nPrayerBeads roll new`
 Rolls randomly for the beads on your necklace.
@@ -14,8 +15,10 @@ Curing       | Cure Wounds
              |  (2nd level) or
              |  Lesser Restoration
 Favor        | Greater Restoration
-Smiting      | Branding Smite
-Summons      | Planar Ally
+Smiting      | Branding Smite or 
+             |  (2024) Shining Smite 
+Summons      | Planar Ally or 
+             |  (2024) Guardian of Faith
 Wind Walking | Wind Walk
 ```
  

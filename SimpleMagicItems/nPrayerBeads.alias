@@ -8,6 +8,8 @@ fields= ''
 desc  = ''
 mod   = 0
 
+v2014 = character().csettings['version']=='2014'
+
 # look for the cc and reset our beads if it is full or someone enters 'reset'
 if ch.cc_exists(cc):
       if ch.get_cc(cc) or '&1&'.lower()=='reset':
@@ -32,9 +34,9 @@ else:
 beads = PBDict.available  # set our old variable to the new dict value
 
 # a dict to assign bead type to spell name
-spellBeads  = {'bless': 'Blessing', 'cure wounds': 'Curing', 'lesser restoration': 'Curing', 'greater restoration': 'Favor', 'branding smite': 'Smiting', 'planar ally': 'Summons', 'wind walk': 'Wind Walking'}
+spellBeads  = {'bless': 'Blessing', 'cure wounds': 'Curing', 'lesser restoration': 'Curing', 'greater restoration': 'Favor', 'branding smite': 'Smiting', 'planar ally': 'Summons', 'wind walk': 'Wind Walking'} if v2014 else {'bless': 'Blessing', 'cure wounds': 'Curing', 'lesser restoration': 'Curing', 'greater restoration': 'Favor', 'shining smite': 'Smiting', 'guardian of faith': 'Summons', 'wind walk': 'Wind Walking'}
 
-spell_table  = f"""```\nBead of...   | Spell\n-------------|--------------------\nBlessing     | Bless\nCuring       | Cure Wounds\n             |  (2nd level) or\n             |  Lesser Restoration\nFavor        | Greater Restoration\nSmiting      | Branding Smite\nSummons      | Planar Ally\nWind Walking | Wind Walk```"""
+spell_table  = f"""```\nBead of...   | Spell\n-------------|--------------------\nBlessing     | Bless\nCuring       | Cure Wounds\n             |  (2nd level) or\n             |  Lesser Restoration\nFavor        | Greater Restoration\nSmiting      | """ + ("Branding Smite\nSummons      | Planar Ally" if v2014 else "Shining Smite\nSummons      | Guardian of Faith") + "\nWind Walking | Wind Walk```"
 
 base_fields = f""" -f "`{ctx.prefix+ctx.alias} roll new`|Rolls randomly for the beads and saves them to a cvar named 'PrayerBeads' for later use." -f "`{ctx.prefix+ctx.alias} cast <spell> [casting arguments]`|This will cast the coresponding spell and consume a bead.  Specify the spell like: `{ctx.prefix+ctx.alias} cast 'cure wounds'` or `{ctx.prefix+ctx.alias} cast wind`.  Partial matching will work. Use the typical casting arguments for this." -f "`{ctx.prefix+ctx.alias} set [type] [type]...`|Enter up to six types, separated by spaces, to set the types of beads on the necklace.  Use the following options to set the beads: `Blessing`, `Curing`, `Favor`, `Smiting`, `Summons`, `'Wind Walking'`.\nPartial matching will work." """
 
