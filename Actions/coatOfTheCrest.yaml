@@ -56,3 +56,4 @@ _v: 2
 proper: true
 verb: absorbs damage with their
 activation_type: 4
+list_display_override: 'Use `-choice fire` to resist fire and `-amt 34` to recover HP from an attack dealing 34 [fire] damage.  This requires a counter named "Coat of the Crest".'
