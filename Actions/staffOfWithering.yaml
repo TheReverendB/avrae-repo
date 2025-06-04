@@ -1,0 +1,92 @@
+name: Staff of Withering   # this action needs a counter named "Staff of Withering"
+automation:
+  - type: variable
+    name: wither
+    value: choice and 'wither' in choice
+    onError: "0"
+  - type: variable
+    name: skipAttack
+    value: choice and 'skip' in choice
+    onError: "0"
+  - type: variable
+    name: lastAttackDidHit
+    value: "0"
+    onError: "0"
+  - type: target
+    target: all
+    effects:
+      - type: condition
+        condition: skipAttack
+        onTrue:
+          - type: counter
+            counter: Staff of Withering
+            amount: "1"
+            allowOverflow: false
+            errorBehaviour: raise
+            fixedValue: true
+        onFalse:
+          - type: counter
+            counter: Staff of Withering
+            amount: wither
+            allowOverflow: false
+            errorBehaviour: raise
+            fixedValue: true
+          - type: attack
+            hit:
+              - type: damage
+                damage: 1d6 + {strengthMod} [magical bludgeoning] {{'+ 2d10 [necrotic]' *
+                  wither}}
+                overheal: false
+            miss: []
+            attackBonus: strengthMod + proficiencyBonus
+        errorBehaviour: "false"
+      - type: condition
+        condition: (wither and lastAttackRollTotal) or skipAttack
+        onTrue:
+          - type: condition
+            condition: lastAttackDidHit
+            onTrue: []
+            onFalse:
+              - type: damage
+                damage: 2d10 [necrotic]
+                overheal: false
+            errorBehaviour: "false"
+          - type: save
+            stat: con
+            fail:
+              - type: ieffect2
+                name: Withered
+                duration: "600"
+                effects:
+                  save_dis:
+                    - str
+                    - con
+                  check_dis:
+                    - strength
+                    - constitution
+                attacks: []
+                buttons: []
+                end: false
+                conc: false
+                desc: The target has Disadvantage for 1 hour on any ability check or saving
+                  throw that uses Strength or Constitution.
+                stacking: false
+                save_as: null
+                parent: null
+                target_self: false
+                tick_on_caster: false
+            success: []
+            dc: "15"
+        onFalse: []
+        errorBehaviour: "false"
+  - type: text
+    text: The staff can be wielded as a magic Quarterstaff. On a hit, it deals
+      damage as a normal Quarterstaff , and you can expend 1 charge to deal an
+      extra 2d10 Necrotic damage to the target and force it to make a DC 15
+      Constitution saving throw. On a failed save, the target has Disadvantage
+      for 1 hour on any ability check or saving throw that uses Strength or
+      Constitution.
+_v: 2
+list_display_override: Attacks normally with the staff.  Use `-choice wither` to
+  use a charge when attacking or `-choice skip` to skip the attack, use a
+  charge, and only apply the bonus damage and save.
