@@ -8,7 +8,7 @@ fields= ''
 desc  = ''
 mod   = 0
 
-v2014 = character().csettings['version']=='2014'
+v2014 = character().csettings['version']=='2014' if ctx.guild.servsettings()['allow_character_override'] else ctx.guild.servsettings()['version']=='2014'
 
 # look for the cc and reset our beads if it is full or someone enters 'reset'
 if ch.cc_exists(cc):

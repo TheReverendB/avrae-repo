@@ -1,6 +1,6 @@
 An alias for the Neclace of Prayer Beads.
  
-**April 2024 Update:**  Should support changes for the 2024 version of this item.
+**April 2024 Update:**  Should support changes for the 2024 version of this item.  Check your _version_ in `!servsettings` and `!csettings` if the alias is not allowing you to choose the beads for your version. 
  
 `!nPrayerBeads roll new`
 Rolls randomly for the beads on your necklace.
