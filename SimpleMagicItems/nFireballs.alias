@@ -1,21 +1,22 @@
 <drac2>
-uses= min(7, int('&1&') if '&1&'.isdigit() else 0)  # grab the entered number of uses or default to 0 
-lvl = uses+2 if uses else 0  # calaculate the of the spell or default to 0 
-cc  = "Necklace of Fireballs"  # set the name of our counter 
-i   = argparse(&ARGS&).get('i')  # allow for ignoring uses of the counter
-ch  = character()  # make typing easier later
-desc= f"{cc}|This necklace has 1d6 + 3 beads hanging from it. You can use an action to detach a bead and throw it up to 60 feet away. When it reaches the end of its trajectory, the bead detonates as a 3rd-level fireball spell (save DC 15).\n\nYou can hurl multiple beads, or even the whole necklace, as one action. When you do so, increase the level of the fireball by 1 for each bead beyond the first."
+v2014= character().csettings['version']=='2014' if ctx.guild.servsettings()['allow_character_override'] else ctx.guild.servsettings()['version']=='2014'
+uses = min(7 if v2014 else 5, int('&1&') if '&1&'.isdigit() else 0)  # grab the entered number of uses or default to 0 
+lvl  = uses+2 if uses else 0  # calaculate the of the spell or default to 0 
+cc   = "Necklace of Fireballs"  # set the name of our counter 
+i    = argparse(&ARGS&).get('i')  # allow for ignoring uses of the counter
+ch   = character()  # make typing easier later
+desc = f"{cc}|This necklace has 1d6 + 3 beads hanging from it. You can use an action to detach a bead and throw it up to 60 feet away. When it reaches the end of its trajectory, the bead detonates as a 3rd-level fireball spell (save DC 15).\n\nYou can hurl multiple beads, or even the whole necklace, as one action. When you do so, increase the level of the fireball by 1 for each bead beyond the first."
 
 if "&1&".lower()=="roll":  # let's roll for some beads on a new necklace
   r = vroll('1d6+3')
   ch.create_cc_nx(cc, 0, r.total, None, 'bubble')  # create our counter to track our beads
   return f"""embed -title "{name} counts the beads on their {cc}!" -desc "{r}\n\n`{ctx.prefix+ctx.alias} [charges used] [-t target(s)]` to use your beads." -f "{desc}" -f "{cc}|{ch.cc_str(cc)}" """
 
-if lvl==0:  # this happens if you didn't enter a number as the first argument
-  return f'''embed -title "{name} quickly reads the instructions for their {cc}!" {f""" -desc '`{ctx.prefix+ctx.alias} roll` to roll for beads on your necklace.'""" if not ch.cc_exists(cc) else f""" -desc '`{ctx.prefix+ctx.alias} [charges used] [-t target(s)] [-i]`'  -f '{cc}|{ch.cc_str(cc)}' """} '''
+if lvl==0 or not ch.cc_exists(cc):  # this happens if you didn't enter a number as the first argument
+  return f'''embed -title "{name} quickly reads the instructions for their {cc}!" {f""" -desc "`{ctx.prefix+ctx.alias} roll` to roll for beads on your necklace." """ if not ch.cc_exists(cc) else f""" -desc "`{ctx.prefix+ctx.alias} [charges used] [-t target(s)] [-i]`"  -f "{cc}|{ch.cc_str(cc)}" """} '''
 
 if ch.cc_exists(cc):  # this happens if you have a counter
-  v = ch.get_cc(cc)>=uses and lvl!=0  # do you have enough uses remaining?
+  v = ch.get_cc(cc)>=uses  # do you have enough uses remaining?
   x = ch.get_cc(cc)>0  # do we have more than 0 uses?
 
   if v or i:  # we have uses or have ignored uses

@@ -1,4 +1,6 @@
 An alias for using the Necklace of Fireballs.
+
+June/2025: Updated for automatic detection of sheet version to limit beads used with 2024 item version.  Use `!servsettings` or `!csettings` to change versions.
  
 `!nFireballs roll` 
 This will create the counter with a roll to determine the amount of beads on the necklace.  If you already found a Necklace of Fireballs, and rolled for the amount of beads, you can create your own counter, adding the max as needed.  `!cc create "Necklace of Fireballs" -min 0 -max ??`
