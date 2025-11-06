@@ -2,7 +2,7 @@ name: Bad News (Exandria)
 automation:
   - type: text
     text: |-
-      Firearms, Ranged
+      Firearms, Ranged (200/800)
       _25 lbs. --- 2d12 piercing - two-handed, reload (1), misfire (3)_
   - type: roll
     dice: 1d8 [fire]
