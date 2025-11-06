@@ -1,0 +1,139 @@
+name: Bad News (Exandria)
+automation:
+  - type: text
+    text: |-
+      Firearms, Ranged
+      _25 lbs. --- 2d12 piercing - two-handed, reload (1), misfire (3)_
+  - type: roll
+    dice: 1d8 [fire]
+    name: damage
+    fixedValue: true
+    displayName: Possible Explosion Damage
+    hidden: false
+  - type: variable
+    name: misfired
+    value: "0"
+    onError: "0"
+  - type: target
+    target: all
+    effects:
+      - type: condition
+        condition: targetNumber==1 and not misfired
+        onTrue:
+          - type: attack
+            hit:
+              - type: variable
+                name: misfired
+                value: lastAttackNaturalRoll <= 3
+                onError: "0"
+              - type: condition
+                condition: not misfired
+                onTrue:
+                  - type: damage
+                    damage: 2d12+{dexterityMod} [magical piercing]
+                    overheal: false
+                onFalse: []
+                errorBehaviour: "false"
+            miss:
+              - type: variable
+                name: misfired
+                value: lastAttackNaturalRoll <= 3
+                onError: "0"
+            attackBonus: dexterityMod+proficiencyBonus
+          - type: condition
+            condition: misfired
+            onTrue:
+              - type: ieffect2
+                name: Misfired (Bad News Rifle)
+                duration: null
+                effects: null
+                attacks: []
+                buttons:
+                  - label: Repair (Bad News Rifle)
+                    automation:
+                      - type: target
+                        target: self
+                        effects:
+                          - type: check
+                            ability:
+                              - arcana
+                              - history
+                              - investigation
+                              - nature
+                              - religion
+                            dc: 8+3
+                            success:
+                              - type: remove_ieffect
+                              - type: text
+                                text: The weapon can now be used again.
+                                title: Repair was Successful
+                            fail:
+                              - type: remove_ieffect
+                              - type: ieffect2
+                                name: Broken (Bad News Rifle)
+                                duration: null
+                                effects: null
+                                attacks: []
+                                buttons: []
+                                end: false
+                                conc: false
+                                desc: The weapon is broken and must be mended out of combat.
+                                stacking: false
+                                save_as: null
+                                parent: null
+                                target_self: false
+                                tick_on_caster: false
+                          - type: text
+                            text: Avrae automation does not support doing tools check. Please check whether
+                              the correct proficiency bonus (if any) were
+                              applied.
+                            title: An equivalent Check was made instead of Tinker's Tools
+                    verb: attempts to repair their rifle
+                    style: "1"
+                end: false
+                conc: false
+                desc: This weapon misfired and cannot be used until a successful Tinker's Tools
+                  check (DC {8+2}) is made.
+                stacking: false
+                save_as: null
+                parent: null
+                target_self: true
+                tick_on_caster: false
+              - type: text
+                text: Whenever you make an attack roll with a firearm, and the dice roll is
+                  equal to or lower than the weapon's Misfire score, the weapon
+                  misfires. The attack misses, and the weapon cannot be used
+                  again until you spend an action to try and repair it. To
+                  repair your firearm, you must make a successful Tinker's Tools
+                  check (DC equal to 8 + misfire score). If your check fails,
+                  the weapon is broken and must be mended out of combat at a
+                  quarter of the cost of the firearm. Creatures who use a
+                  firearm without being proficient increase the weapon's misfire
+                  score by 1.
+                title: Weapon Misfired
+            onFalse: []
+            errorBehaviour: "false"
+        onFalse:
+          - type: condition
+            condition: not targets or (lastAttackDidHit and not misfired)
+            onTrue:
+              - type: save
+                stat: dex
+                fail:
+                  - type: damage
+                    damage: "{damage}"
+                    fixedValue: true
+                success: []
+                dc: 8+proficiencyBonus+dexterityMod
+              - type: text
+                text: >
+                  Upon a hit, everything within 5 ft of the target must make a Dexterity
+                  saving throw (DC equal to 8 + your proficiency bonus + your
+                  Dexterity modifier) or suffer 1d8 fire damage. If the weapon
+                  misses, the ammunition fails to detonate, or bounces away
+                  harmlessly before doing so.
+                title: Explosive
+            onFalse: []
+            errorBehaviour: "false"
+        errorBehaviour: "false"
+_v: 2
