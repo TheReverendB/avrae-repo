@@ -18,7 +18,7 @@ automation:
     target: all
     effects:
       - type: condition
-        condition: targetNumber==1 and not misfired
+        condition: targetNumber==1 and not misfired and 1/len(targets)
         onTrue:
           - type: attack
             hit:
@@ -33,7 +33,7 @@ automation:
                     damage: 2d12+{dexterityMod} [magical piercing]
                     overheal: false
                 onFalse: []
-                errorBehaviour: "false"
+                errorBehaviour: "both"
             miss:
               - type: variable
                 name: misfired
