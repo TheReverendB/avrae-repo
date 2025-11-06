@@ -137,3 +137,5 @@ automation:
             errorBehaviour: "false"
         errorBehaviour: "false"
 _v: 2
+list_display_override: The first target will be the attack target, even with `-rr`.  Additional
+  targets will take the explosion damage if the attack hit.  Do not use `-rr` with explosion damage targets included.
