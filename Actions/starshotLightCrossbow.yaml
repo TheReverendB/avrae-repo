@@ -1,0 +1,114 @@
+name: Starshot Light Crossbow
+automation:
+  - type: condition
+    condition: not choice
+    onTrue:
+      - type: target
+        target: all
+        effects:
+          - type: attack
+            hit:
+              - type: damage
+                damage: 1d8 + {dexterityMod} [magical piercing]
+            miss: []
+            attackBonus: dexterityMod + proficiencyBonus
+    onFalse:
+      - type: counter
+        counter: Starshot Crossbow
+        amount: "1"
+      - type: condition
+        condition: choice in 'flames'
+        onTrue:
+          - type: target
+            target: self
+            effects:
+              - type: ieffect2
+                name: Flames Constellation Activated
+                duration: "1"
+                attacks:
+                  - attack:
+                      _v: 2
+                      name: Flames Damage
+                      automation:
+                        - type: target
+                          target: all
+                          effects:
+                            - type: damage
+                              damage: 2d6 [fire]
+                      verb: applies Flames damage
+                desc: Until the end of your next turn, when you hit a creature with a ranged
+                  attack roll using this crossbow, the attack deals an
+                  additional 2d8 fire damage.
+          - type: target
+            target: all
+            effects:
+              - type: attack
+                hit:
+                  - type: damage
+                    damage: 1d8 + {dexterityMod} + 2d6 [fire]
+                miss: []
+                attackBonus: dexterityMod + proficiencyBonus
+        onFalse:
+          - type: condition
+            condition: choice in 'rogue'
+            onTrue:
+              - type: target
+                target: self
+                effects:
+                  - type: ieffect2
+                    name: Invisible (Rogue Constellation)
+                    duration: "1"
+                    end: true
+                    effects:
+                      attack_advantage: "1"
+                    desc: Until the end of your next turn, you have the invisible condition, and
+                      anything you are wearing or carrying is also invisible.
+            onFalse:
+              - type: condition
+                condition: choice in 'balance'
+                onTrue:
+                  - type: target
+                    target: self
+                    effects:
+                      - type: ieffect2
+                        name: "Starshot Crossbow: Balance"
+                        desc: The next time you hit a creature with a ranged attack roll using this
+                          crossbow before the end of your next turn, you or
+                          another creature of your choice within 30 feet of you
+                          can regain hit points equal to 1d8 plus your
+                          proficiency bonus.
+                        duration: "2"
+                        end: true
+                        attacks:
+                          - attack:
+                              _v: 2
+                              name: "Balance: Healing"
+                              automation:
+                                - type: target
+                                  target: all
+                                  effects:
+                                    - type: damage
+                                      damage: -(1d8 + {proficiencyBonus}) [heal]
+                              verb: applies Balance
+                  - type: target
+                    target: all
+                    effects:
+                      - type: attack
+                        hit:
+                          - type: damage
+                            damage: 1d8 + {dexterityMod} [magical piercing]
+                        miss: []
+                        attackBonus: dexterityMod + proficiencyBonus
+                onFalse:
+                  - type: text
+                    text: >-
+                      You entered `{choice}` which is not an option for the Starshot Crossbow.
+
+                      `-choice balance` will use a charge and attack an enemy, adding an action to heal someone else.
+                      `-choice flames` will use a charge and attack, adding 2d6 fire damage and granting you an additional action to apply the fire damage on subsequent hits.
+                      `-choice rogue` grants you the invisible condition and attack advantage.
+                    title: Using the Starshot Crossbow
+    errorBehaviour: "true"
+_v: 2
+proper: false
+list_display_override: Use `-choice flames`, `-choice balance` or `-choice rogue` to use a charge and apply effects.  Balance and Flames both will make an attack at the enemy as well.
