@@ -1,0 +1,75 @@
+name: HydraFlailSetup
+automation:
+  - type: target
+    target: self
+    effects:
+      - type: ieffect2
+        name: Hydra Flail Head Tracker
+        duration: "600"
+        effects: null
+        attacks:
+          - attack:
+              _v: 2
+              name: Hydra Flail
+              automation:
+                - type: target
+                  target: all
+                  effects:
+                    - type: variable
+                      name: extraHeads
+                      value: min(3, len(ieffect.children))
+                    - type: attack
+                      hit:
+                        - type: variable
+                          name: extraHeads
+                          value: min(3, len(ieffect.children))
+                        - type: damage
+                          damage: 1d8 + {{strengthMod+2}} {{f'+{extraHeads*2}' if extraHeads else ''}}
+                            [magical bludgeoning]
+                          overheal: false
+                        - type: condition
+                          condition: lastAttackDidCrit
+                          onTrue:
+                            - type: ieffect2
+                              name: "Flail Heads: {{len(ieffect.children)+1}}"
+                              duration: null
+                              effects: null
+                              attacks: []
+                              buttons: []
+                              end: false
+                              conc: false
+                              desc: null
+                              stacking: false
+                              save_as: null
+                              parent: ieffect
+                              target_self: true
+                              tick_on_caster: false
+                          onFalse: []
+                          errorBehaviour: "false"
+                      miss: []
+                      attackBonus: proficiencyBonus + strengthMod + 2 + 2*extraHeads
+                - type: text
+                  text: This flail's spiked head is held in the jaws of a metal hydra figurehead.
+                    Whenever you score a critical hit with this weapon against a
+                    hostile creature, the weapon magically grows another spiked
+                    head. You gain a +2 bonus to damage rolls made with this
+                    magic weapon for each head the flail has (to a maximum of
+                    +6). After 1 hour, any head the flail grows in this way
+                    falls off and disappears.
+                  title: Effect
+              verb: attacks with a Hydra
+              proper: true
+        buttons: []
+        end: true
+        conc: false
+        desc: null
+        stacking: true
+        save_as: null
+        parent: null
+        target_self: false
+        tick_on_caster: false
+  - type: text
+    text: This action is to establish the flail attack from an effect to track the
+      bonuses and extra heads.
+    title: Effect
+_v: 2
