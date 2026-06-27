@@ -59,6 +59,7 @@ automation:
                   title: Effect
               verb: attacks with a Hydra
               proper: true
+              activation_type: 1
         buttons: []
         end: true
         conc: false
@@ -73,3 +74,5 @@ automation:
       bonuses and extra heads.
     title: Effect
 _v: 2
+list_display_override: The Setup action adds an attack for the flail, with proper bonuses on crits, in combat.
+activation_type: 8
