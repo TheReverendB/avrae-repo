@@ -58,8 +58,8 @@ if '&1&'.lower() in 'thunder':
         save  = vroll(targ.saves.get('con').d20(adv)+bonus) if targ else err(f"Your target '{t}' is not in combat.")
         if save.total<17 and targ:
           combat().me.add_effect('Thunder Stun','',2,end=True)
-          targ.add_effect('Thunder Struck - Staff of Thunder and Lightning','',parent=combat().me.get_effect('Thunder Stun'),desc=f'The target is stunned until the end of {name}\'s next turn.')
-          return f'''-title "{name} uses Thunder with the {cc}!" -f "Stun|**DC 17**" -f "{targ.name}|**CON Save**: {save}; Failure!\n**Effect:** {targ.get_effect('Thunder Struck')}" {desc} -f "{ccT}|{character().cc_str(ccT)} {'_use ignored_' if i else '(-1)'}" {footer} '''
+          tEffect = targ.add_effect('Stunned - Staff of Thunder and Lightning','',parent=combat().me.get_effect('Thunder Stun'),desc=f'The target is stunned until the end of {name}\'s next turn.')
+          return f'''-title "{name} uses Thunder with the {cc}!" -f "Stun|**DC 17**" -f "{targ.name}|**CON Save**: {save}; Failure!\n**Effect:** {tEffect}" {desc} -f "{ccT}|{character().cc_str(ccT)} {'_use ignored_' if i else '(-1)'}" {footer} '''
         else:
           return f'''-title "{name} uses Thunder with the {cc}!" -f "Stun|**DC 17**" -f "{targ.name}|**CON Save**: {save}; Success!" {desc} -f "{ccT}|{character().cc_str(ccT)} {'_use ignored_' if i else '(-1)'}" {footer} '''
       else:
@@ -135,11 +135,12 @@ elif '&1&'.lower() in 'thunderclap':
     return f'''-title "{name} already used their {cc} to Thunderclap!" -desc "You need to wait until dawn to use this feature again.\n\n`{alias} thunderclap -i` to ignore the counter." -f "{ccTC}|{character().cc_str(ccTC)}" {footer} '''
 
 
+
+
 elif '&1&'.lower() in 'dual':
-  v2014 = character().csettings['version'] == '2014'
   if vTL or i:
     character().mod_cc(ccTL,-1) if not i else ''
-    return f'''-title "{name} uses Thunder and Lightning at the same time!" -phrase "with the {cc}" -f "You can use an action to use the Lightning Strike and Thunderclap properties at the same time. Doing so doesn't expend the daily use of those properties, only the use of this one. (use `{alias} {'clap' if v2014 else 'thunder'} -i [-t target(s)]` and `{alias} {'strike' if v2014 else 'lightning'} -i [-t target(s)]` to not expend a use, and target the two effects separately.)" -f "{ccTL}|{character().cc_str(ccTL)} {'_use ignored_' if i else '(-1)'}|inline" {footer}'''
+    return f'''-title "{name} uses Thunder and Lightning at the same time!" -phrase "with the {cc}" -f "You can use an action to use the Lightning Strike and Thunderclap properties at the same time. Doing so doesn't expend the daily use of those properties, only the use of this one. (use `{alias} clap -i [-t target(s)]` and `{alias} strike -i [-t target(s)]` to not expend a use, and target the two effects separately.)" -f "{ccTL}|{character().cc_str(ccTL)} {'_use ignored_' if i else '(-1)'}|inline" {footer}'''
   else:
     return f"""-title "{name} tries to use Thunder and Lightning at the same time!" -f "You need to wait until dawn to use this feature again.\n\n`{alias} dual -i` to ignore the counter." -f "{ccTL}|{character().cc_str(ccTL)}|inline" {footer} """
 else:
