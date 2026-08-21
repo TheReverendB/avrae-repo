@@ -1,0 +1,49 @@
+name: Shortbow of the Eldritch Archer
+automation:
+  - type: target
+    target: 1
+    effects:
+      - type: attack
+        hit:
+          - type: damage
+            damage: 1d10 + {dexterityMod} [force]
+            overheal: false
+        miss: []
+        attackBonus: dexterityMod+proficiencyBonus+2
+  - type: text
+    text: Arrows shot from this bow are destroyed once they're fired, turning into a
+      projectile of pure energy instead. This projectile deals 1d10 force
+      damage, instead of the arrow's normal damage, and retains any magical
+      properties of the destroyed arrow. Hit or miss, a projectile is lost after
+      the attack.
+    title: Effect
+  - type: condition
+    condition: len(targets) > 1
+    onTrue:
+      - type: target
+        target: 2
+        effects:
+          - type: save
+            stat: dex
+            fail:
+              - type: damage
+                damage: 1d10 [force]
+                overheal: false
+              - type: text
+                text: These energy projectiles can sometimes pierce enemies. Once on each of
+                  your turns when you make an attack using this weapon, you can
+                  force another creature 10 feet directly behind the original
+                  target to make a DC 15 Dexterity saving throw. On a failed
+                  save, the creature takes 1d10 force damage.
+                title: Secondary Target
+            success: []
+            dc: "15"
+    onFalse: []
+    errorBehaviour: "false"
+_v: 2
+proper: true
+verb: fires his
+thumb: https://www.dndbeyond.com/avatars/46168/585/638699915240041958.png
+list_display_override: Attack +{dexterityMod+proficiencyBonus} to hit. 1d10 +
+  {dexterityMod} [force] damage.  A second target must make a DC 15 Dex save or
+  take 1d10 [force] damage
