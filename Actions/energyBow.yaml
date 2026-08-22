@@ -1,0 +1,126 @@
+name: Energy Shortbow
+automation:
+  - type: text
+    text: You gain a +1 bonus to attack rolls and damage rolls made with this magic
+      weapon, which has no string. Each time you pull your arm back in a firing
+      motion, a magical arrow made of golden energy appears nocked and ready to
+      fire. An arrow produced by this weapon deals Force damage instead of
+      Piercing damage on a hit, and it disappears after it hits or misses its
+      target. Until it disappears, the arrow emits Bright Light in a 20-foot
+      radius and Dim Light for an additional 20 feet.
+    title: Effect
+  - type: condition
+    condition: choice and choice in 'ladder'
+    onTrue:
+      - type: text
+        text: As a Magic action, you can loose a flurry of energy arrows from this
+          weapon at a wall up to 60 feet away from yourself. The arrows become
+          glowing rungs that stick out of the wall, forming a magical ladder up
+          to 60 feet long on the wall. This ladder lasts for 1 minute before
+          disappearing.
+        title: Energy Ladder
+    onFalse:
+      - type: target
+        target: all
+        effects:
+          - type: attack
+            hit:
+              - type: condition
+                condition: choice and choice in 'restraint'
+                onTrue:
+                  - type: text
+                    text: Whenever you use this weapon to make a ranged attack against a creature,
+                      you can try to restrain the target instead of dealing
+                      damage to it. If the arrow hits, the target must succeed
+                      on a DC 15 Strength saving throw or have the Restrained
+                      condition for 1 minute. As an action, a creature
+                      Restrained by an arrow can make a DC 20 Strength
+                      (Athletics) check to try to break the restraint, ending
+                      the effect on itself on a successful check.
+                    title: Arrow of Restraint
+                  - type: save
+                    stat: str
+                    fail:
+                      - type: ieffect2
+                        name: Restrained - Energy Arrow
+                        duration: "10"
+                        effects:
+                          attack_advantage: "-1"
+                          save_dis:
+                            - dex
+                        attacks: []
+                        buttons:
+                          - label: Resist Restraining Arrow
+                            automation:
+                              - type: target
+                                target: self
+                                effects:
+                                  - type: save
+                                    stat: str
+                                    fail:
+                                      - type: text
+                                        text: "{caster.name} is still restrained by the arrow."
+                                        title: Effect
+                                    success:
+                                      - type: remove_ieffect
+                                      - type: text
+                                        text: "{caster.name} breaks free of the Restraining Arrow!"
+                                        title: Effect
+                                    dc: "20"
+                            verb: tries to break free from the Restraining Arrow
+                            style: "1"
+                            defaultDC: null
+                            defaultAttackBonus: null
+                            defaultCastingMod: null
+                        end: true
+                        conc: false
+                        desc: >-
+                          While you have the Restrained condition, you experience the following
+                          effects.
+
+                          Speed 0 - Your Speed is 0 and can’t increase.
+
+                          Attacks Affected - Attack rolls against you have Advantage, and your attack rolls have Disadvantage.
+
+                          Saving Throws Affected - You have Disadvantage on Dexterity saving throws.
+                        stacking: false
+                        save_as: null
+                        parent: null
+                        target_self: false
+                        tick_on_caster: false
+                        hidden: false
+                    success: []
+                    dc: "15"
+                onFalse:
+                  - type: condition
+                    condition: choice and (choice in 'teleport' or choice in 'transport')
+                    onTrue: []
+                    onFalse:
+                      - type: damage
+                        damage: 1d6 + {dexterityMod+1} [force]
+                        overheal: false
+                    errorBehaviour: "false"
+                errorBehaviour: "false"
+            miss: []
+            attackBonus: dexterityMod + proficiencyBonus + 1
+          - type: condition
+            condition: choice and (choice in 'teleport' or choice in 'transport')
+            onTrue:
+              - type: text
+                text: As a Magic action, you can fire one energy arrow from this weapon at a
+                  target you can see within 60 feet of yourself. The target can
+                  be either a willing Medium or smaller creature or an object
+                  that isn’t being worn or carried, provided the object is small
+                  enough to fit inside a 5-foot Cube. The arrow teleports the
+                  target to an unoccupied space you can see within 10 feet of
+                  you.
+                title: Arrow of Transport
+            onFalse: []
+            errorBehaviour: "false"
+    errorBehaviour: "false"
+_v: 2
+proper: true
+verb: fires their
+list_display_override: "Attack: +{dexterityMod+proficiencyBonus+1} to hit.  Hit:
+  1d6 + {dexterityMod+1} [force] damage.  Use `-choice` to do fun
+  things!  Options: `ladder`, `restrain`, `teleport` or `transport`"
