@@ -99,3 +99,5 @@ automation:
     title: Pipes of Haunting
 _v: 2
 list_display_override: DC 15 WIS save.  Frightens on failure, immune to the pipes on a success.
+proper: true
+verb: plays their
