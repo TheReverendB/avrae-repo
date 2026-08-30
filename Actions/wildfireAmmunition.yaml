@@ -1,0 +1,110 @@
+name: Wildfire Ammunition
+automation:
+  - type: counter
+    counter: Wildfire Ammunition
+    amount: "1"
+    allowOverflow: false
+    errorBehaviour: raise
+  - type: condition
+    condition: any(targets)
+    onTrue:
+      - type: roll
+        dice: 4d8 [fire]
+        name: damage
+        hidden: false
+      - type: target
+        target: all
+        effects:
+          - type: save
+            stat: dex
+            fail:
+              - type: damage
+                damage: "{damage}"
+                overheal: false
+            success:
+              - type: damage
+                damage: ({damage})/2
+                overheal: false
+            dc: "15"
+    onFalse:
+      - type: target
+        target: self
+        effects:
+          - type: ieffect2
+            name: Wildfire Arrow
+            duration: "4"
+            effects: null
+            attacks:
+              - attack:
+                  name: Wildfire Explosion
+                  automation:
+                    - type: text
+                      text: >-
+                        You can use a bonus action on your turn to speak the ammunition's command
+                        word and choose a point you can see within 120 feet of
+                        where you fired it from. When you do, the arrow or bolt
+                        reappears directly above the point and explodes,
+                        creating a 20-foot-radius, 40-foot-high cylinder of
+                        searing flames centered on that point. Each creature in
+                        the area must make a DC 15 Dexterity saving throw. On a
+                        failed save, a creature takes 4d8 fire damage, plus an
+                        extra 2d8 fire damage for every round the ammunition
+                        remained in its pocket dimension. On a successful save,
+                        a creature takes half as much damage.
+                         
+                        If the ammunition remains in its extradimensional space for the full duration without its command word being spoken, it reappears and explodes above a random point
+                      title: Effect
+                    - type: roll
+                      dice: 4d8 + {2*(4-ieffect.remaining)}d8 [fire]
+                      name: damage
+                      hidden: false
+                    - type: remove_ieffect
+                    - type: target
+                      target: all
+                      effects:
+                        - type: save
+                          stat: dex
+                          fail:
+                            - type: damage
+                              damage: "{damage}"
+                              overheal: false
+                          success:
+                            - type: damage
+                              damage: ({damage})/2
+                              overheal: false
+                          dc: "15"
+                  _v: 2
+                  verb: calls his arrow back creating
+                defaultDC: null
+                defaultAttackBonus: null
+                defaultCastingMod: null
+            buttons: []
+            end: true
+            conc: false
+            desc: null
+            stacking: false
+            save_as: null
+            parent: null
+            target_self: false
+            tick_on_caster: false
+            hidden: false
+    errorBehaviour: "false"
+  - type: text
+    text: >-
+      This ammunition smolders while you hold it, sparking softly with simmering
+      embers. When you use this arrow or bolt to make a ranged weapon attack, it
+      vanishes in a scattering of sparks immediately after it's fired:
+      disappearing into a special extradimensional space without hitting a
+      target. The ammunition's flames burn hotter the longer it remains in this
+      space and can stay there for up to 3 rounds.
+
+
+      You can use a bonus action on your turn to speak the ammunition's command word and choose a point you can see within 120 feet of where you fired it from. When you do, the arrow or bolt reappears directly above the point and explodes, creating a 20-foot-radius, 40-foot-high cylinder of searing flames centered on that point. Each creature in the area must make a DC 15 Dexterity saving throw. On a failed save, a creature takes 4d8 fire damage, plus an extra 2d8 fire damage for every round the ammunition remained in its pocket dimension. On a successful save, a creature takes half as much damage.
+       
+      If the ammunition remains in its extradimensional space for the full duration without its command word being spoken, it reappears and explodes above a random point within 120 feet of where it was fired.
+    title: Effect
+_v: 2
+list_display_override: Uses 1 charge of Wildfire Ammunition.  DC 15 Dex
+  save.  With a target, erupts immediately and applies damage.  Without a
+  target, creates an effect to track the rounds passed and grants an attack to
+  erupt later.
